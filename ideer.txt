@@ -1,0 +1,19 @@
+visualisering i kombination med ljudupplevelse av en miljö:
+	- hur ändras den om man sätter in ett blockerande objekt tex en vägg
+	- en arena eller konsert-plats positioner för lyssnare/källor och ljudupplevelse på olika positioner
+	
+extra dimension från ljud
+	- hur kan man göra detta på ett bra sätt 
+	- precisions-problem
+	- automatisk ljuddesign beskriver t.ex skador vid jordbävning
+	- ge mer av en upplevelse
+	- mer engagerande
+	
+Kartor och positioner i spel
+	- använd musik för att ge intryck av var man är 
+	- miljöljud 
+	- ljud används ofta i spel men kan användas för mer informativa syften
+	
+stora dataset markera punkter
+	- intressepunkter, maxpunkter
+	- kluster med punkter, vilka är mer intressanta
