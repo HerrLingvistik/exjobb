@@ -4,6 +4,8 @@
 #include <time.h>
 #include <math.h>
 #include <fstream>
+#include <sstream>
+#include <string>
 
 
 using namespace std;
@@ -16,9 +18,19 @@ void readFile(){
 	ifstream infile;
 	infile.open("dataset1.txt"); 
 	string line;
+	string number;
+	int row=0, col=0;
 	if(infile.is_open()){		
 		while(getline(infile, line)){
-			cout << line << endl;
+
+			istringstream is(line);
+			while( getline(is, number, ',') ) {
+        canvas[row][col] = stoi(number);
+				col++;				
+				if(col>=DIM)
+					row=0; 
+    	}			
+
 		}
 	}
 	else
@@ -54,7 +66,7 @@ int main(int argc, char **argv){
 	srand(time(NULL));
 	//createLines();
 	readFile();
-	//printLines();
+	printLines();
 	
 	return 0;
 }
