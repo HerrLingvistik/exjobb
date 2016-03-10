@@ -12,5 +12,5 @@ dataset = [1 0 0 0 0 0 0 0 0 1;
        
 %save dataset1.txt dataset -ascii
 
-dlmwrite('dataset1.txt',dataset)
-type('dataset1.txt')
+dlmwrite('dataset1.txt',dataset, 'delimiter', ' ')
+%type('dataset1.txt')
