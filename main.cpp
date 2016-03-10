@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <fstream>
 
 
 using namespace std;
@@ -11,6 +12,18 @@ const int DIM = 10;
 
 int canvas[DIM][DIM] = {0};
 
+void readFile(){
+	ifstream infile;
+	infile.open("dataset1.txt"); 
+	string line;
+	if(infile.is_open()){		
+		while(getline(infile, line)){
+			cout << line << endl;
+		}
+	}
+	else
+		cout<<"fail"<<endl;
+}
 
 void printLines(){
 	for(int i=0; i<DIM; i++){
@@ -39,7 +52,9 @@ void createLines(){
 int main(int argc, char **argv){
 	//std::cout<<"hello strut"<<std::endl;
 	srand(time(NULL));
-	createLines();
-	printLines();
+	//createLines();
+	readFile();
+	//printLines();
+	
 	return 0;
 }
