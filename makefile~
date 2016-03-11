@@ -5,4 +5,4 @@ CFLAGS=-Wall
 
 version=-std=c++11 
 all:
-	$(CC) $(CFLAGS) $(version) dataReader.cpp main.cpp -o strut
+	$(CC) $(CFLAGS) $(version)  main.cpp -o strut

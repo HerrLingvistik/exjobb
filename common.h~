@@ -1,6 +1,3 @@
-/* This file includes declaration of variables that are used in multiple parts of the program. */
-
-
 #ifndef INCLUDED_COMMON_H
 #define INCLUDED_COMMON_H
  
