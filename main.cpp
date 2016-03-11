@@ -6,11 +6,10 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-
+#include "common.h"
+#include "dataReader.cpp"
 
 using namespace std;
-
-const int DIM = 10;
 
 int canvas[DIM][DIM] = {0};
 
@@ -24,11 +23,13 @@ void readFile(){
 		while(getline(infile, line)){
 
 			istringstream is(line);
-			while( getline(is, number, ',') ) {
-        canvas[row][col] = stoi(number);
-				col++;				
-				if(col>=DIM)
-					row=0; 
+			while( getline(is, number, ' ') ) {
+        canvas[row][col] = stoi(number);					
+				col++;			
+				if(col>=DIM){
+					row++;
+					col=0; 
+				}
     	}			
 
 		}
@@ -46,25 +47,7 @@ void printLines(){
 	}
 }
 
-void createLines(){
-	int x1=0; 
-	int y1, y2, dx = DIM, dy; 
-	int ypos;
-	for(int y=0; y<3; y++){
-		y1 = rand()%DIM;
-		y2 = rand()%DIM;
-		dy = y2 - y1;
-		for(int x=0; x<DIM; x++){
-			ypos = y1 + round(dy * (x-x1) / (float)dx); 
-			canvas[ypos][x] += 1;
-		}
-	}
-}
-
 int main(int argc, char **argv){
-	//std::cout<<"hello strut"<<std::endl;
-	srand(time(NULL));
-	//createLines();
 	readFile();
 	printLines();
 	
