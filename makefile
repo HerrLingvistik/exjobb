@@ -3,6 +3,10 @@ CC=g++
 #Another comment, a flag giving all them warnings 
 CFLAGS=-Wall
 
-version=-std=c++11 
+version=-std=c++11
+
+
+ 
 all:
-	$(CC) $(CFLAGS) $(version) dataReader.cpp main.cpp -o strut
+	$(CC) $(CFLAGS) $(version) dataReader.cpp main.cpp -lGL -lGLU -lglut -o strut
+

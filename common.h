@@ -8,7 +8,7 @@ const int DIM = 10;
 
 extern int canvas[DIM][DIM];
  
-#endif /* INCLUDED_GLOBALS_H */
+#endif /* INCLUDED_COMMON_H */
 
 
 
