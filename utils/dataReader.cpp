@@ -14,7 +14,7 @@ using namespace std;
 	 a two-dimensional array canvas[][]. */
 void readFile(){
 	ifstream infile;
-	infile.open("dataset1.txt"); 
+	infile.open("./data/dataset1.txt"); 
 	string line;
 	string number;
 	int row=0, col=0;

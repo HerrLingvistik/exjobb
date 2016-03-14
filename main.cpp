@@ -19,28 +19,34 @@
 #include <sstream>
 #include <string>
 
-#include "common.h"
+#include "utils/common.h"
 
-#include "dataReader.h"
+#include "utils/dataReader.h"
 
 
-#include "shaderReader.h"
+#include "utils/shaderReader.h"
 
 using namespace std;
 
 GLuint drawShader, computeShader;
 //pointers for vertices
 GLuint triVertArray, triVertBuffer; 
+
+
 GLfloat verts[] = 
 {
 	//top triangle
-	-1.0f, 1.0f, 0.0f, 
-	-1.0f, -1.0f, 0.0f, 
-	1.0f, 1.0f, 0.0f,
-	//bottom triangle
-	-1.0f, -1.0f, 0.0f, 
-	1.0f, -1.0f, 0.0f, 
-	1.0f, 1.0f, 0.0f
+	-0.9f, 0.9f, 0.0f, //top left 
+	-0.9f, -0.9f, 0.0f, //bottom left
+	
+	-0.9f, -0.9f, 0.0f,//bottom left
+	0.9f, -0.9f, 0.0f, //bottom right
+	
+	0.9f, -0.9f, 0.0f, //bottom right
+	0.9f, 0.9f, 0.0f, //top right
+
+	0.9f, 0.9f, 0.0f, //top right 
+	-0.9f, 0.9f, 0.0f //top left 
 };
 
 int canvas[DIM][DIM] = {0};
@@ -60,12 +66,15 @@ void draw(){
 	glClearColor(0.0f,0.0f,0.0f,1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
+	glUseProgram(drawShader);
+	glDrawArrays(GL_LINES, 0, 8);
+	glUseProgram(0);
 	glutSwapBuffers();
 }
 
 void init(){
 	
-	//drawShader = loadShaders("draw.vert", "draw.frag");
+	drawShader = loadShaders("./shaders/test.vert", "./shaders/test.frag");
 
 	glGenVertexArrays(1, &triVertArray);
 	glBindVertexArray(triVertArray);
@@ -95,7 +104,6 @@ int main(int argc, char **argv){
   glutDisplayFunc(draw);
 
 	init();
-
   // Loop require by OpenGL
   glutMainLoop();
 
