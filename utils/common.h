@@ -4,9 +4,11 @@
 #ifndef INCLUDED_COMMON_H
 #define INCLUDED_COMMON_H
  
-const int DIM = 10;
+const int DIM = 3;
 
 extern int canvas[DIM][DIM];
+
+extern float data[(DIM-1)*2*DIM*2];
  
 #endif /* INCLUDED_COMMON_H */
 

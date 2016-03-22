@@ -11,7 +11,7 @@
 
 
 
-string readFile(const char* filename){
+string readShaderFile(const char* filename){
 
 	ifstream infile;
 	infile.open(filename,  std::ifstream::binary);
@@ -30,8 +30,8 @@ string readFile(const char* filename){
 GLuint loadShaders(const char* vertexShader, const char* fragmentShader){
 	
 	//Get contents of shader files
-	string vertSource = readFile(vertexShader);
-	string fragSource = readFile(fragmentShader);
+	string vertSource = readShaderFile(vertexShader);
+	string fragSource = readShaderFile(fragmentShader);
 
 	//Create handles for the shaders
 	GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
@@ -39,11 +39,11 @@ GLuint loadShaders(const char* vertexShader, const char* fragmentShader){
 
 	//Transform the string into something useful for the shadersource.
 	const GLchar *source = (const GLchar *)vertSource.c_str();
-	//Set source code for and compile shaders
+	//Set source code and compile shaders
 	glShaderSource(vertShader, 1, &source, NULL);
 	glCompileShader(vertShader);
 	
-	//Test if the compilation could be performed
+	//Test if the compilation was successfull
 	GLint isCompiled = 0;
 	glGetShaderiv(vertShader, GL_COMPILE_STATUS, &isCompiled);
 	
@@ -63,7 +63,7 @@ GLuint loadShaders(const char* vertexShader, const char* fragmentShader){
 		return 0;
 	}	
 
-	//Same process for the fragment shader
+	//Same process for the fragment shader as for the vertex shader
 	source = (const GLchar *)fragSource.c_str();
 	glShaderSource(fragShader, 1, &source, NULL);
 	glCompileShader(fragShader);
@@ -99,10 +99,10 @@ GLuint loadShaders(const char* vertexShader, const char* fragmentShader){
 	//Attach our shaders to our program
 	glDetachShader(program, vertShader);
 	glDetachShader(program, fragShader);
-
+	//Not needed anymore.
 	glDeleteShader(vertShader);
 	glDeleteShader(fragShader);
-
+	//return handle to our shaders
 	return program; 
 
 }

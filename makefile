@@ -5,8 +5,6 @@ CFLAGS=-Wall
 
 version=-std=c++11
 
-
- 
 all:
 	$(CC) $(CFLAGS) $(version) utils/*.cpp main.cpp -lGL -lGLU -lglut -o strut
 
