@@ -27,18 +27,18 @@ void readFile(){
         //canvas[row][col] = stoi(number);	
 				//Added a one-dimensional data set which will probably be used since I don't think we can send in
 				//2d arrays to the shaders
-				if(col==0 || col == DIM-1){
+				//if(col==0 || col == DIM-1){
 					data[i] = startPos + 0.9*col;
 					data[i+1] = stof(number);
 					i+=2;
-				}else{
+				/*}else{
 					data[i] = startPos + 0.9*col;
 					data[i+1] = stof(number);
 					i+=2;
 					data[i] = startPos + 0.9*col;
 					data[i+1] = stof(number);
 					i+=2;
-				}
+				}*/
 								
 				col++;			
 				if(col>=DIM){

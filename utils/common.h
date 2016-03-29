@@ -7,8 +7,8 @@
 const int DIM = 3;
 
 extern int canvas[DIM][DIM];
-
-extern float data[(DIM-1)*2*DIM*2];
+extern float data[2*DIM*DIM];
+//extern float data[(DIM-1)*2*DIM*2];
  
 #endif /* INCLUDED_COMMON_H */
 

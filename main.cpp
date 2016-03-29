@@ -56,7 +56,7 @@ GLfloat triVerts[] =
 };
 
 int canvas[DIM][DIM] = {0};
-float data[(DIM-1)*2*DIM*2] = {0};
+float data[2*DIM*DIM] = {0};
 
 void draw(){
 	//set window color and clear last screen
@@ -71,8 +71,12 @@ void draw(){
 	//enable or disable a generic vertex attribute array
 	glEnableVertexAttribArray(0);
 	//draw lines tell opengl how many values will be sent to the shaders
-	//OBS MAY NOT NEED TO STORE EXTRA POINTS TEST STRIDE IN ATTR POINTER AND SEE IF YOU CAN USE GL_LINE_STRIP
-	glDrawArrays(GL_LINES, 0, (DIM-1)*2*DIM*2);
+	//first says where each line should be drawn	
+	int first[3] = {0,3,6};
+	//count says how many vertices should be used in each strip
+	int count[3] = {3,3,3};
+	//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
+	glMultiDrawArrays(GL_LINE_STRIP, first, count,3/*(DIM-1)*2*DIM*2*/);
 	//disable and unbind just to be safe
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);	
@@ -117,10 +121,28 @@ void init(){
 	glBindBuffer(GL_ARRAY_BUFFER, dataBuffer);
 	glBufferData(GL_ARRAY_BUFFER,sizeof(data), data, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	//TRY TO CHANGE THE STRIDE
+	//TRY TO CHANGE THE STRIDE OR USE INDICES!
 	glVertexAttribPointer(glGetAttribLocation(paralellShader, "in_Position"),2, GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),0);
 	glDisableVertexAttribArray(0);
 
+	/*
+		Create texture and set attach it to a framebuffer object.
+	*/
+	//tex 1 and fbo object 1
+	glGenTextures(1, &tex0);
+	glActiveTexture(tex0);
+	glBindTexture(GL_TEXTURE_2D, tex0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, W, H, 0, GL_RGBA, GL_FLOAT, particles);
+
+	glGenFramebuffers(1, &fbo0);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex0, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glBindVertexArray(0);
 }
 
 int main(int argc, char **argv){	
