@@ -4,5 +4,5 @@ out vec4 out_Color;
 
 //set white color with full opacity
 void main(void){
-	out_Color = vec4(1,1,1,0.3);
+	out_Color = vec4(1,0,0,1);
 }

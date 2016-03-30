@@ -10,7 +10,7 @@
 	THINGS TO ADD
 	- Create FBO containing texture on which the parallel coordinates will be drawn.
 	- bind the fbo when drawing the parallel coordinates
-	- bind the textures when drawing to the screen, draw texture on the quad.
+	- bind the textures when drawing to the screen, draw texture on the quad. 
 
 	- normalize all values between 0 and 1, no matter their range(feature scaling). y' = (y - min(y))/(max(y) - min(y))  
 	- Also draw lines for the axes. 
@@ -40,8 +40,8 @@ using namespace std;
 //shader handles
 GLuint drawShader, paralellShader;
 //pointers for vertices
-GLuint triVertArray, triVertBuffer, dataArray, dataBuffer; 
-
+GLuint triVertArray, triVertBuffer, dataArray, dataBuffer, tex, fbo; 
+int counter=0;
 //Vertices used to draw to triangles(one quad) upon which the texture will be drawn
 GLfloat triVerts[] = 
 {
@@ -57,10 +57,12 @@ GLfloat triVerts[] =
 
 int canvas[DIM][DIM] = {0};
 float data[2*DIM*DIM] = {0};
+const int W = 512;
+const int H = 512;
 
 void draw(){
 	//set window color and clear last screen
-	glClearColor(0.0f,0.0f,0.0f,0.0f);
+	glClearColor(0.0f,0.0f,0.0f,1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
@@ -76,7 +78,40 @@ void draw(){
 	//count says how many vertices should be used in each strip
 	int count[3] = {3,3,3};
 	//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
-	glMultiDrawArrays(GL_LINE_STRIP, first, count,3/*(DIM-1)*2*DIM*2*/);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glClearColor(0.0f,0.0f,0.0f,0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	//use parallel coordinates shader
+	glMultiDrawArrays(GL_LINE_STRIP, first, count,3);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//disable and unbind just to be safe
+	glDisableVertexAttribArray(0);
+	glBindVertexArray(0);	
+	glDisable(GL_BLEND);
+	//don't draw using the parallel coordinates shader anymore.
+	glUseProgram(0);
+/*
+	unsigned int* ids = new unsigned int[ W*H ];
+glBindTexture(GL_TEXTURE_2D, tex);
+glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, ids);
+	int i = 0;	
+	
+while(i<W*H){
+		if(ids[i] > 0){
+			cout<<ids[i]<<endl;
+		}
+i++;
+	}*/
+	//cout<<"done"<<endl;
+	glUseProgram(drawShader);
+	glBindVertexArray(triVertArray);
+	//enable or disable a generic vertex attribute array
+	glEnableVertexAttribArray(0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);    
+	glUniform1i(glGetUniformLocation(drawShader, "parallelTex"), 0);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 	//disable and unbind just to be safe
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);	
@@ -90,7 +125,7 @@ void init(){
 	//read data set into data array
 	readFile();
 
-	drawShader = loadShaders("./shaders/test.vert", "./shaders/test.frag");
+	drawShader = loadShaders("./shaders/draw.vert", "./shaders/draw.frag");
 	paralellShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
 
 	//Generate holder for vertices in triangles!!!!!!!!!! CAFFEIN OVERLOAD!!!!!!!!!
@@ -129,20 +164,38 @@ void init(){
 		Create texture and set attach it to a framebuffer object.
 	*/
 	//tex 1 and fbo object 1
-	glGenTextures(1, &tex0);
-	glActiveTexture(tex0);
-	glBindTexture(GL_TEXTURE_2D, tex0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, W, H, 0, GL_RGBA, GL_FLOAT, particles);
+	glGenTextures(1, &tex);
+	glActiveTexture(tex);
+	glBindTexture(GL_TEXTURE_2D, tex);  
 
-	glGenFramebuffers(1, &fbo0);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex0, 0);
+	//KOMMER INTE HA RGBA!!!
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, W, H, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, W, H, 0, GL_RED, GL_UNSIGNED_INT, NULL);	
+	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glGenerateMipmap(GL_TEXTURE_2D);	
+	//GL_R32UI	
+	/* GLenum err;
+    while ((err = glGetError()) != GL_NO_ERROR) {
+        cerr << "OpenGL error: " << err << endl;
+    }*/ 
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glBindVertexArray(0);
+}
+
+// This function is called whenever the computer is idle
+// As soon as the machine is idle, ask GLUT to trigger rendering of a new
+// frame
+void idle()
+{
+	glutPostRedisplay();
 }
 
 int main(int argc, char **argv){	
@@ -151,18 +204,18 @@ int main(int argc, char **argv){
 	//sets the initial display mode
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutInitWindowPosition(100,100);
-	glutInitWindowSize(512,512);
+	glutInitWindowSize(W,H);
 	//set version to be used
 	glutInitContextVersion(3, 3);
 
 	glutCreateWindow("Do you wanna roll in my 64?!");
-
+	glutIdleFunc(idle);
 	//Call to the drawing function
   glutDisplayFunc(draw);
 	//initiate stuff for the drawing
 	init();
   // Loop required by OpenGL
   glutMainLoop();
-
-	return 0;
+	cout << "dase: "<< counter << endl;
+	exit(0);
 }
