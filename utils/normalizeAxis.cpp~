@@ -1,0 +1,60 @@
+#include "normalizeAxis.h"
+#include <iostream>
+#include <math.h>
+
+
+//This method is used to normalize the y-values of each indiviudal dimension, 
+//so that the highest value of each axis will be on top of the window, and the lowest axis on the lowest point. 
+//The loop is performed column by column and data values are normalized within the rage -1 to 1.
+//Note that this normalization requires that all data is stored in a one-dimensional array with a set x-coordinate for each y.
+void normalizeAxis(){
+	
+	int startPoint=1;
+	int dimensionCounter=0;
+	
+	//Temporary values for finding min/max as needed for the feature scaling.
+	float minValue = 9999999999999999;
+	float maxValue = -9999999999999999;
+	
+	//This loop is simply for finding min/max values for each column. Start on the first y.
+	while(startPoint < 2*DIM*DIM && dimensionCounter != DIM) {
+	
+		//Find largest and smallest values to be used for the normalization.
+		for(int i = startPoint; i < 2*DIM*DIM; ) {
+
+			if(data[i] < minValue) {
+				minValue = data[i];				
+			}
+			
+			if(data[i] > maxValue) {
+				maxValue = data[i];				
+			}
+
+			//cout << data[i] << " Index: " <<  i << endl;
+			i+=DIM*2;
+		}
+		
+		//cout << "		Smallest value: " << minValue << endl;
+		//cout << "		Largest value: " << maxValue << endl;
+		
+		//Perform feature scaling, this gives values between 0 to 1.
+		for(int i = startPoint; i < 2*DIM*DIM; ) {
+						
+			data[i] = (data[i] - minValue)/(maxValue - minValue);	
+			//Change interval from -1 to 1.	
+			data[i] -= 0.5;
+			data[i] *= 2;
+			//cout << "					Rescaled value: " << data[i] << endl;	
+			i+=DIM*2;
+		}
+		
+		//Reset the temporary variables to be able to find min/max in the next column
+		minValue = 9999999999999999;
+		maxValue = -9999999999999999;
+		
+		dimensionCounter++;
+		//Go to the first y-value of the next dimension.
+		startPoint+=2;
+	}
+
+}

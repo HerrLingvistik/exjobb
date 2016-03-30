@@ -1,3 +1,4 @@
+
 /* ---------------------------------------------------------------------------
 ** Audial Support for Visual Dense Data Display, 
 ** Master of Science in Media Technology, Linköping University
@@ -5,7 +6,24 @@
 ** Authors: Gustav Hallström, Tobias Erlandsson
 ** -------------------------------------------------------------------------*/
 
-#include <GL/glut.h>
+/*
+	THINGS TO ADD
+	- Create FBO containing texture on which the parallel coordinates will be drawn.
+	- bind the fbo when drawing the parallel coordinates
+	- bind the textures when drawing to the screen, draw texture on the quad.
+
+	- normalize all values between 0 and 1, no matter their range(feature scaling). y' = (y - min(y))/(max(y) - min(y))  
+	- Also draw lines for the axes. 
+	- for more axes set width of each axis 
+
+	- add interaction mouse listener
+	- add clustering?
+	- add sound
+*/
+
+#define GL_GLEXT_PROTOTYPES	
+#include <GL/freeglut.h>
+#include <GL/gl.h>
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
@@ -13,27 +31,195 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include "utils/common.h"
+#include "utils/dataReader.h"
+#include "utils/shaderReader.h"
+#include "utils/normalizeAxis.h"
 
-#include "common.h"
-#include "dataReader.h"
 
 using namespace std;
 
+//Shader handles
+GLuint drawShader, paralellShader;
+//Pointers for vertices
+GLuint triVertArray, triVertBuffer, dataArray, dataBuffer; 
+
+//Vertices used to draw to triangles(one quad) upon which the texture will be drawn
+GLfloat triVerts[] = 
+{
+	//top triangle
+	-1.0f, 1.0f, 0.0f, 
+	-1.0f, -1.0f, 0.0f, 
+	1.0f, 1.0f, 0.0f,
+	//bottom triangle
+	-1.0f, -1.0f, 0.0f, 
+	1.0f, -1.0f, 0.0f, 
+	1.0f, 1.0f, 0.0f
+};
+
 int canvas[DIM][DIM] = {0};
+float data[2*DIM*DIM] = {0};
 
+ /*
+void normalizeAxis(){
+	
+	int startPoint=1;
+	int dimensionCounter=0;
+	
+	//Temporary values for finding min/max as needed for the feature scaling.
+	float minValue = 9999999999999999;
+	float maxValue = -9999999999999999;
+	
+	//This loop is simply for finding min/max values for each column. Start on the first y.
+	while(startPoint < 2*DIM*DIM && dimensionCounter != DIM) {
+	
+		//Find largest and smallest values to be used for the normalization.
+		for(int i = startPoint; i < 2*DIM*DIM; ) {
 
-void printLines(){
-	for(int i=0; i<DIM; i++){
-		for(int j=0; j<DIM; j++){
-			cout<<canvas[i][j]<<" ";
+			if(data[i] < minValue) {
+				minValue = data[i];				
+			}
+			
+			if(data[i] > maxValue) {
+				maxValue = data[i];				
+			}
+
+			//cout << data[i] << " Index: " <<  i << endl;
+			i+=DIM*2;
 		}
-		cout<<endl;
+		
+		//cout << "		Smallest value: " << minValue << endl;
+		//cout << "		Largest value: " << maxValue << endl;
+		
+		//Perform feature scaling, this gives values between 0 to 1.
+		for(int i = startPoint; i < 2*DIM*DIM; ) {
+						
+			data[i] = (data[i] - minValue)/(maxValue - minValue);	
+			//Change interval from -1 to 1.	
+			data[i] -= 0.5;
+			data[i] *= 2;
+			//cout << "					Rescaled value: " << data[i] << endl;	
+			i+=DIM*2;
+		}
+		
+		//Reset the temporary variables to be able to find min/max in the next column
+		minValue = 9999999999999999;
+		maxValue = -9999999999999999;
+		
+		dimensionCounter++;
+		//Go to the first y-value of the next dimension.
+		startPoint+=2;
 	}
+
+}  */
+
+void draw(){
+	//set window color and clear last screen
+	glClearColor(0.0f,0.0f,0.0f,0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	//use parallel coordinates shader
+	glUseProgram(paralellShader);
+	//bind data array containing coordinates for drawing lines between
+	glBindVertexArray(dataArray);
+	//enable or disable a generic vertex attribute array
+	glEnableVertexAttribArray(0);
+	//draw lines tell opengl how many values will be sent to the shaders
+	//first says where each line should be drawn	
+	int first[3] = {0,3,6};
+	//count says how many vertices should be used in each strip
+	int count[3] = {3,3,3};
+	//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
+	glMultiDrawArrays(GL_LINE_STRIP, first, count,3/*(DIM-1)*2*DIM*2*/);
+	//disable and unbind just to be safe
+	glDisableVertexAttribArray(0);
+	glBindVertexArray(0);	
+	//don't draw using the parallel coordinates shader anymore.
+	glUseProgram(0);
+	//swaps the buffers of the current window if double buffered(draw)
+	glutSwapBuffers();
 }
 
-int main(int argc, char **argv){
+void init(){
+	//read data set into data array
 	readFile();
-	printLines();
+	normalizeAxis();
+
+	drawShader = loadShaders("./shaders/test.vert", "./shaders/test.frag");
+	paralellShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
+
+	//Generate holder for vertices in triangles!!!!!!!!!! CAFFEIN OVERLOAD!!!!!!!!!
+	glGenVertexArrays(1, &triVertArray);
+	glGenVertexArrays(1, &dataArray);
+
+	/*
+		Send vertices for the fullscreen quad, consisting of two triangles, to the draw shader.
+		This will be used to draw the texture on when drawing to the screen. The vertices are
+		sent to  be sent to a draw shader which will simply draw the result to a texture on which different 
+		operations can be performed.
+	*/
+	glBindVertexArray(triVertArray);
+	glGenBuffers(1, &triVertBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, triVertBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(triVerts), triVerts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(glGetAttribLocation(drawShader, "in_Position"),3, GL_FLOAT,GL_FALSE,3*sizeof(GL_FLOAT),0);
+	glDisableVertexAttribArray(0);
 	
+	/*
+		Send vertices to the shader which will draw lines between the coordinates(parallel coordinates).
+		Take the data array and send it two floats at a time to the parallel coordinates shader
+		which will use these as coordinates to draw lines between.
+	*/
+	glBindVertexArray(dataArray);
+	glGenBuffers(1, &dataBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, dataBuffer);
+	glBufferData(GL_ARRAY_BUFFER,sizeof(data), data, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	//TRY TO CHANGE THE STRIDE OR USE INDICES!
+	glVertexAttribPointer(glGetAttribLocation(paralellShader, "in_Position"),2, GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),0);
+	glDisableVertexAttribArray(0);
+
+	/*
+		Create texture and set attach it to a framebuffer object.
+	*/
+	//tex 1 and fbo object 1 
+ 	/*
+	glGenTextures(1, &tex0);
+	glActiveTexture(tex0);
+	glBindTexture(GL_TEXTURE_2D, tex0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, W, H, 0, GL_RGBA, GL_FLOAT, particles);
+
+	glGenFramebuffers(1, &fbo0);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex0, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glBindVertexArray(0); */
+}
+
+int main(int argc, char **argv){	
+	//initiate glut
+	glutInit(&argc, argv);
+	//sets the initial display mode
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
+	glutInitWindowPosition(100,100);
+	glutInitWindowSize(512,512);
+	//set version to be used
+	glutInitContextVersion(3, 3);
+
+	glutCreateWindow("Do you wanna roll in my 64?!");
+
+	//Call to the drawing function
+  glutDisplayFunc(draw);
+	//initiate stuff for the drawing
+	init();
+  // Loop required by OpenGL
+  glutMainLoop();
+
 	return 0;
 }
