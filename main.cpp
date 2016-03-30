@@ -34,14 +34,18 @@
 #include "utils/common.h"
 #include "utils/dataReader.h"
 #include "utils/shaderReader.h"
+#include "utils/normalizeAxis.h"
+
 
 using namespace std;
 
-//shader handles
+//Shader handles
 GLuint drawShader, paralellShader;
+
 //pointers for vertices
 GLuint triVertArray, triVertBuffer, dataArray, dataBuffer, tex, fbo; 
 int counter=0;
+
 //Vertices used to draw to triangles(one quad) upon which the texture will be drawn
 GLfloat triVerts[] = 
 {
@@ -124,6 +128,7 @@ i++;
 void init(){
 	//read data set into data array
 	readFile();
+	normalizeAxis();
 
 	drawShader = loadShaders("./shaders/draw.vert", "./shaders/draw.frag");
 	paralellShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
@@ -163,6 +168,7 @@ void init(){
 	/*
 		Create texture and set attach it to a framebuffer object.
 	*/
+
 	//tex 1 and fbo object 1
 	glGenTextures(1, &tex);
 	glActiveTexture(tex);
@@ -185,9 +191,7 @@ void init(){
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glBindVertexArray(0);
 }
 
 // This function is called whenever the computer is idle
