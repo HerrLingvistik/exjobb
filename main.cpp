@@ -31,6 +31,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <vector>
 #include "utils/common.h"
 #include "utils/dataReader.h"
 #include "utils/shaderReader.h"
@@ -38,7 +39,6 @@
 
 
 using namespace std;
-
 //Shader handles
 GLuint drawShader, paralellShader;
 //Pointers for vertices
@@ -57,8 +57,12 @@ GLfloat triVerts[] =
 	1.0f, 1.0f, 0.0f
 };
 
-int canvas[DIM][DIM] = {0};
-float data[2*DIM*DIM] = {0};
+//int canvas[DIM][DIM] = {0};
+	//float data[2*DIM*DIM] = {0};
+vector<float> data;
+//int DIM = 3;
+int dimX = 0;
+int dimY = 0;
 
 void draw(){
 	//set window color and clear last screen
@@ -74,11 +78,12 @@ void draw(){
 	glEnableVertexAttribArray(0);
 	//draw lines tell opengl how many values will be sent to the shaders
 	//first says where each line should be drawn	
-	int first[3] = {0,3,6};
+	int first[4] = {0,4,8,12};
 	//count says how many vertices should be used in each strip
-	int count[3] = {3,3,3};
+	int count[4] = {4,4,4,4};
 	//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
-	glMultiDrawArrays(GL_LINE_STRIP, first, count,3/*(DIM-1)*2*DIM*2*/);
+	glMultiDrawArrays(GL_LINE_STRIP, first, count, dimY/*(DIM-1)*2*DIM*2*/);
+	//glDrawArrays(GL_LINE_STRIP, 0, 16);
 	//disable and unbind just to be safe
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);	
@@ -122,31 +127,12 @@ void init(){
 	glBindVertexArray(dataArray);
 	glGenBuffers(1, &dataBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, dataBuffer);
-	glBufferData(GL_ARRAY_BUFFER,sizeof(data), data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT)*sizeof(data), &data.front(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	//TRY TO CHANGE THE STRIDE OR USE INDICES!
 	glVertexAttribPointer(glGetAttribLocation(paralellShader, "in_Position"),2, GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),0);
 	glDisableVertexAttribArray(0);
 
-	/*
-		Create texture and set attach it to a framebuffer object.
-	*/
-	//tex 1 and fbo object 1 
- 	/*
-	glGenTextures(1, &tex0);
-	glActiveTexture(tex0);
-	glBindTexture(GL_TEXTURE_2D, tex0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glGenerateMipmap(GL_TEXTURE_2D);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, W, H, 0, GL_RGBA, GL_FLOAT, particles);
-
-	glGenFramebuffers(1, &fbo0);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex0, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glBindVertexArray(0); */
 }
 
 int main(int argc, char **argv){	

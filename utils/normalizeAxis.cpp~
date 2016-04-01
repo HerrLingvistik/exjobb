@@ -1,6 +1,10 @@
 #include "normalizeAxis.h"
 #include <iostream>
 #include <math.h>
+#include <vector>
+#include <iomanip>
+
+using namespace std;
 
 
 //This method is used to normalize the y-values of each indiviudal dimension, 
@@ -16,11 +20,11 @@ void normalizeAxis(){
 	float minValue = 9999999999999999;
 	float maxValue = -9999999999999999;
 	
-	//This loop is simply for finding min/max values for each column. Start on the first y.
-	while(startPoint < 2*DIM*DIM && dimensionCounter != DIM) {
+	//Start on the first y.
+	while(startPoint < 2*dimX*dimY && dimensionCounter < dimX) {
 	
-		//Find largest and smallest values to be used for the normalization.
-		for(int i = startPoint; i < 2*DIM*DIM; ) {
+		//Find largest and smallest values per column to be used for the normalization.
+		for(int i = startPoint; i < 2*dimX*dimY; ) {
 
 			if(data[i] < minValue) {
 				minValue = data[i];				
@@ -31,30 +35,38 @@ void normalizeAxis(){
 			}
 
 			//cout << data[i] << " Index: " <<  i << endl;
-			i+=DIM*2;
+			i+=dimX*2;
 		}
 		
 		//cout << "		Smallest value: " << minValue << endl;
 		//cout << "		Largest value: " << maxValue << endl;
 		
-		//Perform feature scaling, this gives values between 0 to 1.
-		for(int i = startPoint; i < 2*DIM*DIM; ) {
+		//Perform feature scaling on this column, this gives values between 0 to 1.
+		for(int i = startPoint; i < 2*dimX*dimY; ) {
 						
 			data[i] = (data[i] - minValue)/(maxValue - minValue);	
 			//Change interval from -1 to 1.	
 			data[i] -= 0.5;
 			data[i] *= 2;
 			//cout << "					Rescaled value: " << data[i] << endl;	
-			i+=DIM*2;
-		}
+			i+=dimX*2;
+		} 
 		
 		//Reset the temporary variables to be able to find min/max in the next column
 		minValue = 9999999999999999;
 		maxValue = -9999999999999999;
 		
 		dimensionCounter++;
+		//cout << dimensionCounter << endl;
 		//Go to the first y-value of the next dimension.
 		startPoint+=2;
 	}
+	
+
+	for(uint i = 0; i < data.size(); i+=2)
+	{
+	cout << setw(20) << " X" << ": " << data[i] << setw(8) <<  " Y" << ": " << data[i+1] << endl;
+	}	
+
 
 }
