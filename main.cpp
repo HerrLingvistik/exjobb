@@ -103,9 +103,9 @@ void draw(){
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	//use parallel coordinates shader
-	glMultiDrawArrays(GL_LINE_STRIP, first, count,3);
+	glMultiDrawArrays(GL_LINE_STRIP, first, count,4);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//disable and unbind just to be safe
+	//disable and unbind just to be safeopengl
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);	
 	glDisable(GL_BLEND);
@@ -124,6 +124,7 @@ glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, ids);
 		i++;
 
 	}
+	
 	//cout<<numbers[W-1][H-1]<< endl;
 	glUseProgram(drawShader);
 	glBindVertexArray(triVertArray);
@@ -149,7 +150,13 @@ void init(){
 	//read data set into data array
 	readFile();
 	normalizeAxis();
-
+	uint j=0;
+	cout<< "FROM MAIN"<<endl<<endl;
+	/*while(j<data.size()){
+		cout << " X: "<<data[j]<<" Y: "<<data[j+1]<<endl;
+		j+=2;
+	}*/
+	cout<<data.size()<<endl<<endl;
 	createTexArray();
 
 	drawShader = loadShaders("./shaders/draw.vert", "./shaders/draw.frag");
@@ -182,7 +189,7 @@ void init(){
 	glBindVertexArray(dataArray);
 	glGenBuffers(1, &dataBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, dataBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT)*sizeof(data), &data.front(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT)*data.size(), &data.front(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	//TRY TO CHANGE THE STRIDE OR USE INDICES!
 	glVertexAttribPointer(glGetAttribLocation(paralellShader, "in_Position"),2, GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),0);
