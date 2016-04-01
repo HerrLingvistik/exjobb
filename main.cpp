@@ -64,12 +64,25 @@ float data[2*DIM*DIM] = {0};
 const int W = 512;
 const int H = 512;
 
+uint numbers[W][H];
+
+void createTexArray(){
+	for(int i=0; i<W; i++){
+		for(int j=0; j<H; j++){
+			numbers[i][j] = 2;
+		}
+	}
+}
+
 void draw(){
 	//set window color and clear last screen
-	glClearColor(0.0f,0.0f,0.0f,1.0f);
+	glClearColor(0,0,0,1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glBlendEquation( GL_FUNC_ADD );
+	glBlendFunc(GL_ONE, GL_ONE);
 	//use parallel coordinates shader
 	glUseProgram(paralellShader);
 	//bind data array containing coordinates for drawing lines between
@@ -83,9 +96,6 @@ void draw(){
 	int count[3] = {3,3,3};
 	//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	glClearColor(0.0f,0.0f,0.0f,0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
 	//use parallel coordinates shader
 	glMultiDrawArrays(GL_LINE_STRIP, first, count,3);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -95,19 +105,20 @@ void draw(){
 	glDisable(GL_BLEND);
 	//don't draw using the parallel coordinates shader anymore.
 	glUseProgram(0);
-/*
-	unsigned int* ids = new unsigned int[ W*H ];
+
+	uint* ids = new uint[ W*H ];
 glBindTexture(GL_TEXTURE_2D, tex);
 glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, ids);
 	int i = 0;	
 	
-while(i<W*H){
-		if(ids[i] > 0){
+	while(i<W*H){
+		if(ids[i] == 2){
 			cout<<ids[i]<<endl;
 		}
-i++;
-	}*/
-	//cout<<"done"<<endl;
+		i++;
+
+	}
+	//cout<<numbers[W-1][H-1]<< endl;
 	glUseProgram(drawShader);
 	glBindVertexArray(triVertArray);
 	//enable or disable a generic vertex attribute array
@@ -116,6 +127,8 @@ i++;
 	glBindTexture(GL_TEXTURE_2D, tex);    
 	glUniform1i(glGetUniformLocation(drawShader, "parallelTex"), 0);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindTexture(GL_TEXTURE_2D, 0); 
+	glActiveTexture(0);
 	//disable and unbind just to be safe
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);	
@@ -129,6 +142,8 @@ void init(){
 	//read data set into data array
 	readFile();
 	normalizeAxis();
+
+	createTexArray();
 
 	drawShader = loadShaders("./shaders/draw.vert", "./shaders/draw.frag");
 	paralellShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
@@ -150,7 +165,8 @@ void init(){
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(glGetAttribLocation(drawShader, "in_Position"),3, GL_FLOAT,GL_FALSE,3*sizeof(GL_FLOAT),0);
 	glDisableVertexAttribArray(0);
-	
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 	/*
 		Send vertices to the shader which will draw lines between the coordinates(parallel coordinates).
 		Take the data array and send it two floats at a time to the parallel coordinates shader
@@ -164,9 +180,11 @@ void init(){
 	//TRY TO CHANGE THE STRIDE OR USE INDICES!
 	glVertexAttribPointer(glGetAttribLocation(paralellShader, "in_Position"),2, GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),0);
 	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 
 	/*
-		Create texture and set attach it to a framebuffer object.
+		Create textuhttps://www.opengl.org/discussion_boards/showthread.php/169270-Subset-of-blending-modes-for-32-bit-integer-renderre and set attach it to a framebuffer object.
 	*/
 
 	//tex 1 and fbo object 1
@@ -176,10 +194,10 @@ void init(){
 
 	//KOMMER INTE HA RGBA!!!
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, W, H, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, W, H, 0, GL_RED, GL_UNSIGNED_INT, NULL);	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, W, H, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, NULL);	
 	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glGenerateMipmap(GL_TEXTURE_2D);	
@@ -192,6 +210,11 @@ void init(){
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
 
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+		cout<<"texture creation successful"<<endl;
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 // This function is called whenever the computer is idle
