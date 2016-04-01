@@ -24,6 +24,8 @@ void readFile(){
 
 			istringstream is(line);
 			
+			first.push_back(dimX);			
+
 			//Read element by element
 			while( getline(is, number, ' ') ) {
  						
@@ -43,10 +45,11 @@ void readFile(){
 		}	
 
 		dimX/=dimY;
+		count.assign(first.size(), dimY);
 		
 		cout << "Dimensions X: " << dimX << endl;
 		cout << "Dimensions Y: " << dimY << endl;
-		
+
 		infile.close();
 	}
 	else

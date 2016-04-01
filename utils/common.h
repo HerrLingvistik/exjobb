@@ -10,10 +10,12 @@ using namespace std;
 //extern int DIM;
 extern int dimX, dimY;
 
-
-//extern int canvas[DIM][DIM];
-//extern float data[2*DIM*DIM];
+//Extern vector data to store the data points
 extern vector<float> data;
+
+//Vectors in order to have a dynamic amount of lines drawn 
+extern vector<int> first;
+extern vector<int> count;
 
 //extern float data[(DIM-1)*2*DIM*2];
  

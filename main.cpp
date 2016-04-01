@@ -62,10 +62,11 @@ GLfloat triVerts[] =
 
 const int W = 512;
 const int H = 512;
-//int canvas[DIM][DIM] = {0};
-	//float data[2*DIM*DIM] = {0};
+
 vector<float> data;
-//int DIM = 3;
+vector<int> first;
+vector<int> count;
+
 int dimX = 0;
 int dimY = 0;
 
@@ -78,6 +79,8 @@ void createTexArray(){
 		}
 	}
 }
+
+	
 
 void draw(){
 	//set window color and clear last screen
@@ -96,14 +99,14 @@ void draw(){
 	glEnableVertexAttribArray(0);
 	//draw lines tell opengl how many values will be sent to the shaders
 	//first says where each line should be drawn	
-	int first[4] = {0,4,8,12};
+	//int first[4] = {0,4,8,12};
 	//count says how many vertices should be used in each strip
-	int count[4] = {4,4,4,4};
+	//int count[4] = {4,4,4,4};
 	//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	//use parallel coordinates shader
-	glMultiDrawArrays(GL_LINE_STRIP, first, count,4);
+	glMultiDrawArrays(GL_LINE_STRIP, &first.front(), &count.front(),count.size());
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	//disable and unbind just to be safeopengl
 	glDisableVertexAttribArray(0);
