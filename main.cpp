@@ -71,15 +71,7 @@ int dimY = 0;
 
 uint numbers[W][H];
 
-void createTexArray(){
-	for(int i=0; i<W; i++){
-		for(int j=0; j<H; j++){
-			numbers[i][j] = 2;
-		}
-	}
-}
-
-void draw(){
+void initTexture(){
 	//set window color and clear last screen
 	glClearColor(0,0,0,1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -95,12 +87,13 @@ void draw(){
 	//enable or disable a generic vertex attribute array
 	glEnableVertexAttribArray(0);
 	//draw lines tell opengl how many values will be sent to the shaders
+	
 	//first says where each line should be drawn	
 	int first[4] = {0,4,8,12};
 	//count says how many vertices should be used in each strip
 	int count[4] = {4,4,4,4};
-	//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
 
+	//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	//use parallel coordinates shader
 	glMultiDrawArrays(GL_LINE_STRIP, first, count,4);
@@ -111,8 +104,12 @@ void draw(){
 	glDisable(GL_BLEND);
 	//don't draw using the parallel coordinates shader anymore.
 	glUseProgram(0);
+}
 
-	uint* ids = new uint[ W*H ];
+void draw(){
+	
+
+	/*uint* ids = new uint[ W*H ];
 glBindTexture(GL_TEXTURE_2D, tex);
 glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, ids);
 	int i = 0;	
@@ -123,7 +120,7 @@ glGetTexImage(GL_TEXTURE_2D, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, ids);
 		}
 		i++;
 
-	}
+	}*/
 	
 	//cout<<numbers[W-1][H-1]<< endl;
 	glUseProgram(drawShader);
@@ -150,14 +147,8 @@ void init(){
 	//read data set into data array
 	readFile();
 	normalizeAxis();
-	uint j=0;
-	cout<< "FROM MAIN"<<endl<<endl;
-	/*while(j<data.size()){
-		cout << " X: "<<data[j]<<" Y: "<<data[j+1]<<endl;
-		j+=2;
-	}*/
-	cout<<data.size()<<endl<<endl;
-	createTexArray();
+
+	
 
 	drawShader = loadShaders("./shaders/draw.vert", "./shaders/draw.frag");
 	paralellShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
@@ -229,6 +220,8 @@ void init(){
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	initTexture();
 }
 
 // This function is called whenever the computer is idle
