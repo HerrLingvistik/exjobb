@@ -70,6 +70,8 @@ vector<int> count;
 int dimX = 0;
 int dimY = 0;
 
+int bajs[4] = {4, 4, 4, 4};
+
 uint numbers[W][H];
 
 void initTexture(){
@@ -89,18 +91,11 @@ void initTexture(){
 	//enable or disable a generic vertex attribute array
 	glEnableVertexAttribArray(0);
 	//draw lines tell opengl how many values will be sent to the shaders
-	
-	//first says where each line should be drawn	
-	//int first[4] = {0,4,8,12};
-	//count says how many vertices should be used in each strip
-	//int count[4] = {4,4,4,4};
-	//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
-
 
 	//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	//use parallel coordinates shader
-	glMultiDrawArrays(GL_LINE_STRIP, &first.front(), &count.front(),count.size());
+	glMultiDrawArrays(GL_LINE_STRIP, &first.front(), bajs,first.size());
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	//disable and unbind just to be safeopengl
 	glDisableVertexAttribArray(0);

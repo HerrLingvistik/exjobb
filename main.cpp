@@ -70,6 +70,7 @@ vector<int> count;
 int dimX = 0;
 int dimY = 0;
 
+
 uint numbers[W][H];
 
 void initTexture(){
