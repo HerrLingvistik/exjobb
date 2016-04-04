@@ -63,10 +63,10 @@ void normalizeAxis(){
 	}
 	
 
-	for(uint i = 0; i < data.size(); i+=2)
+	/*for(uint i = 0; i < data.size(); i+=2)
 	{
 	cout << setw(20) << " X" << ": " << data[i] << setw(8) <<  " Y" << ": " << data[i+1] << endl;
-	}	
+	}*/	
 
 
 }

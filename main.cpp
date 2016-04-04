@@ -7,12 +7,7 @@
 ** -------------------------------------------------------------------------*/
 
 /*
-	THINGS TO ADD
-	- Create FBO containing texture on which the parallel coordinates will be drawn.
-	- bind the fbo when drawing the parallel coordinates
-	- bind the textures when drawing to the screen, draw texture on the quad. 
-
-	- normalize all values between 0 and 1, no matter their range(feature scaling). y' = (y - min(y))/(max(y) - min(y))  
+	THINGS TO ADD 
 	- Also draw lines for the axes. 
 	- for more axes set width of each axis 
 
@@ -59,13 +54,16 @@ GLfloat triVerts[] =
 	1.0f, 1.0f, 0.0f
 };
 
+const int W = 1000;
+const int H = 600;
 
-const int W = 512;
-const int H = 512;
 
 vector<float> data;
 vector<int> first;
 vector<int> count;
+
+
+uint startTex[W][H];
 
 int dimX = 0;
 int dimY = 0;
@@ -73,16 +71,40 @@ int dimY = 0;
 
 uint numbers[W][H];
 
+void glErrorCheck()
+{
+    int errCode;
+    if ((errCode = glGetError()) != GL_NO_ERROR)
+    {
+        printf("Failure in OpenGL %d \n", errCode);
+        //exit(0);
+    }
+}
+
+void fillArray(){
+	for(int i=0; i< W; i++)
+		for(int j=0; j<H; j++)
+			startTex[i][j] = 0;
+}
+
+/*
+	Problem med texture blending som skriver över istället för att blenda. 
+	Alternativt att den blendar och sedan clampar;
+*/
+
 void initTexture(){
 
 	//set window color and clear last screen
-	glClearColor(0,0,0,1);
+	glClearColor(0,0,0,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDisable(GL_CULL_FACE);
+	
+	glClampColor(GL_CLAMP_READ_COLOR, GL_FALSE);
+
 	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
-	glBlendEquation( GL_FUNC_ADD );
 	glBlendFunc(GL_ONE, GL_ONE);
+	glClampColor(GL_CLAMP_READ_COLOR, GL_FALSE);
 	//use parallel coordinates shader
 	glUseProgram(paralellShader);
 	//bind data array containing coordinates for drawing lines between
@@ -91,17 +113,38 @@ void initTexture(){
 	glEnableVertexAttribArray(0);
 	//draw lines tell opengl how many values will be sent to the shaders
 
+
 	//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	//use parallel coordinates shader
 	glMultiDrawArrays(GL_LINE_STRIP, &first.front(), &count.front(),count.size());
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//disable and unbind just to be safeopengl
+	//disable and unbind just to be safe
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);	
 	glDisable(GL_BLEND);
+
+
+	float* ids = new float[ W*H ];
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, ids);
+	int i = 0;	
+	float max = 0;
+	while(i<W*H){
+		if(ids[i] > max){
+			max = ids[i];
+		}
+		i++;
+	}
 	//don't draw using the parallel coordinates shader anymore.
 	glUseProgram(0);
+	glUseProgram(drawShader);
+	glUniform1f(glGetUniformLocation(drawShader, "maxValue"), max);
+	glUseProgram(0);
+	cout << "DONE WITH TEXTURE. Max value: "<<max<<endl;	
+	
 }
 
 void draw(){
@@ -115,15 +158,15 @@ void draw(){
 	glBindTexture(GL_TEXTURE_2D, tex);    
 	glUniform1i(glGetUniformLocation(drawShader, "parallelTex"), 0);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-
+	
 	glBindTexture(GL_TEXTURE_2D, 0); 
-	glActiveTexture(0);
 	//disable and unbind just to be safe
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);	
 	//don't draw using the parallel coordinates shader anymore.
 	glUseProgram(0);
 	//swaps the buffers of the current window if double buffered(draw)
+	//glErrorCheck();
 	glutSwapBuffers();
 }
 
@@ -132,7 +175,8 @@ void init(){
 	readFile();
 	normalizeAxis();
 
-	
+	//temporary function
+	fillArray();	
 
 	drawShader = loadShaders("./shaders/draw.vert", "./shaders/draw.frag");
 	paralellShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
@@ -175,37 +219,33 @@ void init(){
 	/*
 		Create textuhttps://www.opengl.org/discussion_boards/showthread.php/169270-Subset-of-blending-modes-for-32-bit-integer-renderre and set attach it to a framebuffer object.
 	*/
-
-	//tex 1 and fbo object 1
-	glGenTextures(1, &tex);
-	glActiveTexture(tex);
-	glBindTexture(GL_TEXTURE_2D, tex);  
-
-	//KOMMER INTE HA RGBA!!!
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, W, H, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, W, H, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, NULL);	
 	
+	//tex 1 and fbo object 1
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);  
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, W, H, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, W, H, 0, GL_RED, GL_UNSIGNED_INT, NULL);	
+	//glErrorCheck();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glGenerateMipmap(GL_TEXTURE_2D);	
-	//GL_R32UI	
-	/* GLenum err;
-    while ((err = glGetError()) != GL_NO_ERROR) {
-        cerr << "OpenGL error: " << err << endl;
-    }*/ 
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
-
+	
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-		cout<<"texture creation successful"<<endl;
+		cout<<"texture creation not successful"<<endl;
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
-
+	
 	initTexture();
+	
 }
 
 // This function is called whenever the computer is idle
@@ -235,6 +275,5 @@ int main(int argc, char **argv){
 	init();
   // Loop required by OpenGL
   glutMainLoop();
-	cout << "dase: "<< counter << endl;
 	exit(0);
 }
