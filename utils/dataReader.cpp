@@ -12,7 +12,7 @@ using namespace std;
 //The aim of this function is to read ASCII-data from a text file and store it into a one dimensional array.
 void readFile(){
 	ifstream infile;
-	infile.open("./data/testSet.txt"); 
+	infile.open("./data/out5dhaxad.txt"); 
 	string line;
 	string number;
 	int col=0; //int row=0; int i=0;
@@ -31,7 +31,7 @@ void readFile(){
 				//Add X 
 				data.push_back(startPos + 0.66*col);
 				//Add Y
-				data.push_back(stof(number));
+				data.push_back(stoi(number));
 								
 				col++;			
 				dimX++;
@@ -41,11 +41,11 @@ void readFile(){
 			col=0;
 
 		}	
-
+		cout<<dimX<<endl;
 		dimX/=dimY;
 		
-		cout << "Dimensions X: " << dimX << endl;
-		cout << "Dimensions Y: " << dimY << endl;
+		//cout << "Dimensions X: " << dimX << endl;
+		//cout << "Dimensions Y: " << dimY << endl;
 		
 		infile.close();
 	}

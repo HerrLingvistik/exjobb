@@ -13,7 +13,7 @@ extern int dimX, dimY;
 
 //extern int canvas[DIM][DIM];
 //extern float data[2*DIM*DIM];
-extern vector<float> data;
+extern vector<int> data;
 
 //extern float data[(DIM-1)*2*DIM*2];
  
