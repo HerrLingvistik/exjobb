@@ -14,6 +14,8 @@
 	- add interaction mouse listener
 	- add clustering?
 	- add sound
+	- Enable reading of dimension in beginning of file. 
+	- Maybe make the file reading more general?? Work for both int and float and different formats like whitespace and so on.
 */
 
 #define GL_GLEXT_PROTOTYPES	
@@ -54,8 +56,8 @@ GLfloat triVerts[] =
 	1.0f, 1.0f, 0.0f
 };
 
-const int W = 1000;
-const int H = 600;
+const int W = 1299;
+const int H = 620;
 
 
 vector<float> data;
@@ -70,6 +72,9 @@ int dimY = 0;
 
 
 uint numbers[W][H];
+uint texArray[W][H];
+
+float* texture = new float[ W*H ];
 
 void glErrorCheck()
 {
@@ -85,6 +90,20 @@ void fillArray(){
 	for(int i=0; i< W; i++)
 		for(int j=0; j<H; j++)
 			startTex[i][j] = 0;
+}
+
+void writeFile(){
+
+	ofstream myfile;
+	myfile.open ("texture.txt");
+	int i = 0;
+	while(i<W*H){
+		myfile << texture[i] << " "; 
+		i++;	
+		if(i % W == 0)
+			myfile << "\n";
+	}
+	myfile.close();
 }
 
 /*
@@ -126,15 +145,15 @@ void initTexture(){
 	glDisable(GL_BLEND);
 
 
-	float* ids = new float[ W*H ];
+	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, ids);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, texture);
 	int i = 0;	
 	float max = 0;
 	while(i<W*H){
-		if(ids[i] > max){
-			max = ids[i];
+		if(texture[i] > max){
+			max = texture[i];
 		}
 		i++;
 	}
@@ -176,7 +195,7 @@ void init(){
 	normalizeAxis();
 
 	//temporary function
-	fillArray();	
+	//fillArray();	
 
 	drawShader = loadShaders("./shaders/draw.vert", "./shaders/draw.frag");
 	paralellShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
@@ -245,7 +264,7 @@ void init(){
 	glBindTexture(GL_TEXTURE_2D, 0);
 	
 	initTexture();
-	
+	//writeFile();
 }
 
 // This function is called whenever the computer is idle

@@ -11,11 +11,8 @@ void main(void){
 	float intensity = 0;
 	float red = 0;
 	intensity = texture(parallelTex, texCoord).r;	
-	//if(intensity < 2)
-		//intensity = 0;
-	//intensity = normalize(intensity)
-	//out_Color = vec4(red,intensity,0, 1);
-	//out_Color = vec4(intensity/maxValue, intensity/maxValue, intensity/maxValue, 0);	
-	float scale = 50;
-	out_Color = vec4(scale*intensity/maxValue, scale*intensity/maxValue, scale*intensity/maxValue, 0);
+		
+	float scale = 1.0;
+	out_Color = vec4(log(log(intensity+1)/log(10) +1)/log(10), log(log(intensity+1)/log(10) +1)/log(10), log(log(intensity+1)/log(10) +1)/log(10), 1);
+	//out_Color = vec4(0.5, 0, 0, 1);
 }

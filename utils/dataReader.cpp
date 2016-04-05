@@ -37,7 +37,7 @@ void readFile(){
 				//Add X 
 				data.push_back(startPos + 0.5*col);
 				//Add Y
-				data.push_back((float)stoi(number));
+				data.push_back((float)stof(number));
 				col++;			
 				dimX++;
 				//cout << "Col = " << col << endl;
