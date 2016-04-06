@@ -14,5 +14,5 @@ void main(void){
 		
 	float scale = 1.0;
 	out_Color = vec4(log(log(intensity+1)/log(10) +1)/log(10), log(log(intensity+1)/log(10) +1)/log(10), log(log(intensity+1)/log(10) +1)/log(10), 1);
-	//out_Color = vec4(0.5, 0, 0, 1);
+	//out_Color = vec4(intensity, intensity, intensity, 1);
 }

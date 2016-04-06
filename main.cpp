@@ -8,6 +8,9 @@
 
 /*
 	THINGS TO ADD 
+
+	- Fix problem with point sampling, giving the wrong intensity / position.
+
 	- Also draw lines for the axes. 
 	- for more axes set width of each axis 
 
@@ -69,10 +72,11 @@ uint startTex[W][H];
 
 int dimX = 0;
 int dimY = 0;
-
+int maxPos = 0;	
+int rowMax=0, colMax=0;
 
 uint numbers[W][H];
-uint texArray[W][H];
+float texArray[W][H];
 
 float* texture = new float[ W*H ];
 
@@ -86,22 +90,22 @@ void glErrorCheck()
     }
 }
 
-void fillArray(){
-	for(int i=0; i< W; i++)
-		for(int j=0; j<H; j++)
-			startTex[i][j] = 0;
-}
-
 void writeFile(){
 
 	ofstream myfile;
 	myfile.open ("texture.txt");
 	int i = 0;
+	int row = 619, col=0;
 	while(i<W*H){
 		myfile << texture[i] << " "; 
-		i++;	
-		if(i % W == 0)
+		texArray[col][row] = texture[i];
+		i++;
+		col++;	
+		if(col==W){
 			myfile << "\n";
+			row--;
+			col=0;
+		}
 	}
 	myfile.close();
 }
@@ -149,21 +153,29 @@ void initTexture(){
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, texture);
-	int i = 0;	
+	int i = 0, row = 0, col = 0;
 	float max = 0;
 	while(i<W*H){
 		if(texture[i] > max){
 			max = texture[i];
+			maxPos = i;
+			colMax=col;
+			rowMax=row;
 		}
+		if(col == W){
+			col = 0;
+			row++;
+		}
+		col++;
 		i++;
 	}
+	cout<<maxPos << " of " << i <<endl;
 	//don't draw using the parallel coordinates shader anymore.
 	glUseProgram(0);
 	glUseProgram(drawShader);
 	glUniform1f(glGetUniformLocation(drawShader, "maxValue"), max);
 	glUseProgram(0);
-	cout << "DONE WITH TEXTURE. Max value: "<<max<<endl;	
-	
+	cout << "DONE WITH TEXTURE. Max value: "<<max<<" pos "<<colMax<<", "<<rowMax<<endl;	
 }
 
 void draw(){
@@ -264,7 +276,9 @@ void init(){
 	glBindTexture(GL_TEXTURE_2D, 0);
 	
 	initTexture();
-	//writeFile();
+	cout<<"after initTexture "<<texArray[520][88]<<endl;
+	writeFile();
+	cout<<"after write: "<<texArray[520][88]<<endl;
 }
 
 // This function is called whenever the computer is idle
@@ -275,6 +289,26 @@ void idle()
 	glutPostRedisplay();
 
 }
+
+/*
+	Interaction function
+*/
+
+void mouseEvent(int event, int state, int x, int y){
+	if(event == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+		cout<<texArray[x][y]<<endl;
+	}
+}
+	
+void mouseMove(int x, int y){	
+		std::string s;
+		s = std::to_string(x) + ", " + to_string(y) + " value " + to_string(texArray[x][y]);
+		char const *pchar = s.c_str();
+		//cout<<"hello"<<texArray[520][88]<<endl;
+		glutSetWindowTitle(pchar);
+		
+}
+
 
 int main(int argc, char **argv){	
 	//initiate glut
@@ -292,6 +326,8 @@ int main(int argc, char **argv){
   glutDisplayFunc(draw);
 	//initiate stuff for the drawing
 	init();
+	glutMouseFunc(mouseEvent);
+	glutPassiveMotionFunc(mouseMove);
   // Loop required by OpenGL
   glutMainLoop();
 	exit(0);
