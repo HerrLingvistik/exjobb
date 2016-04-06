@@ -12,12 +12,9 @@
 	- Fix problem with point sampling, giving the wrong intensity / position.
 
 	- Also draw lines for the axes. 
-	- for more axes set width of each axis 
 
-	- add interaction mouse listener
 	- add clustering?
 	- add sound
-	- Enable reading of dimension in beginning of file. 
 	- Maybe make the file reading more general?? Work for both int and float and different formats like whitespace and so on.
 */
 
@@ -73,7 +70,6 @@ uint startTex[W][H];
 int dimX = 0;
 int dimY = 0;
 int maxPos = 0;	
-int rowMax=0, colMax=0;
 
 uint numbers[W][H];
 float texArray[W][H];
@@ -159,8 +155,6 @@ void initTexture(){
 		if(texture[i] > max){
 			max = texture[i];
 			maxPos = i;
-			colMax=col;
-			rowMax=row;
 		}
 		if(col == W){
 			col = 0;
@@ -169,18 +163,16 @@ void initTexture(){
 		col++;
 		i++;
 	}
-	cout<<maxPos << " of " << i <<endl;
 	//don't draw using the parallel coordinates shader anymore.
 	glUseProgram(0);
 	glUseProgram(drawShader);
 	glUniform1f(glGetUniformLocation(drawShader, "maxValue"), max);
 	glUseProgram(0);
-	cout << "DONE WITH TEXTURE. Max value: "<<max<<" pos "<<colMax<<", "<<rowMax<<endl;	
+	cout << "DONE WITH TEXTURE. Max value: "<<max<<endl;	
 }
 
 void draw(){
 	
-	//cout<<numbers[W-1][H-1]<< endl;
 	glUseProgram(drawShader);
 	glBindVertexArray(triVertArray);
 	//enable or disable a generic vertex attribute array
@@ -276,9 +268,7 @@ void init(){
 	glBindTexture(GL_TEXTURE_2D, 0);
 	
 	initTexture();
-	cout<<"after initTexture "<<texArray[520][88]<<endl;
 	writeFile();
-	cout<<"after write: "<<texArray[520][88]<<endl;
 }
 
 // This function is called whenever the computer is idle
@@ -291,7 +281,7 @@ void idle()
 }
 
 /*
-	Interaction function
+	Interaction function for clicking mouse button
 */
 
 void mouseEvent(int event, int state, int x, int y){
@@ -299,12 +289,13 @@ void mouseEvent(int event, int state, int x, int y){
 		cout<<texArray[x][y]<<endl;
 	}
 }
-	
+/*
+	Interaction function for moving mouse
+*/
 void mouseMove(int x, int y){	
 		std::string s;
-		s = std::to_string(x) + ", " + to_string(y) + " value " + to_string(texArray[x][y]);
+		s = "x: " + std::to_string(x) + " y: " + to_string(y) + " value " + to_string(texArray[x][y]);
 		char const *pchar = s.c_str();
-		//cout<<"hello"<<texArray[520][88]<<endl;
 		glutSetWindowTitle(pchar);
 		
 }
