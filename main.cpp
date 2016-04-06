@@ -19,6 +19,11 @@
 */
 
 #define GL_GLEXT_PROTOTYPES	
+#include <stdio.h>
+#include <AL/al.h>
+#include <AL/alut.h>
+
+#include <GL/glut.h>
 #include <GL/freeglut.h>
 #include <GL/gl.h>
 #include <iostream>
@@ -33,6 +38,7 @@
 #include "utils/dataReader.h"
 #include "utils/shaderReader.h"
 #include "utils/normalizeAxis.h"
+
 
 
 using namespace std;
@@ -55,6 +61,9 @@ GLfloat triVerts[] =
 	1.0f, -1.0f, 0.0f, 
 	1.0f, 1.0f, 0.0f
 };
+
+//Array of audio buffer ID's
+//ALuint audioBuffers[1];
 
 const int W = 1299;
 const int H = 620;
@@ -302,6 +311,61 @@ void mouseMove(int x, int y){
 
 
 int main(int argc, char **argv){	
+		
+	//http://mrl.nyu.edu/~dzorin/ig04/lecture10/OpenALDemo.cpp 
+	/*
+	ALCdevice *Device;
+	ALCcontext *Context;
+	ALint	error;
+
+	ALfloat listenerPos[]={0.0,0.0,0.0};
+	ALfloat listenerVel[]={0.0,0.0,0.0};
+	ALfloat	listenerOri[]={0.0,0.0,-1.0, 0.0,1.0,0.0};	// Listener facing into the screen
+
+	// Initialize Open AL manually
+	//Open device
+	Device = alcOpenDevice(NULL); // this is supposed to select the "preferred device"	
+	//Create context(s)
+	if(Device) {
+		Context = alcCreateContext(Device, NULL);
+		//Set active context
+		alcMakeContextCurrent(Context);
+	}
+		
+	//To generate a set of buffers for use, use alGetError to reset the error state, call alGenSources to generate
+	// the number of sources desired, and then use alGetError again to detect if an error was generated
+	alGetError();
+	//Generate buffers. First value being the number of buffers to be created, second is an array of audio buffer ID's
+	alGenBuffers(1, audioBuffers);
+
+	if ((error = alGetError()) != AL_NO_ERROR) 
+	{ 
+      cout << "alGenBuffers :" << alGetString(error) << endl;  
+	} 
+	
+	ALsizei size,freq;
+	ALenum	format;
+	ALvoid	*data;
+	ALboolean loop;
+	
+	// Load test.wav 
+	alutLoadWAVFile("/audio/var1.wav",&format,&data,&size,&freq,&loop); 
+	if ((error = alGetError()) != AL_NO_ERROR) 
+	{ 		
+				cout << "alutLoadWAVFile test.wav : " << alGetString(error) << endl; 
+		    alDeleteBuffers(1, audioBuffers);        
+	} */
+	
+	alutInit(&argc, argv);
+	ALuint buffer = alutCreateBufferFromFile("var1.wav");
+	ALuint source; 
+	alGenSources(1, &source); 
+	alSourcei(source, AL_BUFFER, buffer);
+	alSourcePlay(source); 
+
+	int error = alGetError(); 
+	if (error) printf("%s\n", alutGetErrorString(error));
+
 	//initiate glut
 	glutInit(&argc, argv);
 	//sets the initial display mode

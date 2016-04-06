@@ -18,6 +18,7 @@ void readFile(){
 	string number, dim;
 	int col=0;
 	float startPos = -1.0, axisSpacing;
+
 	if(infile.is_open()){		
 		//Read first line to get dimensions.
 		getline(infile, line);

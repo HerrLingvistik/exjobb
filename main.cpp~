@@ -7,21 +7,23 @@
 ** -------------------------------------------------------------------------*/
 
 /*
-	THINGS TO ADD
-	- Create FBO containing texture on which the parallel coordinates will be drawn.
-	- bind the fbo when drawing the parallel coordinates
-	- bind the textures when drawing to the screen, draw texture on the quad. 
+	THINGS TO ADD 
 
-	- normalize all values between 0 and 1, no matter their range(feature scaling). y' = (y - min(y))/(max(y) - min(y))  
+	- Fix problem with point sampling, giving the wrong intensity / position.
+
 	- Also draw lines for the axes. 
-	- for more axes set width of each axis 
 
-	- add interaction mouse listener
 	- add clustering?
 	- add sound
+	- Maybe make the file reading more general?? Work for both int and float and different formats like whitespace and so on.
 */
 
 #define GL_GLEXT_PROTOTYPES	
+#include <stdio.h>
+#include <AL/al.h>
+#include <AL/alut.h>
+
+#include <GL/glut.h>
 #include <GL/freeglut.h>
 #include <GL/gl.h>
 #include <iostream>
@@ -36,6 +38,7 @@
 #include "utils/dataReader.h"
 #include "utils/shaderReader.h"
 #include "utils/normalizeAxis.h"
+
 
 
 using namespace std;
@@ -59,31 +62,77 @@ GLfloat triVerts[] =
 	1.0f, 1.0f, 0.0f
 };
 
+//Array of audio buffer ID's
+//ALuint audioBuffers[1];
 
-const int W = 512;
-const int H = 512;
+const int W = 1299;
+const int H = 620;
+
 
 vector<float> data;
 vector<int> first;
 vector<int> count;
 
+
+uint startTex[W][H];
+
 int dimX = 0;
 int dimY = 0;
-
-int bajs[4] = {4, 4, 4, 4};
+int maxPos = 0;	
 
 uint numbers[W][H];
+float texArray[W][H];
+
+float* texture = new float[ W*H ];
+
+void glErrorCheck()
+{
+    int errCode;
+    if ((errCode = glGetError()) != GL_NO_ERROR)
+    {
+        printf("Failure in OpenGL %d \n", errCode);
+        //exit(0);
+    }
+}
+
+void writeFile(){
+
+	ofstream myfile;
+	myfile.open ("texture.txt");
+	int i = 0;
+	int row = 619, col=0;
+	while(i<W*H){
+		myfile << texture[i] << " "; 
+		texArray[col][row] = texture[i];
+		i++;
+		col++;	
+		if(col==W){
+			myfile << "\n";
+			row--;
+			col=0;
+		}
+	}
+	myfile.close();
+}
+
+/*
+	Problem med texture blending som skriver över istället för att blenda. 
+	Alternativt att den blendar och sedan clampar;
+*/
 
 void initTexture(){
 
 	//set window color and clear last screen
-	glClearColor(0,0,0,1);
+	glClearColor(0,0,0,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDisable(GL_CULL_FACE);
+	
+	glClampColor(GL_CLAMP_READ_COLOR, GL_FALSE);
+
 	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
-	glBlendEquation( GL_FUNC_ADD );
 	glBlendFunc(GL_ONE, GL_ONE);
+	glClampColor(GL_CLAMP_READ_COLOR, GL_FALSE);
 	//use parallel coordinates shader
 	glUseProgram(paralellShader);
 	//bind data array containing coordinates for drawing lines between
@@ -92,22 +141,47 @@ void initTexture(){
 	glEnableVertexAttribArray(0);
 	//draw lines tell opengl how many values will be sent to the shaders
 
+
 	//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	//use parallel coordinates shader
-	glMultiDrawArrays(GL_LINE_STRIP, &first.front(), bajs,first.size());
+	glMultiDrawArrays(GL_LINE_STRIP, &first.front(), &count.front(),count.size());
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//disable and unbind just to be safeopengl
+	//disable and unbind just to be safe
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);	
 	glDisable(GL_BLEND);
+
+
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, texture);
+	int i = 0, row = 0, col = 0;
+	float max = 0;
+	while(i<W*H){
+		if(texture[i] > max){
+			max = texture[i];
+			maxPos = i;
+		}
+		if(col == W){
+			col = 0;
+			row++;
+		}
+		col++;
+		i++;
+	}
 	//don't draw using the parallel coordinates shader anymore.
 	glUseProgram(0);
+	glUseProgram(drawShader);
+	glUniform1f(glGetUniformLocation(drawShader, "maxValue"), max);
+	glUseProgram(0);
+	cout << "DONE WITH TEXTURE. Max value: "<<max<<endl;	
 }
 
 void draw(){
 	
-	//cout<<numbers[W-1][H-1]<< endl;
 	glUseProgram(drawShader);
 	glBindVertexArray(triVertArray);
 	//enable or disable a generic vertex attribute array
@@ -116,15 +190,15 @@ void draw(){
 	glBindTexture(GL_TEXTURE_2D, tex);    
 	glUniform1i(glGetUniformLocation(drawShader, "parallelTex"), 0);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-
+	
 	glBindTexture(GL_TEXTURE_2D, 0); 
-	glActiveTexture(0);
 	//disable and unbind just to be safe
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);	
 	//don't draw using the parallel coordinates shader anymore.
 	glUseProgram(0);
 	//swaps the buffers of the current window if double buffered(draw)
+	//glErrorCheck();
 	glutSwapBuffers();
 }
 
@@ -133,7 +207,8 @@ void init(){
 	readFile();
 	normalizeAxis();
 
-	
+	//temporary function
+	//fillArray();	
 
 	drawShader = loadShaders("./shaders/draw.vert", "./shaders/draw.frag");
 	paralellShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
@@ -176,37 +251,33 @@ void init(){
 	/*
 		Create textuhttps://www.opengl.org/discussion_boards/showthread.php/169270-Subset-of-blending-modes-for-32-bit-integer-renderre and set attach it to a framebuffer object.
 	*/
-
-	//tex 1 and fbo object 1
-	glGenTextures(1, &tex);
-	glActiveTexture(tex);
-	glBindTexture(GL_TEXTURE_2D, tex);  
-
-	//KOMMER INTE HA RGBA!!!
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, W, H, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI, W, H, 0, GL_RED_INTEGER, GL_UNSIGNED_INT, NULL);	
 	
+	//tex 1 and fbo object 1
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);  
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, W, H, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, W, H, 0, GL_RED, GL_UNSIGNED_INT, NULL);	
+	//glErrorCheck();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glGenerateMipmap(GL_TEXTURE_2D);	
-	//GL_R32UI	
-	/* GLenum err;
-    while ((err = glGetError()) != GL_NO_ERROR) {
-        cerr << "OpenGL error: " << err << endl;
-    }*/ 
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
-
+	
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-		cout<<"texture creation successful"<<endl;
+		cout<<"texture creation not successful"<<endl;
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
-
+	
 	initTexture();
+	writeFile();
 }
 
 // This function is called whenever the computer is idle
@@ -218,7 +289,86 @@ void idle()
 
 }
 
+<<<<<<< HEAD
+/*
+	Interaction function for clicking mouse button
+*/
+
+void mouseEvent(int event, int state, int x, int y){
+	if(event == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+		cout<<texArray[x][y]<<endl;
+	}
+}
+/*
+	Interaction function for moving mouse
+*/
+void mouseMove(int x, int y){	
+		std::string s;
+		s = "x: " + std::to_string(x) + " y: " + to_string(y) + " value " + to_string(texArray[x][y]);
+		char const *pchar = s.c_str();
+		glutSetWindowTitle(pchar);
+		
+}
+
+=======
+>>>>>>> sound
+
 int main(int argc, char **argv){	
+		
+	//http://mrl.nyu.edu/~dzorin/ig04/lecture10/OpenALDemo.cpp 
+	/*
+	ALCdevice *Device;
+	ALCcontext *Context;
+	ALint	error;
+
+	ALfloat listenerPos[]={0.0,0.0,0.0};
+	ALfloat listenerVel[]={0.0,0.0,0.0};
+	ALfloat	listenerOri[]={0.0,0.0,-1.0, 0.0,1.0,0.0};	// Listener facing into the screen
+
+	// Initialize Open AL manually
+	//Open device
+	Device = alcOpenDevice(NULL); // this is supposed to select the "preferred device"	
+	//Create context(s)
+	if(Device) {
+		Context = alcCreateContext(Device, NULL);
+		//Set active context
+		alcMakeContextCurrent(Context);
+	}
+		
+	//To generate a set of buffers for use, use alGetError to reset the error state, call alGenSources to generate
+	// the number of sources desired, and then use alGetError again to detect if an error was generated
+	alGetError();
+	//Generate buffers. First value being the number of buffers to be created, second is an array of audio buffer ID's
+	alGenBuffers(1, audioBuffers);
+
+	if ((error = alGetError()) != AL_NO_ERROR) 
+	{ 
+      cout << "alGenBuffers :" << alGetString(error) << endl;  
+	} 
+	
+	ALsizei size,freq;
+	ALenum	format;
+	ALvoid	*data;
+	ALboolean loop;
+	
+	// Load test.wav 
+	alutLoadWAVFile("/audio/var1.wav",&format,&data,&size,&freq,&loop); 
+	if ((error = alGetError()) != AL_NO_ERROR) 
+	{ 		
+				cout << "alutLoadWAVFile test.wav : " << alGetString(error) << endl; 
+		    alDeleteBuffers(1, audioBuffers);        
+	} */
+	
+	alutInit(&argc, argv);
+	ALuint buffer = alutCreateBufferFromFile("var1.wav");
+	ALuint source; 
+	alGenSources(1, &source); 
+	alSourcei(source, AL_BUFFER, buffer);
+	alSourcePlay(source); 
+
+	int error = alGetError(); 
+	if (error) printf("%s\n", alutGetErrorString(error));
+
 	//initiate glut
 	glutInit(&argc, argv);
 	//sets the initial display mode
@@ -234,8 +384,9 @@ int main(int argc, char **argv){
   glutDisplayFunc(draw);
 	//initiate stuff for the drawing
 	init();
+	glutMouseFunc(mouseEvent);
+	glutPassiveMotionFunc(mouseMove);
   // Loop required by OpenGL
   glutMainLoop();
-	cout << "dase: "<< counter << endl;
 	exit(0);
 }
