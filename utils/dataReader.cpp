@@ -16,7 +16,7 @@ void readFile(){
 	infile.open("./data/out5dhaxad.txt"); 
 	string line;
 	string number;
-	int col=0, ind=0; //int row=0; int i=0;
+	int col=0; //ind=0; //int row=0; int i=0;
 	float startPos = -1.0;
 	if(infile.is_open()){		
 		
