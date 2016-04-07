@@ -45,12 +45,12 @@
 
 using namespace std;
 //Shader handles
-GLuint drawShader, paralellShader;
+GLuint drawShader, paralellShader, mouseShader;
 
 ALuint source; 
 
 //pointers for vertices
-GLuint triVertArray, triVertBuffer, dataArray, dataBuffer, tex, fbo; 
+GLuint triVertArray, triVertBuffer, dataArray, dataBuffer, mouseBuffer, mouseArray,tex, fbo; 
 int counter=0;
 
 //Vertices used to draw to triangles(one quad) upon which the texture will be drawn
@@ -64,6 +64,15 @@ GLfloat triVerts[] =
 	-1.0f, -1.0f, 0.0f, 
 	1.0f, -1.0f, 0.0f, 
 	1.0f, 1.0f, 0.0f
+};
+
+GLfloat mouseVerts[] = 
+{
+	-0.5f, 0.5f, 
+	-0.5f, -0.5f, 
+	0.5f, -0.5f, 
+	0.5f, 0.5f,
+	-0.5f, 0.5f 
 };
 
 //Array of audio buffer ID's
@@ -80,9 +89,7 @@ vector<int> count;
 
 uint startTex[W][H];
 
-int dimX = 0;
-int dimY = 0;
-int maxPos = 0;
+int dimX = 0, dimY = 0, maxPos = 0, mouseX, mouseY;
 float maxValue;	
 
 uint numbers[W][H];
@@ -118,6 +125,41 @@ void writeFile(){
 		}
 	}
 	myfile.close();
+}
+
+void calcMouseSquare(){
+	//bind data array containing coordinates for drawing lines between
+	mouseVerts[0] = ((mouseX-5.0f)/(float)W)*2.0-1.0;
+	mouseVerts[1] = -(((mouseY-5.0f)/(float)H)*2.0-1.0);
+	mouseVerts[2] = ((mouseX-5.0f)/(float)W)*2.0-1.0;
+	mouseVerts[3] = -(((mouseY+5.0f)/(float)H)*2.0-1.0);
+	mouseVerts[4] = ((mouseX+5.0f)/(float)W)*2.0-1.0;
+	mouseVerts[5] = -(((mouseY+5.0f)/(float)H)*2.0-1.0);
+	mouseVerts[6] = ((mouseX+5.0f)/(float)W)*2.0-1.0;
+	mouseVerts[7] = -(((mouseY-5.0f)/(float)H)*2.0-1.0);
+	mouseVerts[8] = ((mouseX-5.0f)/(float)W)*2.0-1.0;
+	mouseVerts[9] = -(((mouseY-5.0f)/(float)H)*2.0-1.0);
+	
+	glBindVertexArray(mouseArray);
+	glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(mouseVerts), mouseVerts, GL_STATIC_DRAW);
+}
+
+float calcVolume(){
+	float sum = 0;
+	int posX = 0, posY = 0;
+	for(int i=-5; i<=5; i++){
+		for(int j=-5; j<=5; j++){
+			posX = mouseX+i;
+			posY = mouseY+j;
+			if(posX<0 || posX > W)
+				posX=mouseX;
+			if(posY<0 || posY > H)
+				posY=mouseY;
+			sum+=texArray[posX][posY];
+		}
+	}
+	return sum/121.0f;
 }
 
 /*
@@ -182,6 +224,7 @@ void initTexture(){
 	glUseProgram(drawShader);
 	glUniform1f(glGetUniformLocation(drawShader, "maxValue"), max);
 	glUseProgram(0);
+	
 	cout << "DONE WITH TEXTURE. Max value: "<<max<<endl;
 	maxValue = max;	
 }
@@ -203,6 +246,18 @@ void draw(){
 	glBindVertexArray(0);	
 	//don't draw using the parallel coordinates shader anymore.
 	glUseProgram(0);
+
+	glUseProgram(mouseShader);
+	//recalculate mouse marker area
+	calcMouseSquare();	
+	//enable or disable a generic vertex attribute array
+	glEnableVertexAttribArray(0);
+	glDrawArrays(GL_LINE_STRIP, 0, 5);
+	//bind data array containing coordinates for drawing lines between
+	glBindVertexArray(0);
+	//enable or disable a generic vertex attribute array
+	glDisableVertexAttribArray(0);
+	glUseProgram(0);
 	//swaps the buffers of the current window if double buffered(draw)
 	//glErrorCheck();
 	glutSwapBuffers();
@@ -218,10 +273,12 @@ void init(){
 
 	drawShader = loadShaders("./shaders/draw.vert", "./shaders/draw.frag");
 	paralellShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
+	mouseShader = loadShaders("./shaders/mouse.vert", "./shaders/mouse.frag");
 
 	//Generate holder for vertices in triangles!!!!!!!!!! CAFFEIN OVERLOAD!!!!!!!!!
 	glGenVertexArrays(1, &triVertArray);
 	glGenVertexArrays(1, &dataArray);
+	glGenVertexArrays(1, &mouseArray);
 
 	/*
 		Send vertices for the fullscreen quad, consisting of two triangles, to the draw shader.
@@ -255,9 +312,22 @@ void init(){
 	glBindVertexArray(0);
 
 	/*
+		for rendering square around mouse pointer
+	*/
+	glBindVertexArray(mouseArray);
+	glGenBuffers(1, &mouseBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(mouseVerts), mouseVerts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	//TRY TO CHANGE THE STRIDE OR USE INDICES!
+	glVertexAttribPointer(glGetAttribLocation(mouseShader, "in_Position"),2, GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),0);
+	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);		
+
+	/*
 		Create textuhttps://www.opengl.org/discussion_boards/showthread.php/169270-Subset-of-blending-modes-for-32-bit-integer-renderre and set attach it to a framebuffer object.
 	*/
-	
 	//tex 1 and fbo object 1
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &tex);
@@ -307,9 +377,13 @@ void playSound(float volume){
 */ 
 void mouseEvent(int event, int state, int x, int y){
 	if(event == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-		cout<<texArray[x][y]/maxValue<<endl;
-		
-		playSound(texArray[x][y]/maxValue);
+		//cout<<<<endl;
+		float vol = calcVolume()/maxValue *2.0;
+		cout<<vol<<endl;
+		playSound(vol);
+		mouseX = x;
+		mouseY = y;
+		glutPostRedisplay();
 	}
 }
 
@@ -318,9 +392,11 @@ void mouseEvent(int event, int state, int x, int y){
 */ 
 void mouseMoveClick(int x, int y){
 	//if(event == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-		cout<<texArray[x][y]/maxValue<<endl;
-		
-		playSound(texArray[x][y]/maxValue);
+		//cout<<texArray[x][y]/maxValue<<endl;
+		mouseX = x;
+		mouseY = y;
+		playSound(calcVolume()/maxValue);
+		glutPostRedisplay();
 	//}
 }
 
@@ -328,10 +404,13 @@ void mouseMoveClick(int x, int y){
 	Interaction function for moving mouse
 */
 void mouseMove(int x, int y){	
+		mouseX = x;
+		mouseY = y;		
 		std::string s;
 		s = "x: " + std::to_string(x) + " y: " + to_string(y) + " value " + to_string(texArray[x][y]);
 		char const *pchar = s.c_str();
 		glutSetWindowTitle(pchar);
+		glutPostRedisplay();
 		
 }
 
@@ -408,6 +487,7 @@ int main(int argc, char **argv){
   glutDisplayFunc(draw);
 	//initiate stuff for the drawing
 	init();
+	glutSetCursor(GLUT_CURSOR_NONE);
 	glutMouseFunc(mouseEvent);
 	glutPassiveMotionFunc(mouseMove);
 	glutMotionFunc(mouseMoveClick);
