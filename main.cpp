@@ -9,6 +9,8 @@
 /*
 	THINGS TO ADD 
 
+	- Make sound be based on density in region instead of in pixel. 	
+
 	- Fix problem with point sampling, giving the wrong intensity / position.
 
 	- Also draw lines for the axes. 
@@ -45,6 +47,8 @@ using namespace std;
 //Shader handles
 GLuint drawShader, paralellShader;
 
+ALuint source; 
+
 //pointers for vertices
 GLuint triVertArray, triVertBuffer, dataArray, dataBuffer, tex, fbo; 
 int counter=0;
@@ -78,7 +82,8 @@ uint startTex[W][H];
 
 int dimX = 0;
 int dimY = 0;
-int maxPos = 0;	
+int maxPos = 0;
+float maxValue;	
 
 uint numbers[W][H];
 float texArray[W][H];
@@ -177,7 +182,8 @@ void initTexture(){
 	glUseProgram(drawShader);
 	glUniform1f(glGetUniformLocation(drawShader, "maxValue"), max);
 	glUseProgram(0);
-	cout << "DONE WITH TEXTURE. Max value: "<<max<<endl;	
+	cout << "DONE WITH TEXTURE. Max value: "<<max<<endl;
+	maxValue = max;	
 }
 
 void draw(){
@@ -288,16 +294,36 @@ void idle()
 	glutPostRedisplay();
 
 }
+/*
+	Do some kind of filtering. Gaussian mean value or similar. 
+*/
+void playSound(float volume){
+	alSourcef(source, AL_GAIN, volume);
+	//alSourcePlay(source); 
+}
 
 /*
 	Interaction function for clicking mouse button
-*/
-
+*/ 
 void mouseEvent(int event, int state, int x, int y){
 	if(event == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-		cout<<texArray[x][y]<<endl;
+		cout<<texArray[x][y]/maxValue<<endl;
+		
+		playSound(texArray[x][y]/maxValue);
 	}
 }
+
+/*
+	Interaction function for clicking mouse button
+*/ 
+void mouseMoveClick(int x, int y){
+	//if(event == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
+		cout<<texArray[x][y]/maxValue<<endl;
+		
+		playSound(texArray[x][y]/maxValue);
+	//}
+}
+
 /*
 	Interaction function for moving mouse
 */
@@ -358,9 +384,10 @@ int main(int argc, char **argv){
 	
 	alutInit(&argc, argv);
 	ALuint buffer = alutCreateBufferFromFile("var1.wav");
-	ALuint source; 
+	
 	alGenSources(1, &source); 
 	alSourcei(source, AL_BUFFER, buffer);
+	alSourcei(source, AL_LOOPING, 1);
 	alSourcePlay(source); 
 
 	int error = alGetError(); 
@@ -383,6 +410,7 @@ int main(int argc, char **argv){
 	init();
 	glutMouseFunc(mouseEvent);
 	glutPassiveMotionFunc(mouseMove);
+	glutMotionFunc(mouseMoveClick);
   // Loop required by OpenGL
   glutMainLoop();
 	exit(0);
