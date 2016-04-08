@@ -421,7 +421,7 @@ void mouseEvent(int event, int state, int x, int y){
 		float vol = calcVolume(x, y)/maxValue *2.0;
 		cout<<vol<<endl;
 		playSound(vol);
-		alSourcePlay(source); 
+		//alSourcePlay(source); 
 		mouseX = x;
 		mouseY = y;
 		glutPostRedisplay();
@@ -433,7 +433,7 @@ void mouseEvent(int event, int state, int x, int y){
 		float vol = calcVolume(x, y)/maxValue *2.0;
 		cout<<vol<<endl;
 		playSound2(vol);	
-		alSourcePlay(source2); 
+		//alSourcePlay(source2); 
 		mouse2X = x;
 		mouse2Y = y;
 		glutPostRedisplay();
@@ -490,13 +490,15 @@ int main(int argc, char **argv){
 
 	alSourcei(source, AL_BUFFER, buffer);
 	alSourcei(source, AL_LOOPING, 1);
-	//alSourcePlay(source); 	
+	playSound(0);
+	alSourcePlay(source); 	
 
 	alGenSources(1, &source2); 
 
 	alSourcei(source2, AL_BUFFER, buffer2);
 	alSourcei(source2, AL_LOOPING, 1);
-	//alSourcePlay(source2); 
+	playSound2(0);
+	alSourcePlay(source2); 
 
 
 	int error = alGetError(); 
