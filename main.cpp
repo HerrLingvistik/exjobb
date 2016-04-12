@@ -21,10 +21,6 @@
 */
 
 #define GL_GLEXT_PROTOTYPES	
-#include <stdio.h>
-#include <AL/al.h>
-#include <AL/alut.h>
-
 #include <GL/glut.h>
 #include <GL/freeglut.h>
 #include <GL/gl.h>
@@ -40,14 +36,12 @@
 #include "utils/dataReader.h"
 #include "utils/shaderReader.h"
 #include "utils/normalizeAxis.h"
-
+#include "utils/sound.h"
 
 
 using namespace std;
 //Shader handles
 GLuint drawShader, paralellShader, mouseShader;
-
-ALuint source, source2; 
 
 //pointers for vertices
 GLuint triVertArray, triVertBuffer, dataArray, dataBuffer, mouseBuffer, mouseArray,tex, fbo; 
@@ -93,6 +87,7 @@ vector<float> data;
 vector<int> first;
 vector<int> count;
 
+//Booleans used for deciding when to play the sounds
 bool mouseClick = false;
 bool mouse2Click = false;
 
@@ -205,7 +200,7 @@ void initTexture(){
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_ONE, GL_ONE);
-	glClampColor(GL_CLAMP_READ_COLOR, GL_FALSE);
+	//glClampColor(GL_CLAMP_READSource_COLOR, GL_FALSE);
 	//use parallel coordinates shader
 	glUseProgram(paralellShader);
 	//bind data array containing coordinates for drawing lines between
@@ -325,7 +320,7 @@ void init(){
 	paralellShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
 	mouseShader = loadShaders("./shaders/mouse.vert", "./shaders/mouse.frag");
 
-	//Generate holder for vertices in triangles!!!!!!!!!! CAFFEIN OVERLOAD!!!!!!!!!
+	//Generate holder for vertices in triangles
 	glGenVertexArrays(1, &triVertArray);
 	glGenVertexArrays(1, &dataArray);
 	glGenVertexArrays(1, &mouseArray);
@@ -413,17 +408,6 @@ void idle()
 {
 	glutPostRedisplay();
 }
-/*
-	Do some kind of filtering. Gaussian mean value or similar. 
-*/
-void playSound(float volume){
-	alSourcef(source, AL_GAIN, volume); 
-}
-
-void playSound2(float volume){
-	alSourcef(source2, AL_GAIN, volume);
-	//alSourcePlay(source); 
-}
 
 /*
 	Interaction function for clicking mouse button
@@ -510,27 +494,8 @@ void resizeKey(unsigned char key, int x, int y){
 int main(int argc, char **argv){	
 	
 	alutInit(&argc, argv);
-	ALuint buffer = alutCreateBufferFromFile("var1.wav");
-	ALuint buffer2 = alutCreateBufferFromFile("var2.wav");
 
-
-	alGenSources(1, &source); 
-
-	alSourcei(source, AL_BUFFER, buffer);
-	alSourcei(source, AL_LOOPING, 1);
-	playSound(0);
-	alSourcePlay(source); 	
-
-	alGenSources(1, &source2); 
-
-	alSourcei(source2, AL_BUFFER, buffer2);
-	alSourcei(source2, AL_LOOPING, 1);
-	playSound2(0);
-	alSourcePlay(source2); 
-
-
-	int error = alGetError(); 
-	if (error) printf("%s\n", alutGetErrorString(error));
+	initSound();
 
 	//initiate glut
 	glutInit(&argc, argv);
@@ -549,8 +514,8 @@ int main(int argc, char **argv){
 	init();
 	//glutSetCursor(GLUT_CURSOR_NONE);
 	glutMouseFunc(mouseEvent);
-//	glutPassiveMotionFunc(mouseMove);
-	glutMotionFunc(mouseMoveClick);
+	glutPassiveMotionFunc(mouseMove);
+	//glutMotionFunc(mouseMoveClick);
 	glutKeyboardFunc(resizeKey);
 
   // Loop required by OpenGL
