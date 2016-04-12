@@ -47,7 +47,7 @@ using namespace std;
 //Shader handles
 GLuint drawShader, paralellShader, mouseShader;
 
-ALuint source; 
+ALuint source, source2; 
 
 //pointers for vertices
 GLuint triVertArray, triVertBuffer, dataArray, dataBuffer, mouseBuffer, mouseArray,tex, fbo; 
@@ -74,6 +74,14 @@ GLfloat mouseVerts[] =
 	0.5f, 0.5f 
 };
 
+GLfloat mouse2Verts[] = 
+{
+	-0.5f, 0.5f, 
+	-0.5f, -0.5f, 
+	0.5f, -0.5f, 
+	0.5f, 0.5f
+};
+
 //Array of audio buffer ID's
 //ALuint audioBuffers[1];
 
@@ -85,10 +93,13 @@ vector<float> data;
 vector<int> first;
 vector<int> count;
 
+bool mouseClick = false;
+bool mouse2Click = false;
 
 uint startTex[W][H];
 
-int dimX = 0, dimY = 0, maxPos = 0, mouseX, mouseY;
+
+int dimX = 0, dimY = 0, maxPos = 0, mouseX, mouseY, mouse2X, mouse2Y;
 float maxValue, markerSize;	
 
 uint numbers[W][H];
@@ -138,30 +149,37 @@ void calcMouseSquare(){
 	mouseVerts[5] = -(((mouseY+space)/(float)H)*2.0-1.0);
 	mouseVerts[6] = ((mouseX+space)/(float)W)*2.0-1.0;
 	mouseVerts[7] = -(((mouseY-space)/(float)H)*2.0-1.0);
-	
-	glBindVertexArray(mouseArray);
-	glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(mouseVerts), mouseVerts, GL_STATIC_DRAW);
+
+	mouse2Verts[0] = ((mouse2X-space)/(float)W)*2.0-1.0;
+	mouse2Verts[1] = -(((mouse2Y-space-1.0f)/(float)H)*2.0-1.0);
+	mouse2Verts[2] = ((mouse2X-space)/(float)W)*2.0-1.0;
+	mouse2Verts[3] = -(((mouse2Y+space)/(float)H)*2.0-1.0);
+	mouse2Verts[4] = ((mouse2X+space)/(float)W)*2.0-1.0;
+	mouse2Verts[5] = -(((mouse2Y+space)/(float)H)*2.0-1.0);
+	mouse2Verts[6] = ((mouse2X+space)/(float)W)*2.0-1.0;
+	mouse2Verts[7] = -(((mouse2Y-space)/(float)H)*2.0-1.0);
 }
+
+
 
 /*
 	Calculate volume for this square send in positions.
 */
 
-float calcVolume(){
+float calcVolume(int x, int y){
 	float sum = 0, space = (markerSize-1.0f)/2.0f;
 	int elements=0;
 	int posX = 0, posY = 0;
 	for(int j=-space; j<=space; j++){
 		for(int i=-space; i<=space; i++){
-			posX = mouseX+i;
-			posY = mouseY+j;
+			posX = x+i;
+			posY = y+j;
 			
 			if(posX>=0 && posX < W && posY>=0 && posY < H){
 				cout<<texArray[posX][posY]<<", ";
 				elements++;
 				sum+=texArray[posX][posY];
-			}
+			}	
 		}
 		cout<<endl;		
 	}	
@@ -265,10 +283,26 @@ void draw(){
 
 	glUseProgram(mouseShader);
 	//recalculate mouse marker area
-	calcMouseSquare();	
+
+	calcMouseSquare();
+	glBindVertexArray(mouseArray);
+	glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(mouseVerts), mouseVerts, GL_STATIC_DRAW);
 	glBindVertexArray(mouseArray);
 	//enable or disable a generic vertex attribute array
 	glEnableVertexAttribArray(0);
+	glUniform3f(glGetUniformLocation(mouseShader, "color"), 1.0f, 0.0f, 0.0f);
+	glDrawArrays(GL_LINE_LOOP, 0, 4);
+	//bind data array containing coordinates for drawing lines between
+	glBindVertexArray(0);
+
+	glBindVertexArray(mouseArray);
+	glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(mouse2Verts), mouse2Verts, GL_STATIC_DRAW);
+	glBindVertexArray(mouseArray);
+	//enable or disable a generic vertex attribute array
+	glEnableVertexAttribArray(0);
+	glUniform3f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 1.0f);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
 	//bind data array containing coordinates for drawing lines between
 	glBindVertexArray(0);
@@ -386,17 +420,37 @@ void playSound(float volume){
 	alSourcef(source, AL_GAIN, volume); 
 }
 
+void playSound2(float volume){
+	alSourcef(source2, AL_GAIN, volume);
+	//alSourcePlay(source); 
+}
+
 /*
 	Interaction function for clicking mouse button
 */ 
 void mouseEvent(int event, int state, int x, int y){
-	if(event == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-		float vol = (calcVolume()/maxValue) *2.0f;
+
+	if(event == GLUT_LEFT_BUTTON && state == GLUT_DOWN){	
+		mouseClick = true;
+		//cout<<<<endl;
+		float vol = calcVolume(x, y)/maxValue *2.0;
 		cout<<"On position x:"<<x<<" y: "<<y << "volume is "<<vol << " marker size: "<<markerSize<<endl;
-		//cout<<vol<<endl;
 		playSound(vol);
+		//alSourcePlay(source); 
 		mouseX = x;
 		mouseY = y;
+		glutPostRedisplay();
+	}
+	
+	if(event == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
+		mouse2Click = true;
+		//cout<<<<endl;
+		float vol = calcVolume(x, y)/maxValue *2.0;
+		cout<<vol<<endl;
+		playSound2(vol);	
+		//alSourcePlay(source2); 
+		mouse2X = x;
+		mouse2Y = y;
 		glutPostRedisplay();
 	}
 }
@@ -408,7 +462,7 @@ void mouseEvent(int event, int state, int x, int y){
 void mouseMoveClick(int x, int y){
 		mouseX = x;
 		mouseY = y;
-		playSound(calcVolume()/maxValue);
+		playSound(calcVolume(x, y)/maxValue);
 		glutPostRedisplay();
 }
 
@@ -416,13 +470,26 @@ void mouseMoveClick(int x, int y){
 	Interaction function for moving mouse marker
 */
 void mouseMove(int x, int y){	
-		mouseX = x;
-		mouseY = y;		
-		std::string s;
-		s = "x: " + std::to_string(x) + " y: " + to_string(y) + " value " + to_string(texArray[x][y]);
-		char const *pchar = s.c_str();
-		glutSetWindowTitle(pchar);
-		glutPostRedisplay();		
+
+	if(!mouseClick){
+			mouseX = x;
+			mouseY = y;		
+			std::string s;
+			s = "x: " + std::to_string(x) + " y: " + to_string(y) + " value " + to_string(texArray[x][y]);
+			char const *pchar = s.c_str();
+			glutSetWindowTitle(pchar);
+			glutPostRedisplay();
+		}
+		
+		if(!mouse2Click){
+			mouse2X = x;
+			mouse2Y = y;		
+			std::string s;
+			s = "x: " + std::to_string(x) + " y: " + to_string(y) + " value " + to_string(texArray[x][y]);
+			char const *pchar = s.c_str();
+			glutSetWindowTitle(pchar);
+			glutPostRedisplay();
+		}	
 }
 
 void resizeKey(unsigned char key, int x, int y){
@@ -433,17 +500,34 @@ void resizeKey(unsigned char key, int x, int y){
 		cout<<"marker size decreased"<<endl;
 		markerSize-=2;
 	}
+	float vol1 = calcVolume(mouseX, mouseY)/maxValue *2.0;
+	float vol2 = calcVolume(mouse2X, mouse2Y)/maxValue *2.0;
+	playSound(vol1);
+	playSound2(vol2);
 }
 
-int main(int argc, char **argv){
+
+int main(int argc, char **argv){	
 	
 	alutInit(&argc, argv);
 	ALuint buffer = alutCreateBufferFromFile("var1.wav");
-	
+	ALuint buffer2 = alutCreateBufferFromFile("var2.wav");
+
+
 	alGenSources(1, &source); 
+
 	alSourcei(source, AL_BUFFER, buffer);
 	alSourcei(source, AL_LOOPING, 1);
-	alSourcePlay(source); 
+	playSound(0);
+	alSourcePlay(source); 	
+
+	alGenSources(1, &source2); 
+
+	alSourcei(source2, AL_BUFFER, buffer2);
+	alSourcei(source2, AL_LOOPING, 1);
+	playSound2(0);
+	alSourcePlay(source2); 
+
 
 	int error = alGetError(); 
 	if (error) printf("%s\n", alutGetErrorString(error));
@@ -465,9 +549,10 @@ int main(int argc, char **argv){
 	init();
 	//glutSetCursor(GLUT_CURSOR_NONE);
 	glutMouseFunc(mouseEvent);
-	glutPassiveMotionFunc(mouseMove);
+//	glutPassiveMotionFunc(mouseMove);
 	glutMotionFunc(mouseMoveClick);
 	glutKeyboardFunc(resizeKey);
+
   // Loop required by OpenGL
   glutMainLoop();
 	exit(0);
