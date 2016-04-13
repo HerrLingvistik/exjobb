@@ -1,4 +1,4 @@
-#include "dataReader.h"
+#include "dataHandler.h"
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,6 +9,8 @@
 #include <string.h>
 
 using namespace std;
+
+float texArray[W][H];
 
 //The aim of this function is to read ASCII-data from a text file and store it into a one dimensional array.
 void readFile(){

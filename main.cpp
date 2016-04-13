@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 #include "utils/common.h"
-#include "utils/dataReader.h"
+#include "utils/dataHandler.h"
 #include "utils/shaderReader.h"
 #include "utils/normalizeAxis.h"
 #include "utils/sound.h"
@@ -79,9 +79,6 @@ GLfloat mouse2Verts[] =
 //Array of audio buffer ID's
 //ALuint audioBuffers[1];
 
-const int W = 1299;
-const int H = 620;
-
 
 vector<float> data;
 vector<int> first;
@@ -97,9 +94,6 @@ uint startTex[W][H];
 int dimX = 0, dimY = 0, maxPos = 0, mouseX, mouseY, mouse2X, mouse2Y;
 float maxValue, markerSize;	
 
-uint numbers[W][H];
-float texArray[W][H];
-
 float* texture = new float[ W*H ];
 
 void glErrorCheck()
@@ -112,24 +106,6 @@ void glErrorCheck()
     }
 }
 
-void writeFile(){
-
-	ofstream myfile;
-	myfile.open ("texture.txt");
-	int i = 0;
-	int row = 0, col=0;
-	while(i<W*H){
-		myfile << texArray[col][row] << " "; 
-		i++;
-		col++;	
-		if(col==W){
-			myfile << "\n";
-			row++;
-			col=0;
-		}
-	}
-	myfile.close();
-}
 /*
 	calculate position for this mouse markers vertices.
 */
