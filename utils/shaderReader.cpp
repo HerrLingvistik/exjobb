@@ -3,12 +3,8 @@
 #include <GL/freeglut.h>
 #include <iostream>
 #include <stdlib.h>
-#include <time.h>
-#include <math.h>
 #include <fstream>
-#include <sstream>
 #include <vector>
-
 
 
 string readShaderFile(const char* filename){
@@ -105,4 +101,107 @@ GLuint loadShaders(const char* vertexShader, const char* fragmentShader){
 	//return handle to our shaders
 	return program; 
 
+}
+GLuint createStuff2(GLfloat *data, int size, GLuint shader){
+	GLuint vertArray; 
+	GLuint vertBuffer; 
+	glGenVertexArrays(1, &vertArray);
+	
+	cout << "data: "<<sizeof(data)<<endl;
+	glBindVertexArray(vertArray);
+	glGenBuffers(1, &vertBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, vertBuffer);
+	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(glGetAttribLocation(shader, "in_Position"),2, GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),0);
+	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	return vertArray;
+}
+
+/*void sendShaderData(GLuint vertArray, data){
+	glBindVertexArray(vertArray);
+	glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(mouseVerts), mouseVerts, GL_STATIC_DRAW);
+	glBindVertexArray(mouseArray);
+}*/
+
+void createStuff(){
+
+	//Generate holder for vertices in triangles
+	//glGenVertexArrays(1, &triVertArray);
+	//glGenVertexArrays(1, &dataArray);
+	//glGenVertexArrays(1, &mouseArray);
+
+	/*
+		Send vertices for the fullscreen quad, consisting of two triangles, to the draw shader.
+		This will be used to draw the texture on when drawing to the screen. The vertices are
+		sent to  be sent to a draw shader which will simply draw the result to a texture on which different 
+		operations can be performed.
+	*/
+	/*glBindVertexArray(triVertArray);
+	glGenBuffers(1, &triVertBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, triVertBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(triVerts), triVerts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(glGetAttribLocation(drawShader, "in_Position"),3, GL_FLOAT,GL_FALSE,3*sizeof(GL_FLOAT),0);
+	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);*/
+	/*
+		Send vertices to the shader which will draw lines between the coordinates(parallel coordinates).
+		Take the data array and send it two floats at a time to the parallel coordinates shader
+		which will use these as coordinates to draw lines between.
+	*/
+	/*glBindVertexArray(dataArray);
+	glGenBuffers(1, &dataBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, dataBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT)*data.size(), &data.front(), GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(glGetAttribLocation(paralellShader, "in_Position"),2, GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),0);
+	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);*/
+
+	/*
+		for rendering square around mouse pointer
+	*/
+	glBindVertexArray(mouseArray);
+	glGenBuffers(1, &mouseBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(mouseVerts), mouseVerts, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(glGetAttribLocation(mouseShader, "in_Position"),2, GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),0);
+	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);			
+
+	/*
+		Create textuhttps://www.opengl.org/discussion_boards/showthread.php/169270-Subset-of-blending-modes-for-32-bit-integer-renderre and set attach it to a framebuffer object.
+	*/
+	//tex 1 and fbo object 1
+	glActiveTexture(GL_TEXTURE0);
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);  
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, W, H, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, W, H, 0, GL_RED, GL_UNSIGNED_INT, NULL);	
+	//glErrorCheck();
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	//glGenerateMipmap(GL_TEXTURE_2D);
+
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+	
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+		cout<<"texture creation not successful"<<endl;
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
