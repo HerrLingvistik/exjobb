@@ -1,9 +1,7 @@
 /* This file includes declaration of variables that are used in multiple parts of the program. */
-#include <vector>
-
 #ifndef INCLUDED_COMMON_H
 #define INCLUDED_COMMON_H
- 
+#include <vector> 
 
 using namespace std;
 

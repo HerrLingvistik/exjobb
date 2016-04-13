@@ -1,12 +1,7 @@
 #include "dataReader.h"
 #include <iostream>
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-#include <math.h>
 #include <fstream>
 #include <sstream>
-#include <string.h>
 
 using namespace std;
 
