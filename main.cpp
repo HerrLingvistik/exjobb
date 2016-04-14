@@ -9,15 +9,12 @@
 /*
 	THINGS TO ADD 
 
-	- Make sound be based on density in region instead of in pixel. 	
+	- add scatterplot 
 
-	- Fix problem with point sampling, giving the wrong intensity / position.
+	- Make sound be based on gaussian in region instead of in pixel. 	
 
 	- Also draw lines for the axes. 
 
-	- add clustering?
-	- add sound
-	- Maybe make the file reading more general?? Work for both int and float and different formats like whitespace and so on.
 */
 
 #define GL_GLEXT_PROTOTYPES	
