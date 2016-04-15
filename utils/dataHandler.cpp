@@ -13,7 +13,11 @@ using namespace std;
 float texArray[W][H];
 
 //The aim of this function is to read ASCII-data from a text file and store it into a one dimensional array.
-void readFile(){
+//This function is specifically for the parallel coordinates model with arbitrary dimensions
+void readFile_pCoords(){
+	
+	data.clear(); //Clear the vector storing data values	
+
 	ifstream infile;
 	infile.open("./data/out5d.txt"); 
 	string line;
@@ -63,6 +67,46 @@ void readFile(){
 		/*cout << "Dimensions X: " << dimX << endl;
 		cout << "Dimensions Y: " << dimY << endl;
 		cout << "count.size() = : " << count.size() << endl;*/
+			
+		infile.close();
+	}
+	else
+		cout<<"fail"<<endl;
+}
+
+//This function is specifically for the two dimensional scatter plot model
+void readFile_sPlot(){
+
+	data.clear(); //Clear the vector storing data values		
+	
+	ifstream infile;
+	infile.open("./data/out5dhaxad.txt"); 
+	string line;
+	string number;
+
+	//int counter = 0;
+
+	if(infile.is_open()){		
+
+		//Read the data set line by line
+		while(getline(infile, line)){
+			
+			istringstream is(line);
+			
+			first.push_back(dimX);			
+			
+			//Read X, stop reading when blankspace is found
+			getline(is, number, ' ');
+			data.push_back((float)stof(number));
+			//cout << data[counter] << " "; 
+			//counter++;
+			
+			//Read X, stop reading when blankspace is found
+			getline(is, number, ' ');
+			data.push_back((float)stof(number));
+			//cout << data[counter] << endl;
+			//counter++;
+		}	
 			
 		infile.close();
 	}

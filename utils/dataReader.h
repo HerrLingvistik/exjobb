@@ -1,7 +1,0 @@
-#ifndef DATAREADER_H
-#define DATAREADER_H
-
-#include "common.h"
-void readFile();
-
-#endif
