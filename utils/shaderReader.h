@@ -8,7 +8,7 @@
 using namespace std;
 
 //pointers for vertices
-extern GLuint dataArray, dataBuffer, mouseBuffer, mouseArray,tex, fbo; 
+extern GLuint dataArray, dataBuffer, mouseBuffer, mouseArray;//,tex, fbo; 
 
 extern GLfloat triVerts[12], mouseVerts[8], mouse2Verts[8];
 
@@ -21,5 +21,9 @@ GLuint loadShaders(const char* vertexShader, const char* fragmentShader);
 GLuint createStuff2(GLfloat *data, int size,GLuint shader);
 
 void createStuff(int W, int H);
+
+GLuint createTexture(int W, int H);
+
+GLuint createFbo(GLuint tex);
 
 #endif

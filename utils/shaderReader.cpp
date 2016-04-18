@@ -178,15 +178,20 @@ void createStuff(int W, int H){
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);			
 
+	
+}
+
+GLuint createTexture(int W1, int H1){
 	/*
 		Create textuhttps://www.opengl.org/discussion_boards/showthread.php/169270-Subset-of-blending-modes-for-32-bit-integer-renderre and set attach it to a framebuffer object.
 	*/
 	//tex 1 and fbo object 1
+	GLuint tex1;
 	glActiveTexture(GL_TEXTURE0);
-	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);  
+	glGenTextures(1, &tex1);
+	glBindTexture(GL_TEXTURE_2D, tex1);  
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, W, H, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, W, H, 0, GL_RED, GL_UNSIGNED_INT, NULL);	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, W1, H1, 0, GL_RED, GL_UNSIGNED_INT, NULL);	
 	//glErrorCheck();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -194,14 +199,21 @@ void createStuff(int W, int H){
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	//glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	return tex1;
+}
 
-	glGenFramebuffers(1, &fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+GLuint createFbo(GLuint tex1){
+	GLuint fbo1;
+	glBindTexture(GL_TEXTURE_2D, tex1); 
+	glGenFramebuffers(1, &fbo1);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo1);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex1, 0);
 	
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
 		cout<<"texture creation not successful"<<endl;
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	return fbo1;
 }
