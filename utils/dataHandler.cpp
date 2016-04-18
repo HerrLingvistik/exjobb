@@ -53,10 +53,11 @@ void readFile_pCoords(){
 				data.push_back((float)stof(number));
 				col++;			
 				dimX++;
+				cout << number << " ";
 				//cout << "Col = " << col << endl;
 				//cout << "DIM X = " << dimX << endl;
     	}	
-			
+			cout <<endl;
 			col=0;
 
 		}	
@@ -84,7 +85,7 @@ void readFile_sPlot(){
 	string line;
 	string number;
 
-	//int counter = 0;
+	int counter = 0;
 
 	if(infile.is_open()){		
 
@@ -98,14 +99,14 @@ void readFile_sPlot(){
 			//Read X, stop reading when blankspace is found
 			getline(is, number, ' ');
 			data.push_back((float)stof(number));
-			//cout << data[counter] << " "; 
-			//counter++;
+			cout << data[counter] << " "; 
+			counter++;
 			
 			//Read X, stop reading when blankspace is found
 			getline(is, number, ' ');
 			data.push_back((float)stof(number));
-			//cout << data[counter] << endl;
-			//counter++;
+			cout << data[counter] << endl;
+			counter++;
 		}	
 			
 		infile.close();

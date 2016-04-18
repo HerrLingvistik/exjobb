@@ -7,6 +7,7 @@
 ** -------------------------------------------------------------------------*/
 
 /*
+<<<<<<< HEAD
 	THINGS TO ADD 
 
 	- add scatterplot 
@@ -15,6 +16,13 @@
 
 	- Also draw lines for the axes. 
 
+=======
+	THINGS TO ADD  	
+
+	- add clustering?
+	- (Also draw lines for the axes.) 
+	- (Maybe make the file reading more general?? Work for both int and float and different formats like whitespace and so on.)
+>>>>>>> restructuring
 */
 
 #define GL_GLEXT_PROTOTYPES	
@@ -36,7 +44,9 @@ GLuint drawShader, paralellShader, mouseShader;
 //pointers for vertices
 GLuint triVertArray, triVertBuffer;
 GLuint dataArray, dataBuffer, mouseBuffer, mouseArray,tex, fbo; 
-int counter=0;
+int counter=0, plot;
+const static int PARALLEL = 0, SCATTER = 1;
+
 //Vertices used to draw to triangles(one quad) upon which the texture will be drawn
 GLfloat triVerts[12] = 
 {
@@ -71,6 +81,7 @@ GLfloat mouse2Verts[8] =
 
 
 vector<float> data;
+vector<float> data2;
 vector<int> first;
 vector<int> count;
 
@@ -85,7 +96,7 @@ int dimX = 0, dimY = 0, maxPos = 0, mouseX, mouseY, mouse2X, mouse2Y;
 float maxValue, markerSize;	
 
 float* texture = new float[ W*H ];
-
+void init(int H, int W);
 void glErrorCheck()
 {
     int errCode;
@@ -156,6 +167,8 @@ float calcVolume(int x, int y){
 
 void initTexture(){
 
+	cout<<"INIT TEXTURE"<<glutGet(GLUT_WINDOW_WIDTH)<<" - "<<glutGet(GLUT_WINDOW_HEIGHT)<<endl;
+
 	//set window color and clear last screen
 	glClearColor(0,0,0,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -179,20 +192,23 @@ void initTexture(){
 	//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	//use parallel coordinates shader
-	glMultiDrawArrays(GL_LINE_STRIP, &first.front(), &count.front(),count.size());
-
+	if(plot == PARALLEL)
+		glMultiDrawArrays(GL_LINE_STRIP, &first.front(), &count.front(),count.size());
+	else if(plot == SCATTER)
+		glDrawArrays(GL_POINTS, 0, data.size());
+	cout << "Number of elements" << data.size()  << " first "<< data[1] << endl;
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	//disable and unbind just to be safe
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);	
 	glDisable(GL_BLEND);
 
-
-	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, texture);
-	int i = 0, row = 0, arrayRow = 619, col = 0;
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(0);
+	int i = 0, row = 0, arrayRow = H-1, col = 0;
 	float max = 0;
 	while(i<W*H){
 		if(texture[i] > max){
@@ -201,11 +217,8 @@ void initTexture(){
 		}
 
 		texArray[col][arrayRow] = texture[i];
-
 		col++;
 		i++;
-		//cout<<col<<", "<<arrayRow<<endl;
-
 		if(col == W){
 			col = 0;
 			row++;
@@ -275,6 +288,7 @@ void draw(){
 	glutSwapBuffers();
 }
 
+/*
 void init(){
 	//read data set into data array
 	readFile_pCoords();
@@ -297,6 +311,7 @@ void init(){
 	initTexture();
 	writeFile();
 }
+*/
 
 // This function is called whenever the computer is idle
 // As soon as the machine is idle, ask GLUT to trigger rendering of a new
@@ -313,11 +328,9 @@ void mouseEvent(int event, int state, int x, int y){
 
 	if(event == GLUT_LEFT_BUTTON && state == GLUT_DOWN){	
 		mouseClick = true;
-		//cout<<<<endl;
 		float vol = calcVolume(x, y)/maxValue *2.0;
 		cout<<"On position x:"<<x<<" y: "<<y << "volume is "<<vol << " marker size: "<<markerSize<<endl;
 		playSound(vol);
-		//alSourcePlay(source); 
 		mouseX = x;
 		mouseY = y;
 		glutPostRedisplay();
@@ -325,11 +338,9 @@ void mouseEvent(int event, int state, int x, int y){
 	
 	if(event == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
 		mouse2Click = true;
-		//cout<<<<endl;
 		float vol = calcVolume(x, y)/maxValue *2.0;
 		cout<<"On position x:"<<x<<" y: "<<y << "volume is "<<vol << " marker size: "<<markerSize<<endl;
 		playSound2(vol);	
-		//alSourcePlay(source2); 
 		mouse2X = x;
 		mouse2Y = y;
 		glutPostRedisplay();
@@ -373,7 +384,7 @@ void mouseMove(int x, int y){
 	}	
 }
 
-void resizeKey(unsigned char key, int x, int y){
+void keyPressed(unsigned char key, int x, int y){
 	if(key == '+' && markerSize <= 21){
 		cout<<"marker size increased"<<endl;
 		markerSize+=2;
@@ -387,6 +398,103 @@ void resizeKey(unsigned char key, int x, int y){
 	playSound2(vol2);
 }
 
+void fKeyPressed(int key, int x, int y){
+	switch(key){
+		case GLUT_KEY_F1:
+			cout<<"f1 pressed"<<endl;
+			plot = PARALLEL;
+			readFile_pCoords();	
+			normalizeAxis();
+			dataArray = createStuff2( &data.front(), sizeof(GL_FLOAT)*data.size(), paralellShader); 
+			glutReshapeWindow(W, H);
+			/*tex = createTexture(W,H);
+			fbo = createFbo(tex);
+			initTexture();*/
+		break;
+		case GLUT_KEY_F2:
+			cout<<"f2 pressed"<<endl;
+			plot = SCATTER;
+			readFile_sPlot();
+			normalizeAxis();
+			dataArray = createStuff2( &data.front(), sizeof(GL_FLOAT)*data.size(), paralellShader);
+			glutReshapeWindow(600, 600);
+			
+			/*tex = createTexture(600,600);
+			fbo = createFbo(tex);
+			initTexture();*/
+		break;
+	}
+	
+}
+
+void reshape(int width, int height){
+	cout<<"RESIZE"<<width<<" - "<<height<<endl<<endl;
+	glViewport(0,0,(GLsizei)width, (GLsizei)height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(60, (GLfloat)width / (GLfloat)height, 1.0, 100.0);
+	glMatrixMode(GL_MODELVIEW);
+	tex = createTexture(width,height);
+	fbo = createFbo(tex);
+	initTexture();
+}
+void init(int W, int H){
+
+	
+	//sets the initial display mode
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
+	glutInitWindowPosition(100,100);
+	glutInitWindowSize(W,H);
+	//set version to be used
+	glutInitContextVersion(3, 3);
+
+	glutCreateWindow("Do you wanna roll in my 64?!");
+	//glutReshapeWindow(100,100);
+	cout<<"window created"<<endl;
+	cout << "WIN: "<<glutGetWindow()<<endl;
+	
+	//Call to the drawing function
+  glutDisplayFunc(draw);
+	glutIdleFunc(idle);
+	glutReshapeFunc(reshape);
+	//initiate stuff for the drawing
+	//init();
+	//glutSetCursor(GLUT_CURSOR_NONE);
+	glutMouseFunc(mouseEvent);
+	glutPassiveMotionFunc(mouseMove);
+	//glutMotionFunc(mouseMoveClick);
+	
+	
+	glutKeyboardFunc(keyPressed);
+	glutSpecialFunc(fKeyPressed);
+	
+ 
+	//plot = PARALLEL;
+	//read data set into data array
+	//readFile();
+	readFile_pCoords();
+	//readFile_sPlot();	
+	normalizeAxis();
+
+	markerSize = 5.0f;	
+
+	drawShader = loadShaders("./shaders/draw.vert", "./shaders/draw.frag");
+	paralellShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
+	mouseShader = loadShaders("./shaders/mouse.vert", "./shaders/mouse.frag");
+	
+	//Create fbos and textures 
+	triVertArray = createStuff2(triVerts, sizeof(triVerts), drawShader);
+	dataArray = createStuff2( &data.front(), sizeof(GL_FLOAT)*data.size(), paralellShader); 
+	mouseArray = createStuff2(mouseVerts, sizeof(mouseVerts), mouseShader);	 
+
+	createStuff(W, H);
+	/*tex = createTexture(W,H);
+	fbo = createFbo(tex);
+
+	initTexture();*/
+	writeFile();
+	 
+}
 
 int main(int argc, char **argv){	
 	
@@ -396,26 +504,8 @@ int main(int argc, char **argv){
 
 	//initiate glut
 	glutInit(&argc, argv);
-	//sets the initial display mode
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-	glutInitWindowPosition(100,100);
-	glutInitWindowSize(W,H);
-	//set version to be used
-	glutInitContextVersion(3, 3);
-
-	glutCreateWindow("Do you wanna roll in my 64?!");
-	glutIdleFunc(idle);
-	//Call to the drawing function
-  glutDisplayFunc(draw);
-	//initiate stuff for the drawing
-	init();
-	//glutSetCursor(GLUT_CURSOR_NONE);
-	glutMouseFunc(mouseEvent);
-	glutPassiveMotionFunc(mouseMove);
-	//glutMotionFunc(mouseMoveClick);
-	glutKeyboardFunc(resizeKey);
-
-  // Loop required by OpenGL
+	init(W, H);
+	// Loop required by OpenGL
   glutMainLoop();
 	exit(0);
 }
