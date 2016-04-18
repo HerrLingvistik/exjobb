@@ -277,7 +277,8 @@ void draw(){
 
 void init(){
 	//read data set into data array
-	readFile();
+	readFile_pCoords();
+	//readFile_sPlot();
 	normalizeAxis();
 
 	markerSize = 5.0f;	
