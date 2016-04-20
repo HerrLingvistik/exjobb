@@ -68,3 +68,29 @@ void normalizeAxis(){
 
 
 }
+
+void normalizeAxis2(){
+	cout<<"normalize scatterplot values"<<endl;
+	//Temporary values for finding min/max as needed for the feature scaling.
+	float minValueX = 9999999999999999, minValueY = 9999999999999999;
+	float maxValueX = -9999999999999999, maxValueY = -9999999999999999;
+	for(uint i = 0; i<data2.size(); i+=2){
+		//check x value first		
+		if(data2[i] < minValueX)
+			minValueX = data2[i];
+		if(data2[i] > maxValueX)
+			maxValueX = data2[i];
+		//then check y value
+		if(data2[i+1] < minValueY)
+			minValueY = data2[i+1];
+		if(data2[i+1] > maxValueY)
+			maxValueY = data2[i+1];
+	}
+
+	for(uint i = 0; i<data2.size(); i+=2){
+		//scale x value first		
+		data2[i] = 2*((data2[i] - minValueX)/(maxValueX - minValueX) - 0.5);
+		//then scale y value
+		data2[i+1] = 2*((data2[i+1] - minValueY)/(maxValueY - minValueY) - 0.5);
+	}
+}

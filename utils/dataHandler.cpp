@@ -32,7 +32,7 @@ void readFile_pCoords(){
 		getline(is1, dim, ' ') ;
 		
 		axisSpacing = 2.0/(stof(dim)-1);
-		cout <<"axis spacing is "<<axisSpacing<<endl;
+		//cout <<"axis spacing is "<<axisSpacing<<endl;
 		//Read line by line
 		while(getline(infile, line)){
 			
@@ -53,15 +53,15 @@ void readFile_pCoords(){
 				data.push_back((float)stof(number));
 				col++;			
 				dimX++;
-				cout << number << " ";
+				//cout << number << " ";
 				//cout << "Col = " << col << endl;
 				//cout << "DIM X = " << dimX << endl;
     	}	
-			cout <<endl;
+			//cout <<endl;
 			col=0;
 
 		}	
-		cout<<"numbers in file: "<<dimX<<endl;
+		//cout<<"numbers in file: "<<dimX<<endl;
 		dimX/=dimY;
 		count.assign(first.size(), dimX);
 
@@ -78,7 +78,7 @@ void readFile_pCoords(){
 //This function is specifically for the two dimensional scatter plot model
 void readFile_sPlot(){
 
-	data.clear(); //Clear the vector storing data values		
+	data2.clear(); //Clear the vector storing data values		
 	
 	ifstream infile;
 	infile.open("./data/out5dhaxad.txt"); 
@@ -98,14 +98,14 @@ void readFile_sPlot(){
 			
 			//Read X, stop reading when blankspace is found
 			getline(is, number, ' ');
-			data.push_back((float)stof(number));
-			cout << data[counter] << " "; 
+			data2.push_back((float)stof(number));
+			//cout << data2[counter] << " "; 
 			counter++;
 			
 			//Read X, stop reading when blankspace is found
 			getline(is, number, ' ');
-			data.push_back((float)stof(number));
-			cout << data[counter] << endl;
+			data2.push_back((float)stof(number));
+			//cout << data2[counter] << endl;
 			counter++;
 		}	
 			
