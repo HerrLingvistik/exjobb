@@ -205,6 +205,22 @@ GLuint createTexture(int W1, int H1, int active){
 	return tex1;
 }
 
+void changeScatter(int x, int y, GLfloat *data, int size, GLuint shader){
+	//cout << "data: "<<sizeof(data)<<endl;
+	glGenVertexArrays(1, &tempArray);
+	glBindVertexArray(tempArray);
+	glGenBuffers(1, &tempBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, tempBuffer);
+	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(glGetAttribLocation(shader, "in_PositionX"));
+	glVertexAttribPointer(glGetAttribLocation(shader, "in_PositionX"),1, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat),(GLvoid*)((2*x-1)*sizeof(GLfloat)));
+	glEnableVertexAttribArray(glGetAttribLocation(shader, "in_PositionY"));
+	glVertexAttribPointer(glGetAttribLocation(shader, "in_PositionY"),1, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (GLvoid*)((2*y-1)*sizeof(GLfloat)));
+	//glDisableVertexAttribArray(glGetAttribLocation(tempScatterShader, "in_PositionY"));
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
 GLuint createFbo(GLuint tex1){
 	GLuint fbo1;
 	glBindTexture(GL_TEXTURE_2D, tex1); 

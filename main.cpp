@@ -41,11 +41,11 @@ https://www.opengl.org/sdk/docs/man/docbook4/xhtml/glActiveTexture.xml
 
 using namespace std;
 //Shader handles
-GLuint drawShader, paralellShader, scatterShader, mouseShader;
+GLuint drawShader, paralellShader, scatterShader, mouseShader, tempScatterShader;
 
 //pointers for vertices
 GLuint triVertArray, triVertBuffer;
-GLuint dataArray, dataArray2, mouseBuffer, mouseArray,tex, fbo, tex2, fbo2; 
+GLuint dataArray, dataArray2, mouseBuffer, mouseArray,tex, fbo, tex2, fbo2, tempArray, tempBuffer; 
 int counter=0, plot;
 const static int PARALLEL = 0, SCATTER = 1;
 
@@ -86,7 +86,6 @@ vector<float> data;
 vector<float> data2;
 vector<int> first;
 vector<int> count;
-
 //Booleans used for deciding when to play the sounds
 bool mouseClick = false;
 bool mouse2Click = false;
@@ -193,12 +192,16 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glBindVertexArray(dataArray);
 	}
 	else{
-		glUseProgram(scatterShader);
+		/*glUseProgram(scatterShader);
 		cout << "create scatter texture"<<endl;
-		glBindVertexArray(dataArray2);	
+		glBindVertexArray(dataArray2);	*/
+		glUseProgram(tempScatterShader);
+		cout << "create scatter texture"<<endl;
+		glBindVertexArray(tempArray);
 	}	
 	//enable or disable a generic vertex attribute array
 	glEnableVertexAttribArray(0);
+	
 	//draw lines tell opengl how many values will be sent to the shaders
 
 
@@ -464,6 +467,7 @@ void init(int W, int H){
 	drawShader = loadShaders("./shaders/draw.vert", "./shaders/draw.frag");
 	paralellShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
 	scatterShader = loadShaders("./shaders/scatter.vert", "./shaders/scatter.frag");
+	tempScatterShader = loadShaders("./shaders/tempScatter.vert", "./shaders/tempScatter.frag");
 	mouseShader = loadShaders("./shaders/mouse.vert", "./shaders/mouse.frag");
 	
 	//Create fbos and textures 
@@ -472,6 +476,12 @@ void init(int W, int H){
 	dataArray2 = createStuff2( &data2.front(), sizeof(GL_FLOAT)*data2.size(), scatterShader); 
 	mouseArray = createStuff2(mouseVerts, sizeof(mouseVerts), mouseShader);	 
 
+	
+	
+	changeScatter(1,3, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
+
+	
+	cout << "ok: "<<data[1]<< endl;
 	mouseArray = createStuff(W, H);
 	plot = PARALLEL;
 	tex = createTexture(W,H,0);
