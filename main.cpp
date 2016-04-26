@@ -33,6 +33,7 @@ https://www.opengl.org/sdk/docs/man/docbook4/xhtml/glActiveTexture.xml
 #include <GL/gl.h>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 #include "utils/common.h"
 #include "utils/dataHandler.h"
 #include "utils/shaderReader.h"
@@ -160,6 +161,43 @@ float calcVolume(int x, int y){
 	//cout<<endl;
 	//cout<<elements<<endl;
 	return sum/elements;
+}
+
+float calcGaussVolume(int x, int y){
+	
+	float sigma = 1.0;
+	float weight = 0;
+	
+	int count = 0;
+
+	float sum = 0, space = (markerSize-1.0f)/2.0f;
+	//int elements=0;
+	int posX = 0, posY = 0;
+	for(int j=-space; j<=space; j++){
+		for(int i=-space; i<=space; i++){
+			posX = x+i;
+			posY = y+j;
+			
+			if(posX>=0 && posX < W && posY>=0 && posY < H){
+
+				//elements++;
+				weight = 1.0f/(2.0f * M_PI* sigma*sigma) * exp( -(pow(i, 2) + pow(j, 2))/(2.0f * sigma*sigma ));
+				sum += weight*texArray[posX][posY];
+		
+				cout << weight << " ";
+				count++;
+
+					if(count == markerSize) { 
+						cout << endl; 
+						count = 0;
+					}
+				
+			}	
+		}		
+	}	
+
+	cout << "SUM IS " << sum << endl;
+	return sum;
 }
 
 /*
@@ -332,7 +370,7 @@ void mouseEvent(int event, int state, int x, int y){
 
 	if(event == GLUT_LEFT_BUTTON && state == GLUT_DOWN){	
 		mouseClick = true;
-		float vol = calcVolume(x, y)/maxValue *2.0;
+		float vol = calcGaussVolume(x, y)/maxValue *10.0;
 		cout<<"On position x:"<<x<<" y: "<<y << "volume is "<<vol << " marker size: "<<markerSize<<endl;
 		playSound(vol);
 		mouseX = x;
@@ -342,7 +380,7 @@ void mouseEvent(int event, int state, int x, int y){
 	
 	if(event == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
 		mouse2Click = true;
-		float vol = calcVolume(x, y)/maxValue *2.0;
+		float vol = calcGaussVolume(x, y)/maxValue *10.0;
 		cout<<"On position x:"<<x<<" y: "<<y << "volume is "<<vol << " marker size: "<<markerSize<<endl;
 		playSound2(vol);	
 		mouse2X = x;
@@ -358,7 +396,7 @@ void mouseEvent(int event, int state, int x, int y){
 void mouseMoveClick(int x, int y){
 		mouseX = x;
 		mouseY = y;
-		playSound(calcVolume(x, y)/maxValue);
+		playSound(calcGaussVolume(x, y)/maxValue);
 		glutPostRedisplay();
 }
 //http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit
@@ -396,8 +434,8 @@ void keyPressed(unsigned char key, int x, int y){
 		cout<<"marker size decreased"<<endl;
 		markerSize-=2;
 	}
-	float vol1 = calcVolume(mouseX, mouseY)/maxValue *2.0;
-	float vol2 = calcVolume(mouse2X, mouse2Y)/maxValue *2.0;
+	float vol1 = calcGaussVolume(mouseX, mouseY)/maxValue *2.0;
+	float vol2 = calcGaussVolume(mouse2X, mouse2Y)/maxValue *2.0;
 	playSound(vol1);
 	playSound2(vol2);
 }
