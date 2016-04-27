@@ -72,7 +72,7 @@ void readFile_pCoords(){
 	else
 		cout<<"fail"<<endl;
 }
-
+/*
 //This function is specifically for the two dimensional scatter plot model
 void readFile_sPlot(){
 
@@ -112,7 +112,7 @@ void readFile_sPlot(){
 	else
 		cout<<"fail"<<endl;
 }
-
+*/
 void writeFile(){
 
 	ofstream myfile;

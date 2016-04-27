@@ -78,7 +78,7 @@ void normalizeAxis(){
 	}
 
 }
-
+/*
 void normalizeAxis2(){
 	cout<<"normalize scatterplot values"<<endl;
 	//Temporary values for finding min/max as needed for the feature scaling.
@@ -103,4 +103,4 @@ void normalizeAxis2(){
 		//then scale y value
 		data2[i+1] = 2*((data2[i+1] - minValueY)/(maxValueY - minValueY) - 0.5);
 	}
-}
+}*/

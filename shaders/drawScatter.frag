@@ -10,5 +10,5 @@ void main(void){
 	float intensity = 0;
 	intensity = texture(scatterTex, texCoord).r;	
 	//out_Color = vec4(1,0, 0, 1);
-	out_Color = vec4(0, intensity, 0, 1);
+	out_Color = vec4(0.0, intensity/5.0, 0.0, 1);
 }

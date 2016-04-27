@@ -20,7 +20,7 @@ GLuint loadShaders(const char* vertexShader, const char* fragmentShader);
 
 GLuint createStuff2(GLfloat *data, int size,GLuint shader);
 
-GLuint createStuff(int W, int H);
+GLuint createStuff();
 
 GLuint createTexture(int W, int H, int i);
 
