@@ -8,6 +8,12 @@ using namespace std;
 const int W = 1299;
 const int H = 620;
 
+const int sW = 600;
+const int sH = 600;
+
+extern float texArray[W][H];
+extern float scatterTex[sW][sH];
+
 //extern int DIM;
 extern int dimX, dimY;
 

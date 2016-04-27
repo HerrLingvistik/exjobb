@@ -127,7 +127,7 @@ GLuint createStuff2(GLfloat *data, int size, GLuint shader){
 	glBindVertexArray(mouseArray);
 }*/
 
-GLuint createStuff(int W, int H){
+GLuint createStuff(){
 
 	//Generate holder for vertices in triangles
 	//glGenVertexArrays(1, &triVertArray);
