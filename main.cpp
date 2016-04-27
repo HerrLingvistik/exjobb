@@ -9,6 +9,8 @@
 /*
 
 	THINGS TO ADD 
+	
+	- Återupprätta Hallströms heder - sänk familjen Wallenberg
 
 	- Alla punkter visas om man byter ut feature scaling från -1 -> 1 till att inte riktigt gå -1 -> 1. använder 1.999 istället för 2.0 just nu
  
