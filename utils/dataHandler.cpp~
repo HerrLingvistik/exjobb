@@ -10,7 +10,6 @@
 
 using namespace std;
 
-float texArray[W][H];
 
 //The aim of this function is to read ASCII-data from a text file and store it into a one dimensional array.
 //This function is specifically for the parallel coordinates model with arbitrary dimensions
@@ -32,7 +31,7 @@ void readFile_pCoords(){
 		getline(is1, dim, ' ') ;
 		
 		axisSpacing = 2.0/(stof(dim)-1);
-		cout <<"axis spacing is "<<axisSpacing<<endl;
+		//cout <<"axis spacing is "<<axisSpacing<<endl;
 		//Read line by line
 		while(getline(infile, line)){
 			
@@ -53,14 +52,15 @@ void readFile_pCoords(){
 				data.push_back((float)stof(number));
 				col++;			
 				dimX++;
+				//cout << number << " ";
 				//cout << "Col = " << col << endl;
 				//cout << "DIM X = " << dimX << endl;
     	}	
-			
+			//cout <<endl;
 			col=0;
 
 		}	
-		cout<<"numbers in file: "<<dimX<<endl;
+		//cout<<"numbers in file: "<<dimX<<endl;
 		dimX/=dimY;
 		count.assign(first.size(), dimX);
 
@@ -74,16 +74,17 @@ void readFile_pCoords(){
 		cout<<"fail"<<endl;
 }
 
+//This function is specifically for the two dimensional scatter plot model
 void readFile_sPlot(){
 
-	data.clear(); //Clear the vector storing data values		
+	data2.clear(); //Clear the vector storing data values		
 	
 	ifstream infile;
 	infile.open("./data/out5dhaxad.txt"); 
 	string line;
 	string number;
 
-	//int counter = 0;
+	int counter = 0;
 
 	if(infile.is_open()){		
 
@@ -96,15 +97,15 @@ void readFile_sPlot(){
 			
 			//Read X, stop reading when blankspace is found
 			getline(is, number, ' ');
-			data.push_back((float)stof(number));
-			//cout << data[counter] << " "; 
-			//counter++;
+			data2.push_back((float)stof(number));
+			//cout << data2[counter] << " "; 
+			counter++;
 			
 			//Read X, stop reading when blankspace is found
 			getline(is, number, ' ');
-			data.push_back((float)stof(number));
-			//cout << data[counter] << endl;
-			//counter++;
+			data2.push_back((float)stof(number));
+			//cout << data2[counter] << endl;
+			counter++;
 		}	
 			
 		infile.close();

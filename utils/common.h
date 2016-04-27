@@ -3,10 +3,13 @@
 #define INCLUDED_COMMON_H
 #include <vector> 
 
+
 using namespace std;
 
 const int W = 1299;
 const int H = 620;
+
+extern float texArray[W][H];
 
 //extern int DIM;
 extern int dimX, dimY;
