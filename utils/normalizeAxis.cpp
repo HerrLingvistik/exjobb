@@ -1,6 +1,7 @@
 #include "normalizeAxis.h"
 #include "common.h"
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -10,6 +11,11 @@ using namespace std;
 //The loop is performed column by column and data values are normalized within the rage -1 to 1.
 //Note that this normalization requires that all data is stored in a one-dimensional array with a set x-coordinate for each y.
 void normalizeAxis(){
+	
+	for(int i = 0; i < 5; i++){
+		//cout << setw(20) << " X" << ": " << data[1+i*10] << setw(8) <<  " Y" << ": " << data[3+i*10] << endl;
+		cout << setw(2) << setw(8) <<  data[1+i*10] <<  setw(8) << data[3+i*10]<< setw(8) << data[5+i*10]<< setw(8) << setw(8) << data[7+i*10]<< setw(8) << setw(8) << data[9+i*10] << setw(8) <<endl;
+	}
 	
 	int startPoint=1;
 	int dimensionCounter=0;
@@ -44,10 +50,11 @@ void normalizeAxis(){
 						
 			data[i] = (data[i] - minValue)/(maxValue - minValue);	
 			//Change interval from -1 to 1.	
-			data[i] -= 0.5;
-			data[i] *= 2;
+			data[i] -= 0.5f;
+			data[i] *= 1.999f;
+			//data[i] *= 2.0f;
 			//cout << "					Rescaled value: " << data[i] << endl;	
-			i+=dimX*2;
+			i+=dimX*2.0f;
 		} 
 		
 		//Reset the temporary variables to be able to find min/max in the next column
@@ -65,7 +72,10 @@ void normalizeAxis(){
 	{
 	cout << setw(20) << " X" << ": " << data[i] << setw(8) <<  " Y" << ": " << data[i+1] << endl;
 	}*/	
-
+	for(int i = 0; i < 5; i++){
+		//cout << setw(20) << " X" << ": " << data[1+i*10] << setw(8) <<  " Y" << ": " << data[3+i*10] << endl;
+		cout << setw(2) <<  data[1+i*10] <<  setw(16) << data[3+i*10]<< setw(16) << data[5+i*10]<< setw(16) << setw(16) << data[7+i*10]<< setw(16) << setw(16) << data[9+i*10] << setw(16) <<endl;
+	}
 
 }
 
