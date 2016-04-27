@@ -12,7 +12,7 @@ using namespace std;
 
 extern GLfloat triVerts[12], mouseVerts[8], mouse2Verts[8]; 	
 
-extern GLuint drawShader, paralellShader, mouseShader, mouseBuffer, mouseArray, tempArray, tempBuffer;
+extern GLuint drawShader, paralellShader, tempScatterShader, drawScatterShader, mouseShader, mouseBuffer, mouseArray, tempArray, tempBuffer;
 
 string readFile(const char* filename);
 
@@ -22,10 +22,10 @@ GLuint createStuff2(GLfloat *data, int size,GLuint shader);
 
 GLuint createStuff(int W, int H);
 
-GLuint createTexture(int W, int H, int active);
+GLuint createTexture(int W, int H, int i);
 
 GLuint createFbo(GLuint tex);
 
-void changeScatter(int x, int y, GLfloat *data, int size, GLuint shader);
+GLuint changeScatter(int x, int y, GLfloat *data, int size, GLuint shader);
 
 #endif

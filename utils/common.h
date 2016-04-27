@@ -5,6 +5,9 @@
 
 using namespace std;
 
+const int W = 1299;
+const int H = 620;
+
 //extern int DIM;
 extern int dimX, dimY;
 
