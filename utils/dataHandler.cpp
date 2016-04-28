@@ -15,7 +15,6 @@ using namespace std;
 void readFile_pCoords(){
 	
 	data.clear(); //Clear the vector storing data values	
-
 	ifstream infile;
 	infile.open("./data/out5d.txt"); 
 	string line;
@@ -28,17 +27,12 @@ void readFile_pCoords(){
 		getline(infile, line);
 		istringstream is1(line);
 		getline(is1, dim, ' ') ;
-		
 		axisSpacing = 2.0/(stof(dim)-1);
-		//cout <<"axis spacing is "<<axisSpacing<<endl;
-		//Read line by line
+
 		while(getline(infile, line)){
-			
 			istringstream is(line);
-			
 			first.push_back(dimX);			
 			dimY++;		
-			//cout << "Dim Y = " << dimY << endl;
 			
 			//Read element by element
 			while( getline(is, number, ' ') ) {	
@@ -51,68 +45,19 @@ void readFile_pCoords(){
 				data.push_back((float)stof(number));
 				col++;			
 				dimX++;
-				//cout << number << " ";
-				//cout << "Col = " << col << endl;
-				//cout << "DIM X = " << dimX << endl;
     	}	
-			//cout <<endl;
 			col=0;
-
 		}	
-		//cout<<"numbers in file: "<<dimX<<endl;
+
 		dimX/=dimY;
 		count.assign(first.size(), dimX);
-
-		/*cout << "Dimensions X: " << dimX << endl;
-		cout << "Dimensions Y: " << dimY << endl;
-		cout << "count.size() = : " << count.size() << endl;*/
-			
 		infile.close();
 	}
-	else
-		cout<<"fail"<<endl;
+
+	else cout<<"fail"<<endl;
+
 }
-/*
-//This function is specifically for the two dimensional scatter plot model
-void readFile_sPlot(){
 
-	data2.clear(); //Clear the vector storing data values		
-	
-	ifstream infile;
-	infile.open("./data/out5dhaxad.txt"); 
-	string line;
-	string number;
-
-	int counter = 0;
-
-	if(infile.is_open()){		
-
-		//Read the data set line by line
-		while(getline(infile, line)){
-			
-			istringstream is(line);
-			
-			first.push_back(dimX);			
-			
-			//Read X, stop reading when blankspace is found
-			getline(is, number, ' ');
-			data2.push_back((float)stof(number));
-			//cout << data2[counter] << " "; 
-			counter++;
-			
-			//Read X, stop reading when blankspace is found
-			getline(is, number, ' ');
-			data2.push_back((float)stof(number));
-			//cout << data2[counter] << endl;
-			counter++;
-		}	
-			
-		infile.close();
-	}
-	else
-		cout<<"fail"<<endl;
-}
-*/
 void writeFile(){
 
 	ofstream myfile;

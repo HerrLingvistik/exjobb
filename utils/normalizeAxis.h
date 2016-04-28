@@ -2,5 +2,6 @@
 #define NORMALIZEAXIS_H
 
 void normalizeAxis();
-void normalizeAxis2();
+void outputNormalized();
+
 #endif

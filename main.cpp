@@ -41,7 +41,7 @@ using namespace std;
 //Shader handles
 GLuint drawShader, paralellShader, scatterShader, mouseShader, tempScatterShader, drawScatterShader;
 
-//pointers for vertices
+//Pointers for vertices
 GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2;
 GLuint dataArray, dataArray2, mouseBuffer, mouseArray,tex, fbo, tex2, fbo2, tempArray, tempBuffer; 
 int counter=0, plot, scatterAxisX = 1, scatterAxisY = 2;
@@ -52,11 +52,11 @@ float scatterTex[sW][sH];
 //Vertices used to draw to triangles(one quad) upon which the texture will be drawn
 GLfloat triVerts[12] = 
 {
-	//top triangle
+	//Top triangle
 	-1.0f, 1.0f, 
 	-1.0f, -1.0f, 
 	1.0f, 1.0f,
-	//bottom triangle
+	//Bottom triangle
 	-1.0f, -1.0f, 
 	1.0f, -1.0f,
 	1.0f, 1.0f
@@ -78,27 +78,24 @@ GLfloat mouse2Verts[8] =
 	0.5f, 0.5f
 };
 
-//Array of audio buffer ID's
-//ALuint audioBuffers[1];
-
-
 vector<float> data;
 vector<int> first;
 vector<int> count;
+
 //Booleans used for deciding when to play the sounds
 bool mouseClick = false;
 bool mouse2Click = false;
 
 uint startTex[W][H];
 
-
 int dimX = 0, dimY = 0, maxPos = 0, mouseX, mouseY, mouse2X, mouse2Y;
 float maxValue=0, markerSize;	
 
+//https://www.opengl.org/sdk/docs/man/docbook4/xhtml/glActiveTexture.xml
+float* texture = new float[ W*H ];
 
-float* texture = new float[ W*H ];//https://www.opengl.org/sdk/docs/man/docbook4/xhtml/glActiveTexture.xml
-//float* scatterTex = new float[ sW*sH ];
 void init(int W, int H);
+
 void glErrorCheck()
 {
     int errCode;
@@ -108,14 +105,14 @@ void glErrorCheck()
         //exit(0);
     }
 }
+
 //http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit
-/*
-	calculate position for this mouse markers vertices.
-*/
+//Calculate position for this mouse markers vertices.
 void calcMouseSquare(){
 	int width = glutGet(GLUT_WINDOW_WIDTH);
 	int height = glutGet(GLUT_WINDOW_HEIGHT);
-	//bind data array containing coordinates for drawing lines between
+
+	//Bind data array containing coordinates for drawing lines between
 	float space = (markerSize-1.0f)/2.0f;
 	mouseVerts[0] = ((mouseX-space)/(float)width)*2.0-1.0;
 	mouseVerts[1] = -(((mouseY-space-1.0f)/(float)height)*2.0-1.0);
@@ -136,10 +133,8 @@ void calcMouseSquare(){
 	mouse2Verts[7] = -(((mouse2Y-space)/(float)height)*2.0-1.0);
 }
 
-/*
-	Calculate volume for this square send in positions.
-*/
 
+//Calculate volume for this square send in positions.
 float calcVolume(int x, int y){
 	float sum = 0, space = (markerSize-1.0f)/2.0f;
 	int elements=0;
@@ -150,26 +145,18 @@ float calcVolume(int x, int y){
 			posY = y+j;
 			
 			if(posX>=0 && posX < W && posY>=0 && posY < H){
-				//cout<<texArray[posX][posY]<<", ";
 				elements++;
 				sum+=texArray[posX][posY];
 			}	
-		}
-		//cout<<endl;		
+		}	
 	}	
-	//cout<<endl;
-	//cout<<elements<<endl;
+
 	return sum/elements;
 }
 
-/*
-	Problem med texture blending som skriver över istället för att blenda. 
-	Alternativt att den blendar och sedan clampar;
-*/
-
+//Problem med texture blending som skriver över istället för att blenda. 
+//Alternativt att den blendar och sedan clampar;
 void initTexture(GLuint fboTemp, GLuint texTemp){
-
-	//cout<<"INIT TEXTURE"<<glutGet(GLUT_WINDOW_WIDTH)<<" - "<<glutGet(GLUT_WINDOW_HEIGHT)<<endl;
 	
 	//set window color and clear last screen
 	glClearColor(0,0,0,0);
@@ -184,41 +171,41 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 	glEnable(GL_POINT_SPRITE);
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 	
-	//bind data array containing coordinates for drawing lines between
-	
+	//Bind data array containing coordinates for drawing lines between
 	if(plot == PARALLEL){	
 		glUseProgram(paralellShader);
 		cout << "create parallel texture"<<endl;
 		glBindVertexArray(dataArray);
 		glEnableVertexAttribArray(0);
 
-		//draw lines tell opengl how many values will be sent to the shaders
-		//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
+		//Draw lines tell opengl how many values will be sent to the shaders
+		//Bind frambuffer to draw into texture
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//use parallel coordinates shader
 		glMultiDrawArrays(GL_LINE_STRIP, &first.front(), &count.front(),count.size());
 	}
+
 	else{
 		glUseProgram(tempScatterShader);
 		cout << "create scatter texture"<<endl;
 		glBindVertexArray(tempArray);
-		//enable or disable a generic vertex attribute array
+		//Enable or disable a generic vertex attribute array
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
-		//draw lines tell opengl how many values will be sent to the shaders
-		//BIND FRAMEBUFFER TO DRAW INTO TEXTURE
+		//Draw lines tell opengl how many values will be sent to the shaders
+		//Bind frambuffer to draw into texture
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
 		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//use parallel coordinates shader
+		//Use parallel coordinates shader
 		cout << "draw scatter texture"<<endl;
 		glDrawArrays(GL_POINTS, 0, data.size()*(1.0f/10.0f));
 	}	
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//disable and unbind just to be safe
+	//Disable and unbind just to be safe
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glBindVertexArray(0);	
@@ -232,7 +219,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		//glActiveTexture(0);
 	
 		int i = 0, row = 0, arrayRow = H-1, col = 0, xpos, ypos;
-		//float max = 0;
+
 		while(i<W*H){
 			if(texture[i] > maxValue){
 				maxValue = texture[i];
@@ -249,16 +236,17 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 				row++;
 				arrayRow--;
 			}
-	
 		}
+
 		glUseProgram(drawShader);
 		glUniform1f(glGetUniformLocation(drawShader, "maxValue"), maxValue);
 		glUseProgram(0);
 	
 		cout << "DONE WITH TEXTURE. Max value: "<<maxValue << "pos: "<<xpos << " : " <<ypos<<endl;
 	}	
+
 	if(plot == SCATTER){
-			float* texture2 = new float[sW*sH];
+		float* texture2 = new float[sW*sH];
 
 		glActiveTexture(GL_TEXTURE1);
 	
@@ -268,6 +256,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 	
 		int i = 0, row = sH-1, col = 0, scatterMax=0, xpos, ypos, row2=0;
 		int count = 0;
+
 		while(i<sW*sH){
 			if(texture2[i] > scatterMax){
 				scatterMax = texture2[i];
@@ -276,20 +265,20 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 			}
 
 			scatterTex[col][row] = texture2[i];
-
 			col++;
 			i++;
+
 			if(col == sW){
 				col = 0;
 				row--;
 				row2++;
 			}
-	
 		}
+
 		cout << "maximum value in scatterplot: "<< scatterMax<< " pos: "<<xpos << " : "<<ypos << endl;
 		cout << "counter: "<<count<<endl;
+
 	}
-	
 }
 
 void draw(){
@@ -297,7 +286,7 @@ void draw(){
 	if(plot == PARALLEL){
 		glUseProgram(drawShader);
 		glBindVertexArray(triVertArray);
-		//enable or disable a genedata[ric vertex attribute array
+		//Enable or disable a genedata[ric vertex attribute array
 		glEnableVertexAttribArray(0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, tex);
@@ -306,7 +295,7 @@ void draw(){
 	else if(plot == SCATTER){
 		glUseProgram(drawScatterShader);
 		glBindVertexArray(triVertArray);
-		//enable or disable a genedata[ric vertex attribute array
+		//Enable or disable a genedata[ric vertex attribute array
 		glEnableVertexAttribArray(0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, tex2);
@@ -316,57 +305,54 @@ void draw(){
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	
 	glBindTexture(GL_TEXTURE_2D, 0); 
-	//disable and unbind just to be safe
+	//Disable and unbind just to be safe
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);	
-	//don't draw using the parallel coordinates shader anymore.
+	//Don't draw using the parallel coordinates shader anymore.
 	glUseProgram(0);
 
 
 	glUseProgram(mouseShader);
-	//recalculate mouse marker area
+	//Recalculate mouse marker area
 
 	calcMouseSquare();
 	glBindVertexArray(mouseArray);
 	glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(mouseVerts), mouseVerts, GL_STATIC_DRAW);
 	glBindVertexArray(mouseArray);
-	//enable or disable a generic vertex attribute array
+	//Enable or disable a generic vertex attribute array
 	glEnableVertexAttribArray(0);
 	glUniform3f(glGetUniformLocation(mouseShader, "color"), 1.0f, 0.0f, 0.0f);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
-	//bind data array containing coordinates for drawing lines between
+	//Bind data array containing coordinates for drawing lines between
 	glBindVertexArray(0);
 
 	glBindVertexArray(mouseArray);
 	glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(mouse2Verts), mouse2Verts, GL_STATIC_DRAW);
 	glBindVertexArray(mouseArray);
-	//enable or disable a generic vertex attribute array
+	//Enable or disable a generic vertex attribute array
 	glEnableVertexAttribArray(0);
 	glUniform3f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 1.0f);
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
-	//bind data array containing coordinates for drawing lines between
+	//Bind data array containing coordinates for drawing lines between
 	glBindVertexArray(0);
-	//enable or disable a generic vertex attribute array
+	//Enable or disable a generic vertex attribute array
 	glDisableVertexAttribArray(0);
 	glUseProgram(0);
-	//swaps the buffers of the current window if double buffered(draw)
+	//Swaps the buffers of the current window if double buffered(draw)
 	//glErrorCheck();
 	glutSwapBuffers();
 }
 
 // This function is called whenever the computer is idle
-// As soon as the machine is idle, ask GLUT to trigger rendering of a new
-// frame
+// As soon as the machine is idle, ask GLUT to trigger rendering of a new frame
 void idle()
 {
 	glutPostRedisplay();
 }
 
-/*
-	Interaction function for clicking mouse button
-*/ 
+//Interaction function for clicking mouse button
 void mouseEvent(int event, int state, int x, int y){
 
 	if(event == GLUT_LEFT_BUTTON && state == GLUT_DOWN){	
@@ -390,10 +376,8 @@ void mouseEvent(int event, int state, int x, int y){
 	}
 }
 
-/*
-	Interaction function for clicking mouse button
-	Here it would do to calculate the vertices only when clicking mouse and not in every frame.
-*/ 
+//Interaction function for clicking mouse button
+//Here it would do to calculate the vertices only when clicking mouse and not in every frame. 
 void mouseMoveClick(int x, int y){
 		mouseX = x;
 		mouseY = y;
@@ -401,9 +385,7 @@ void mouseMoveClick(int x, int y){
 		glutPostRedisplay();
 }
 //http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit
-/*
-	Interaction function for moving mouse marker
-*/
+//Interaction function for moving mouse marker
 void mouseMove(int x, int y){	
 	float pxlValue;
 	if(plot == PARALLEL)
@@ -437,31 +419,35 @@ void keyPressed(unsigned char key, int x, int y){
 		cout<<"marker size increased"<<endl;
 		markerSize+=2;
 
-		/*float vol1 = calcVolume(mouseX, mouseY)/maxValue *2.0;
-		float vol2 = calcVolume(mouse2X, mouse2Y)/maxValue *2.0;*/
 		float vol1 = calcGaussVolume(mouseX, mouseY, markerSize)/maxValue *10.0;
 		float vol2 = calcGaussVolume(mouse2X, mouse2Y, markerSize)/maxValue *10.0;
 
 		playSound(vol1);
 		playSound2(vol2);
-	}else	if(key == '-' && markerSize >=3){
+	}
+	
+	else	if(key == '-' && markerSize >=3){
 		cout<<"marker size decreased"<<endl;
 		markerSize-=2;
 
-		/*float vol1 = calcVolume(mouseX, mouseY)/maxValue *2.0;
-		float vol2 = calcVolume(mouse2X, mouse2Y)/maxValue *2.0;*/
 		float vol1 = calcGaussVolume(mouseX, mouseY, markerSize)/maxValue *10.0;
 		float vol2 = calcGaussVolume(mouse2X, mouse2Y, markerSize)/maxValue *10.0;
 
 		playSound(vol1);
 		playSound2(vol2);
-	}else if(key == 'x'){
+	}
+	
+	else if(key == 'x'){
 		yPressed = false;
 		xPressed = true;
-	}else if(key == 'y'){
+	}
+	
+	else if(key == 'y'){
 		xPressed = false;
 		yPressed = true;
-	}else if(isdigit(key) && plot == SCATTER){
+	}
+	
+	else if(isdigit(key) && plot == SCATTER){
 			int axis = key - '0';
 			if(axis > 0 && axis <=dimX){
 				cout << "chose axis"<<axis<<endl;
@@ -497,7 +483,6 @@ void fKeyPressed(int key, int x, int y){
 			glutReshapeWindow(sW, sH);
 		break;
 	}
-	
 }
 
 void reshape(int width, int height){
@@ -509,15 +494,14 @@ void reshape(int width, int height){
 }
 void init(int W, int H){
 
-	
-	//sets the initial display mode
+	//Sets the initial display mode
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
 	glutInitWindowPosition(100,100);
 	
 	//glutInitWindowSize(W,H);
 	glutInitWindowSize(W,H);
 
-	//set version to be used
+	//Set version to be used
 	glutInitContextVersion(3, 3);
 
 	glutCreateWindow("Do you wanna roll in my 64?!");
@@ -527,17 +511,15 @@ void init(int W, int H){
   glutDisplayFunc(draw);
 	glutIdleFunc(idle);
 	glutReshapeFunc(reshape);
-	//initiate stuff for the drawing
+	//Initiate stuff for the drawing
 	//glutSetCursor(GLUT_CURSOR_NONE);
 	glutMouseFunc(mouseEvent);
 	glutPassiveMotionFunc(mouseMove);
 	//glutMotionFunc(mouseMoveClick);
 	
-	
 	glutKeyboardFunc(keyPressed);
 	glutSpecialFunc(fKeyPressed);
 	
- 
 	//plot = PARALLEL;
 	//read data set into data array
 	//readFile();

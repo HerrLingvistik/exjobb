@@ -9,8 +9,8 @@
 extern ALuint source, source2; 
 
 void initSound();
-float calcVolume(int x, int y, float* texArray[][H], float markerSize);
-float calcGaussVolume(int x, int y, float* texArray[][H], float markerSize);
+float calcVolume(int x, int y, float markerSize);
+float calcGaussVolume(int x, int y, float markerSize);
 void playSound(float volume);
 void playSound2(float volume);
 

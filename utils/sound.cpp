@@ -35,11 +35,7 @@ void initSound(){
 	if (error) printf("%s\n", alutGetErrorString(error));
 }
 
-
-/*
-	Calculate volume for this square send in positions.
-*/
-
+//Calculate volume for this square send in positions.
 float calcVolume(int x, int y, float markerSize){
 	float sum = 0, space = (markerSize-1.0f)/2.0f;
 	int elements=0;
@@ -86,8 +82,7 @@ float calcGaussVolume(int x, int y, float markerSize){
 					if(count == markerSize) { 
 						cout << endl; 
 						count = 0;
-					}
-				
+					}				
 			}	
 		}		
 	}	
