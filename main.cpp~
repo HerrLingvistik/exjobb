@@ -42,13 +42,14 @@ using namespace std;
 GLuint drawShader, paralellShader, scatterShader, mouseShader, tempScatterShader, drawScatterShader;
 
 //Pointers for vertices
-GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2;
+GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisArray;
 GLuint dataArray, dataArray2, mouseBuffer, mouseArray,tex, fbo, tex2, fbo2, tempArray, tempBuffer; 
 int counter=0, plot, scatterAxisX = 1, scatterAxisY = 2;
 const static int PARALLEL = 0, SCATTER = 1;
 bool xPressed = false, yPressed = false; 
 float texArray[W][H];
 float scatterTex[sW][sH];
+
 //Vertices used to draw to triangles(one quad) upon which the texture will be drawn
 GLfloat triVerts[12] = 
 {
@@ -60,6 +61,16 @@ GLfloat triVerts[12] =
 	-1.0f, -1.0f, 
 	1.0f, -1.0f,
 	1.0f, 1.0f
+};
+
+GLfloat scatterAxisPoints[6] =
+{
+	//Top left point
+	-1.0f, 1.0f,
+	//Bottom left point
+	-1.0f, -1.0f,
+	//Bottom right point
+	1.0f, -1.0f
 };
 
 GLfloat mouseVerts[8] = 
@@ -188,22 +199,37 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 	}
 
 	else{
-		glUseProgram(tempScatterShader);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
+		glClearColor(0,0,0,0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glUseProgram(mouseShader);
+		glBindVertexArray(scatterAxisArray);
+		glEnableVertexAttribArray(0);
+		//Set line width of the axes
+		//glDisable(GL_BLEND);
+		glLineWidth(7.0f);
+		glUniform3f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f);
+		glDrawArrays(GL_LINE_STRIP, 0, 3);
+
+		//Set regular line width	
+		glLineWidth(1.0f);
+
+		glUseProgram(0);
 		cout << "create scatter texture"<<endl;
+		glUseProgram(tempScatterShader);
 		glBindVertexArray(tempArray);
 		//Enable or disable a generic vertex attribute array
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		//Draw lines tell opengl how many values will be sent to the shaders
 		//Bind frambuffer to draw into texture
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
-		glClearColor(0,0,0,0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//Use parallel coordinates shader
 		cout << "draw scatter texture"<<endl;
+		//glEnable(GL_BLEND);
 		glDrawArrays(GL_POINTS, 0, data.size()*(1.0f/10.0f));
+		glEnableVertexAttribArray(0);
 	}	
-	
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	//Disable and unbind just to be safe
 	glDisableVertexAttribArray(0);
@@ -538,6 +564,7 @@ void init(int W, int H){
 	
 	//Create fbos and textures 
 	triVertArray = createStuff2(triVerts, sizeof(triVerts), drawShader);
+	scatterAxisArray = createStuff2(scatterAxisPoints, sizeof(scatterAxisPoints), mouseShader);
 	//triVertArray2 = createStuff2(triVerts, sizeof(triVerts), drawScatterShader);
 	tempArray = changeScatter(1,2, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
 	dataArray = createStuff2( &data.front(), sizeof(GL_FLOAT)*data.size(), paralellShader); 
