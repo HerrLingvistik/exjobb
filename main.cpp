@@ -46,7 +46,7 @@ GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisAr
 GLuint dataArray, dataArray2, mouseBuffer, mouseArray,tex, fbo, tex2, fbo2, tempArray, tempBuffer; 
 int counter=0, plot, scatterAxisX = 1, scatterAxisY = 2;
 const static int PARALLEL = 0, SCATTER = 1;
-bool xPressed = false, yPressed = false; 
+bool xPressed = false, yPressed = false, hoover = false; 
 float texArray[W][H];
 float scatterTex[sW][sH];
 
@@ -340,7 +340,7 @@ void draw(){
 
 	glUseProgram(mouseShader);
 	//Recalculate mouse marker area
-
+	
 	calcMouseSquare();
 	glBindVertexArray(mouseArray);
 	glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
@@ -348,27 +348,40 @@ void draw(){
 	glBindVertexArray(mouseArray);
 	//Enable or disable a generic vertex attribute array
 	glEnableVertexAttribArray(0);
-	glUniform3f(glGetUniformLocation(mouseShader, "color"), 1.0f, 0.0f, 0.0f);
-	glDrawArrays(GL_LINE_LOOP, 0, 4);
-	//Bind data array containing coordinates for drawing lines between
-	glBindVertexArray(0);
 
-	glBindVertexArray(mouseArray);
-	glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(mouse2Verts), mouse2Verts, GL_STATIC_DRAW);
-	glBindVertexArray(mouseArray);
-	//Enable or disable a generic vertex attribute array
-	glEnableVertexAttribArray(0);
-	glUniform3f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 1.0f);
+	if(!hoover){
+		glUniform3f(glGetUniformLocation(mouseShader, "color"), 1.0f, 0.0f, 0.0f);
+		}
+
+	else if(hoover){
+		glUniform3f(glGetUniformLocation(mouseShader, "color"), 0.0f, 1.0f, 0.0f);
+	}
+
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
 	//Bind data array containing coordinates for drawing lines between
 	glBindVertexArray(0);
+	
+	if(!hoover){	
+		glBindVertexArray(mouseArray);
+		glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(mouse2Verts), mouse2Verts, GL_STATIC_DRAW);
+		glBindVertexArray(mouseArray);
+		//Enable or disable a generic vertex attribute array
+		glEnableVertexAttribArray(0);
+		glUniform3f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 1.0f);
+		glDrawArrays(GL_LINE_LOOP, 0, 4);
+		//Bind data array containing coordinates for drawing lines between
+		glBindVertexArray(0);
+	}
+	
 	//Enable or disable a generic vertex attribute array
 	glDisableVertexAttribArray(0);
 	glUseProgram(0);
 	//Swaps the buffers of the current window if double buffered(draw)
 	//glErrorCheck();
+	
 	glutSwapBuffers();
+
 }
 
 // This function is called whenever the computer is idle
@@ -405,11 +418,14 @@ void mouseEvent(int event, int state, int x, int y){
 //Interaction function for clicking mouse button
 //Here it would do to calculate the vertices only when clicking mouse and not in every frame. 
 void mouseMoveClick(int x, int y){
+		if(hoover){
 		mouseX = x;
 		mouseY = y;
-		playSound(calcGaussVolume(x, y, markerSize)/maxValue);
+		playSound((calcGaussVolume(x, y, markerSize)/maxValue)*10);
 		glutPostRedisplay();
+		}
 }
+
 //http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit
 //Interaction function for moving mouse marker
 void mouseMove(int x, int y){	
@@ -496,6 +512,18 @@ void keyPressed(unsigned char key, int x, int y){
 				}
 			}
 	}
+	
+	else if(key == 'h'){	
+
+		if(hoover == true){
+			hoover = false;
+		}
+		
+		else{
+			hoover = true;
+			playSound2(0);
+		}
+	}
 }
 
 void fKeyPressed(int key, int x, int y){
@@ -541,7 +569,7 @@ void init(int W, int H){
 	//glutSetCursor(GLUT_CURSOR_NONE);
 	glutMouseFunc(mouseEvent);
 	glutPassiveMotionFunc(mouseMove);
-	//glutMotionFunc(mouseMoveClick);
+	glutMotionFunc(mouseMoveClick);
 	
 	glutKeyboardFunc(keyPressed);
 	glutSpecialFunc(fKeyPressed);
