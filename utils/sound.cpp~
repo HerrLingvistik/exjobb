@@ -110,7 +110,7 @@ float calcGaussVolume_Scatter(int x, int y, float markerSize, float scatterTex[s
 
 				//elements++;
 				weight = 1.0f/(2.0f * M_PI* sigma*sigma) * exp( -(pow(i, 2) + pow(j, 2))/(2.0f * sigma*sigma ));
-				sum += weight*texArray[posX][posY];
+				sum += weight*scatterTex[posX][posY];
 		
 				cout << weight << " ";
 				count++;
