@@ -10,7 +10,8 @@
 
 	THINGS TO ADD 
 	
-	- Skapa texturer med anti aliasing istället för att genomföra dessa beräkningar i draw shadern.		
+	- Skapa texturer med anti aliasing istället för att genomföra dessa beräkningar i draw shadern,
+		ty detta kommer beräknas för varje draw och således bli laggigt annars		
 	
 	- Återupprätta Hallströms heder - sänk familjen Wallenberg
 
@@ -394,11 +395,21 @@ void idle()
 }
 
 //Interaction function for clicking mouse button
-void mouseEvent(int event, int state, int x, int y){
+void mouseEvent(int event, int state, int x, int y){	
+
+	float vol = 0.0;
 
 	if(event == GLUT_LEFT_BUTTON && state == GLUT_DOWN){	
 		mouseClick = true;
-		float vol = calcGaussVolume(x, y, markerSize)/maxValue *10.0;
+
+		if(plot == PARALLEL){
+			vol = calcGaussVolume_Parallel(x, y, markerSize, texArray)/maxValue *10.0;
+		}
+		
+		else if(plot == SCATTER){
+			vol = calcGaussVolume_Scatter(x, y, markerSize, scatterTex)/maxValue *1500.0;
+		}
+
 		cout<<"On position x:"<<x<<" y: "<<y << "volume is "<<vol << " marker size: "<<markerSize<<endl;
 		playSound(vol);
 		mouseX = x;
@@ -408,7 +419,15 @@ void mouseEvent(int event, int state, int x, int y){
 	
 	if(event == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
 		mouse2Click = true;
-		float vol = calcGaussVolume(x, y, markerSize)/maxValue *10.0;
+
+		if(plot == PARALLEL){
+			vol = calcGaussVolume_Parallel(x, y, markerSize, texArray)/maxValue *10.0;
+		}
+		
+		else if(plot == SCATTER){
+			vol = calcGaussVolume_Scatter(x, y, markerSize, scatterTex)/maxValue *1500.0;
+		}		
+
 		cout<<"On position x:"<<x<<" y: "<<y << "volume is "<<vol << " marker size: "<<markerSize<<endl;
 		playSound2(vol);	
 		mouse2X = x;
@@ -423,7 +442,15 @@ void mouseMoveClick(int x, int y){
 		if(hoover){
 		mouseX = x;
 		mouseY = y;
-		playSound((calcGaussVolume(x, y, markerSize)/maxValue)*10);
+
+		if(plot == PARALLEL){
+			playSound((calcGaussVolume_Parallel(x, y, markerSize, texArray)/maxValue)*10);
+		}
+		
+		else if(plot == SCATTER){
+			playSound((calcGaussVolume_Scatter(x, y, markerSize, scatterTex)/maxValue)*1500);
+		}
+
 		glutPostRedisplay();
 		}
 }
@@ -458,13 +485,25 @@ void mouseMove(int x, int y){
 	}	
 }
 
-void keyPressed(unsigned char key, int x, int y){
+void keyPressed(unsigned char key, int x, int y){	
+	
+	float vol1 = 0.0;
+	float vol2 = 0.0;
+	
 	if(key == '+' && markerSize <= 21){
 		cout<<"marker size increased"<<endl;
 		markerSize+=2;
 
-		float vol1 = calcGaussVolume(mouseX, mouseY, markerSize)/maxValue *10.0;
-		float vol2 = calcGaussVolume(mouse2X, mouse2Y, markerSize)/maxValue *10.0;
+
+		if(plot == PARALLEL){
+			vol1 = calcGaussVolume_Parallel(mouseX, mouseY, markerSize, texArray)/maxValue *10.0;
+			vol2 = calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, texArray)/maxValue *10.0;
+		}
+		
+		else if(plot == SCATTER){
+			vol1 = calcGaussVolume_Scatter(mouseX, mouseY, markerSize, scatterTex)/maxValue *1500.0;
+			vol2 = calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex)/maxValue *1500.0;
+		}
 
 		playSound(vol1);
 		playSound2(vol2);
@@ -474,8 +513,15 @@ void keyPressed(unsigned char key, int x, int y){
 		cout<<"marker size decreased"<<endl;
 		markerSize-=2;
 
-		float vol1 = calcGaussVolume(mouseX, mouseY, markerSize)/maxValue *10.0;
-		float vol2 = calcGaussVolume(mouse2X, mouse2Y, markerSize)/maxValue *10.0;
+		if(plot == PARALLEL){
+		vol1 = calcGaussVolume_Parallel(mouseX, mouseY, markerSize, texArray)/maxValue *10.0;
+		vol2 = calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, texArray)/maxValue *10.0;
+		}
+		
+		else if(plot == SCATTER){
+			vol1 = calcGaussVolume_Scatter(mouseX, mouseY, markerSize, scatterTex)/maxValue *1500.0;
+			vol2 = calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex)/maxValue *1500.0;
+		}
 
 		playSound(vol1);
 		playSound2(vol2);
@@ -503,6 +549,7 @@ void keyPressed(unsigned char key, int x, int y){
 					//fbo2 = createFbo(tex2);
 					tempArray = changeScatter(scatterAxisX,scatterAxisY, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
 					initTexture(fbo2, tex2);
+
 				}else if(yPressed){
 					scatterAxisY = axis;
 					cout << "chosen value is: "<< axis << endl;
