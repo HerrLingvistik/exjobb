@@ -42,10 +42,14 @@ void normalizeAxis(){
 		//Perform feature scaling on this column, this gives values between 0 to 1.
 		for(int i = startPoint; i < 2*dimX*dimY; ) {
 						
-			data[i] = (data[i] - minValue)/(maxValue - minValue);	
+			data[i] = (data[i] - minValue)/(maxValue - minValue) * 599.0f;	
 			//Change interval from -1 to 1.	
-			data[i] -= 0.5f;
-			data[i] *= 1.999f;
+
+			//data[i] -= 0.5f;
+			//data[i] *= 1.999f;
+			//data[i] *= 2.0f;
+			//cout << "					Rescaled value: " << data[i] << endl;	
+
 			i+=dimX*2.0f;
 		} 
 		
