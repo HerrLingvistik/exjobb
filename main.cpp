@@ -11,13 +11,14 @@
 	THINGS TO ADD 
 	
 	- Återupprätta Hallströms heder - sänk familjen Wallenberg
+	
+	- OBS! Fixa anti aliasing som ett pre processing step. Skapa extra texturer och skriv till dessa. Använd dem till rendering.
 
-	- Alla punkter visas om man byter ut feature scaling från -1 -> 1 till att inte riktigt gå -1 -> 1. använder 1.999 istället för 2.0 (i normalizeaxis) just nu
- 		För att en punkt ska kunna renderas nu så får den inte ligga där x >= 1 och y <= -1. Bara renderas i övre högra hörnet.
+	- Antialiasing för att få punkterna att se lite trevligare ut. 
 
-	- Hur ska scatterplotten skalas
+	- Problem med skalning i fönster när x=1 eller y=-1. Använder just nu Ingis version då man aldrig skalar upp till 1.0.
 
-	- Testa så att det fungerar med punkterna.  	
+	- Hur ska scatterplotten skalas? 	
 
 	- Also draw lines for the axes. 
 
@@ -78,7 +79,7 @@ GLfloat mouse2Verts[8] =
 	0.5f, 0.5f
 };
 
-//Array of audio buffer ID's
+//Array of audio buffer ID'spixel
 //ALuint audioBuffers[1];
 
 
@@ -171,7 +172,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 
 	//cout<<"INIT TEXTURE"<<glutGet(GLUT_WINDOW_WIDTH)<<" - "<<glutGet(GLUT_WINDOW_HEIGHT)<<endl;
 	
-	//set window color and clear last screen
+	//set window color and clear last screenpixel
 	glClearColor(0,0,0,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
@@ -274,7 +275,8 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 				xpos = col; 
 				ypos = row;
 			}
-
+			if(texture2[i] != 0)
+				count+=texture2[i];
 			scatterTex[col][row] = texture2[i];
 
 			col++;
@@ -505,6 +507,7 @@ void reshape(int width, int height){
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(60, (GLfloat)width / (GLfloat)height, 1.0, 100.0);
+	gluOrtho2D(-1.0, 1.0, -1.0, 1.0);
 	glMatrixMode(GL_MODELVIEW);
 }
 void init(int W, int H){
