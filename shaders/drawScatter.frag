@@ -34,5 +34,6 @@ void main(void){
 		}
 	}	
 
-	out_Color = vec4(0.0, intensity, 0.0, 1);
+	out_Color = vec4(intensity, intensity, intensity, 1);
+	
 }

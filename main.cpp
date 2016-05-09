@@ -43,11 +43,11 @@
 
 using namespace std;
 //Shader handles
-GLuint drawShader, paralellShader, scatterShader, mouseShader, tempScatterShader, drawScatterShader;
+GLuint drawShader, paralellShader, scatterShader, mouseShader, tempScatterShader, drawScatterShader, drawTexShader;
 
 //Pointers for vertices
 GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisArray;
-GLuint dataArray, dataArray2, mouseBuffer, mouseArray,tex, fbo, tex2, fbo2, tempArray, tempBuffer; 
+GLuint dataArray, dataArray2, mouseBuffer, mouseArray,tex, fbo, parTex, parFbo,  scatTex, scatFbo,tex2, fbo2, tempArray, tempBuffer; 
 int counter=0, plot, scatterAxisX = 1, scatterAxisY = 2;
 const static int PARALLEL = 0, SCATTER = 1;
 bool xPressed = false, yPressed = false, hoover = false; 
@@ -200,6 +200,25 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//use parallel coordinates shader
 		glMultiDrawArrays(GL_LINE_STRIP, &first.front(), &count.front(),count.size());
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//Disable and unbind just to be safe
+		glDisableVertexAttribArray(0);
+		glBindVertexArray(0);	
+		glDisable(GL_BLEND);
+		glUseProgram(0);
+		
+		
+		glUseProgram(drawShader);
+		glBindFramebuffer(GL_FRAMEBUFFER, parFbo);
+		glBindVertexArray(triVertArray);
+		//Enable or disable a genedata[ric vertex attribute array
+		glEnableVertexAttribArray(0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex);
+		glUniform1i(glGetUniformLocation(drawShader, "parallelTex"), 0);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glUseProgram(0);
 	}
 
 	else{
@@ -226,21 +245,30 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		//Draw lines tell opengl how many values will be sent to the shaders
-		//Bind frambuffer to draw into texture
-		//Use parallel coordinates shader
-		cout << "draw scatter texture"<<endl;
-		//glEnable(GL_BLEND);
 		glDrawArrays(GL_POINTS, 0, data.size()*(1.0f/10.0f));
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//Disable and unbind just to be safe
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glBindVertexArray(0);	
+		glDisable(GL_BLEND);
+		glUseProgram(0);
+
+		glUseProgram(drawScatterShader);
+		glBindFramebuffer(GL_FRAMEBUFFER, scatFbo);
+		glBindVertexArray(triVertArray);
+		//Enable or disable a genedata[ric vertex attribute array
 		glEnableVertexAttribArray(0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex2);
+		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex"), 0);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glUseProgram(0);
+
 	}	
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//Disable and unbind just to be safe
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
-	glBindVertexArray(0);	
-	glDisable(GL_BLEND);
-	glUseProgram(0);
+	
 	if(plot == PARALLEL){
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, tex);
@@ -315,22 +343,33 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 void draw(){
 	
 	if(plot == PARALLEL){
-		glUseProgram(drawShader);
-		glBindVertexArray(triVertArray);
+		glUseProgram(drawTexShader);
+		glBindVertexArray(triVertArray2);
 		//Enable or disable a genedata[ric vertex attribute array
 		glEnableVertexAttribArray(0);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex);
-		glUniform1i(glGetUniformLocation(drawShader, "parallelTex"), 0);
+		glBindTexture(GL_TEXTURE_2D, parTex);
+		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1, 0, 1, 1);
 	}
 	else if(plot == SCATTER){
-		glUseProgram(drawScatterShader);
+		/*glUseProgram(drawScatterShader);
 		glBindVertexArray(triVertArray);
 		//Enable or disable a genedata[ric vertex attribute array
 		glEnableVertexAttribArray(0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, tex2);
 		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex"), 0);
+		*/
+
+		glUseProgram(drawTexShader);
+		glBindVertexArray(triVertArray2);
+		//Enable or disable a genedata[ric vertex attribute array
+		glEnableVertexAttribArray(0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, scatTex);
+		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 0, 1, 0, 1);
 	}
     
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -595,11 +634,12 @@ void init(int W, int H){
 	drawScatterShader = loadShaders("./shaders/drawScatter.vert", "./shaders/drawScatter.frag");
 	tempScatterShader = loadShaders("./shaders/tempScatter.vert", "./shaders/tempScatter.frag");
 	mouseShader = loadShaders("./shaders/mouse.vert", "./shaders/mouse.frag");
+	drawTexShader = loadShaders("./shaders/texDraw.vert", "./shaders/texDraw.frag");
 	
 	//Create fbos and textures 
 	triVertArray = createStuff2(triVerts, sizeof(triVerts), drawShader);
 	scatterAxisArray = createStuff2(scatterAxisPoints, sizeof(scatterAxisPoints), mouseShader);
-	//triVertArray2 = createStuff2(triVerts, sizeof(triVerts), drawScatterShader);
+	triVertArray2 = createStuff2(triVerts, sizeof(triVerts), drawTexShader);
 	tempArray = changeScatter(1,2, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
 	dataArray = createStuff2( &data.front(), sizeof(GL_FLOAT)*data.size(), paralellShader); 
 	
@@ -610,13 +650,18 @@ void init(int W, int H){
 	plot = PARALLEL;
 	tex = createTexture(W,H,0);
 	fbo = createFbo(tex);
+	parTex = createTexture(W,H,0);
+	parFbo = createFbo(parTex); 
 	initTexture(fbo, tex);
 	
+
 	//Create scatterplot texture
 	plot = SCATTER;
 	glViewport(0,0,sW,sH);
-	tex2 = createTexture(sW,sH, 1);
+	tex2 = createTexture(sW,sH, 2);
 	fbo2 = createFbo(tex2);
+	scatTex = createTexture(sW,sH, 3);
+	scatFbo = createFbo(scatTex);
 	initTexture(fbo2, tex2);
 	
 	//Set initial display to parallel coordinates plot
