@@ -27,20 +27,21 @@
 #include <cmath>
 #include "utils/common.h"
 #include "utils/dataHandler.h"
-#include "utils/shaderReader.h"
+#include "utils/gl_utils.h"
 #include "utils/normalizeAxis.h"
 #include "utils/sound.h"
 
 using namespace std;
 //Shader handles
-GLuint drawShader, paralellShader, scatterShader, mouseShader, tempScatterShader, drawScatterShader, drawTexShader;
+GLuint drawShader, parallelShader, mouseShader, tempScatterShader, drawScatterShader, drawTexShader;
 
 //Pointers for vertices
 GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisArray;
-GLuint dataArray, dataArray2, mouseBuffer, mouseArray,tex, fbo, parTex, parFbo,  scatTex, scatFbo,tex2, fbo2, tempArray, tempBuffer; 
+GLuint dataArray, mouseBuffer, mouseArray,tex, fbo, parTex, parFbo,  scatTex, scatFbo,tex2, fbo2, tempArray; 
 int counter=0, plot, scatterAxisX = 1, scatterAxisY = 2;
 const static int PARALLEL = 0, SCATTER = 1;
 bool xPressed = false, yPressed = false, hoover = false; 
+
 float texArray[W][H];
 float scatterTex[sW][sH];
 
@@ -56,17 +57,6 @@ GLfloat triVerts[12] =
 	1.0f, -1.0f,
 	1.0f, 1.0f
 };
-/*
-GLfloat scatterAxisPoints[6] =
-{
-	//Top left point
-	-0.95f, 1.0f,
-	//Bottom left point
-	-0.95f, -0.95f,
-	//Bottom right point
-	1.0f, -0.95f
-};
-*/
 
 GLfloat scatterAxisPoints[6] =
 {
@@ -189,7 +179,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 	
 	//Bind data array containing coordinates for drawing lines between
 	if(plot == PARALLEL){	
-		glUseProgram(paralellShader);
+		glUseProgram(parallelShader);
 		cout << "create parallel texture"<<endl;
 		glBindVertexArray(dataArray);
 		glEnableVertexAttribArray(0);
@@ -356,8 +346,6 @@ void draw(){
 	}
 	else if(plot == SCATTER){		
 
-		
-
 		glUseProgram(drawTexShader);
 		glBindVertexArray(triVertArray2);
 		//Enable or disable a genedata[ric vertex attribute array
@@ -517,7 +505,6 @@ void mouseMoveClick(int x, int y){
 		}
 }
 
-//http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit
 //Interaction function for moving mouse marker
 void mouseMove(int x, int y){	
 	float pxlValue;
@@ -607,18 +594,14 @@ void keyPressed(unsigned char key, int x, int y){
 					scatterAxisX = axis;
 					cout << "chosen value is: "<< axis << endl;
 					glViewport(0,0,sW,sH);
-					//tex2 = createTexture(600,600, 1);
-					//fbo2 = createFbo(tex2);
-					tempArray = changeScatter(scatterAxisX,scatterAxisY, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
+					tempArray = changeScatterPlot(scatterAxisX,scatterAxisY, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
 					initTexture(fbo2, tex2);
 
 				}else if(yPressed){
 					scatterAxisY = axis;
 					cout << "chosen value is: "<< axis << endl;
 					glViewport(0,0,sW,sH);
-					//tex2 = createTexture(600,600, 1);
-					//fbo2 = createFbo(tex2);
-					tempArray = changeScatter(scatterAxisX,scatterAxisY, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
+					tempArray = changeScatterPlot(scatterAxisX,scatterAxisY, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
 					initTexture(fbo2, tex2);
 				}
 			}
@@ -671,7 +654,6 @@ void init(int W, int H){
 	glutInitContextVersion(3, 3);
 
 	glutCreateWindow("Do you wanna roll in my 64?!");
-	//glutReshapeWindow(100,100);
 	
 	//Call to the drawing function
   glutDisplayFunc(draw);
@@ -686,32 +668,29 @@ void init(int W, int H){
 	glutKeyboardFunc(keyPressed);
 	glutSpecialFunc(fKeyPressed);
 	
-	//plot = PARALLEL;
 	//read data set into data array
-	//readFile();
 	readFile_pCoords();
 	normalizeAxis();
-	//readFile_sPlot();	
-	//normalizeAxis2();
 
 	markerSize = 5.0f;	
 
 	drawShader = loadShaders("./shaders/draw.vert", "./shaders/draw.frag");
-	paralellShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
+	parallelShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");
 	drawScatterShader = loadShaders("./shaders/drawScatter.vert", "./shaders/drawScatter.frag");
 	tempScatterShader = loadShaders("./shaders/tempScatter.vert", "./shaders/tempScatter.frag");
 	mouseShader = loadShaders("./shaders/mouse.vert", "./shaders/mouse.frag");
 	drawTexShader = loadShaders("./shaders/texDraw.vert", "./shaders/texDraw.frag");
 	
 	//Create fbos and textures 
-	triVertArray = createStuff2(triVerts, sizeof(triVerts), drawShader);
-	scatterAxisArray = createStuff2(scatterAxisPoints, sizeof(scatterAxisPoints), mouseShader);
-	triVertArray2 = createStuff2(triVerts, sizeof(triVerts), drawTexShader);
-	tempArray = changeScatter(1,2, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
-	dataArray = createStuff2( &data.front(), sizeof(GL_FLOAT)*data.size(), paralellShader); 
+	triVertArray = createVertArray(triVerts, sizeof(triVerts), drawShader);
+	scatterAxisArray = createVertArray(scatterAxisPoints, sizeof(scatterAxisPoints), mouseShader);
+	triVertArray2 = createVertArray(triVerts, sizeof(triVerts), drawTexShader);
+	dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
 	
-	//mouseArray = createStuff2(mouseVerts, sizeof(mouseVerts), mouseShader);	 
-	mouseArray = createStuff();
+	 
+	createMouseMarker(mouseArray, mouseBuffer, mouseVerts, sizeof(mouseVerts),  mouseShader);
+
+	tempArray = changeScatterPlot(1,2, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
 
 	//Create parallel coordinates texture
 	plot = PARALLEL;
@@ -734,7 +713,6 @@ void init(int W, int H){
 	//Set initial display to parallel coordinates plot
 	plot = PARALLEL;
 	glViewport(0,0,W,H);
-	//writeFile();
 
 	glErrorCheck();
 }
