@@ -8,24 +8,14 @@
 
 /*
 
-	THINGS TO ADD 
-	
-	- Skapa texturer med anti aliasing istället för att genomföra dessa beräkningar i draw shadern,
-		ty detta kommer beräknas för varje draw och således bli laggigt annars		
+	THINGS TO ADD 	
 	
 	- Återupprätta Hallströms heder - sänk familjen Wallenberg
-	
-	- OBS! Fixa anti aliasing som ett pre processing step. Skapa extra texturer och skriv till dessa. Använd dem till rendering.
 
-	- Antialiasing för att få punkterna att se lite trevligare ut. 
+	- Problem med skalning i fönster när x=1 eller y=-1. Använder just nu Ingis version då man aldrig skalar upp till 1.0. 	
 
-	- Problem med skalning i fönster när x=1 eller y=-1. Använder just nu Ingis version då man aldrig skalar upp till 1.0.
+	- add clustering - kmeans? Ska detta användas?
 
-	- Hur ska scatterplotten skalas? 	
-
-	- Also draw lines for the axes. 
-
-	- add clustering - kmeans?
 */
 
 #define GL_GLEXT_PROTOTYPES	
@@ -66,7 +56,7 @@ GLfloat triVerts[12] =
 	1.0f, -1.0f,
 	1.0f, 1.0f
 };
-
+/*
 GLfloat scatterAxisPoints[6] =
 {
 	//Top left point
@@ -75,6 +65,17 @@ GLfloat scatterAxisPoints[6] =
 	-0.95f, -0.95f,
 	//Bottom right point
 	1.0f, -0.95f
+};
+*/
+
+GLfloat scatterAxisPoints[6] =
+{
+	//Top left point
+	-0.9f, 0.9f,
+	//Bottom left point
+	-0.9f, -0.9f,
+	//Bottom right point
+	0.9f, -0.9f
 };
 
 GLfloat mouseVerts[8] = 
@@ -225,19 +226,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
 		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glUseProgram(mouseShader);
-		glBindVertexArray(scatterAxisArray);
-		glEnableVertexAttribArray(0);
-		//Set line width of the axes
-		//glDisable(GL_BLEND);
-		glLineWidth(7.0f);
-		glUniform3f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f);
-		glDrawArrays(GL_LINE_STRIP, 0, 3);
-
-		//Set regular line width	
-		glLineWidth(1.0f);
-
-		glUseProgram(0);
+		
 		cout << "create scatter texture"<<endl;
 		glUseProgram(tempScatterShader);
 		glBindVertexArray(tempArray);
@@ -342,6 +331,10 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 
 void draw(){
 	
+	glClearColor(0,0,0,0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
 	if(plot == PARALLEL){
 		glUseProgram(drawTexShader);
 		glBindVertexArray(triVertArray2);
@@ -351,16 +344,19 @@ void draw(){
 		glBindTexture(GL_TEXTURE_2D, parTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
 		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1, 0, 1, 1);
+
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	
+		glBindTexture(GL_TEXTURE_2D, 0); 
+		//Disable and unbind just to be safe
+		glDisableVertexAttribArray(0);
+		glBindVertexArray(0);	
+		//Don't draw using the parallel coordinates shader anymore.
+		glUseProgram(0);
 	}
-	else if(plot == SCATTER){
-		/*glUseProgram(drawScatterShader);
-		glBindVertexArray(triVertArray);
-		//Enable or disable a genedata[ric vertex attribute array
-		glEnableVertexAttribArray(0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex2);
-		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex"), 0);
-		*/
+	else if(plot == SCATTER){		
+
+		
 
 		glUseProgram(drawTexShader);
 		glBindVertexArray(triVertArray2);
@@ -370,16 +366,40 @@ void draw(){
 		glBindTexture(GL_TEXTURE_2D, scatTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
 		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 0, 1, 0, 1);
+
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	
+		glBindTexture(GL_TEXTURE_2D, 0); 
+		//Disable and unbind just to be safe
+		glDisableVertexAttribArray(0);
+		glBindVertexArray(0);	
+		//Don't draw using the parallel coordinates shader anymore.
+		glUseProgram(0);
+
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);		
+
+		glUseProgram(mouseShader);
+		glBindVertexArray(scatterAxisArray);
+		glEnableVertexAttribArray(0);
+		//Set line width of the axes
+		
+		glLineWidth(3.0f);
+		glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f, 0.3f);
+		glDrawArrays(GL_LINE_STRIP, 0, 3);
+		
+		//Set regular line width	
+		glLineWidth(1.0f);
+
+		glUseProgram(0);
+		
+		glDisable(GL_BLEND);
+
 	}
     
-	glDrawArrays(GL_TRIANGLES, 0, 6);
 	
-	glBindTexture(GL_TEXTURE_2D, 0); 
-	//Disable and unbind just to be safe
-	glDisableVertexAttribArray(0);
-	glBindVertexArray(0);	
-	//Don't draw using the parallel coordinates shader anymore.
-	glUseProgram(0);
 
 
 	glUseProgram(mouseShader);
@@ -394,11 +414,11 @@ void draw(){
 	glEnableVertexAttribArray(0);
 
 	if(!hoover){
-		glUniform3f(glGetUniformLocation(mouseShader, "color"), 1.0f, 0.0f, 0.0f);
+		glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 0.0f, 0.0f, 1.0f);
 		}
 
 	else if(hoover){
-		glUniform3f(glGetUniformLocation(mouseShader, "color"), 0.0f, 1.0f, 0.0f);
+		glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 1.0f, 0.0f, 1.0f);
 	}
 
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
@@ -412,7 +432,7 @@ void draw(){
 		glBindVertexArray(mouseArray);
 		//Enable or disable a generic vertex attribute array
 		glEnableVertexAttribArray(0);
-		glUniform3f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 1.0f);
+		glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 1.0f, 1.0f);
 		glDrawArrays(GL_LINE_LOOP, 0, 4);
 		//Bind data array containing coordinates for drawing lines between
 		glBindVertexArray(0);
@@ -424,6 +444,7 @@ void draw(){
 	//Swaps the buffers of the current window if double buffered(draw)
 	//glErrorCheck();
 	
+
 	glutSwapBuffers();
 
 }
