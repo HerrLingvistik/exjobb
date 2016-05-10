@@ -1,5 +1,5 @@
 #define GL_GLEXT_PROTOTYPES
-#include "shaderReader.h"
+#include "gl_utils.h"
 #include <GL/freeglut.h>
 #include <iostream>
 #include <stdlib.h>
@@ -98,7 +98,8 @@ GLuint loadShaders(const char* vertexShader, const char* fragmentShader){
 	return program; 
 
 }
-GLuint createStuff2(GLfloat *data, int size, GLuint shader){
+
+GLuint createVertArray(GLfloat *data, int size, GLuint shader){
 
 	GLuint vertArray; 
 	GLuint vertBuffer; 
@@ -116,22 +117,36 @@ GLuint createStuff2(GLfloat *data, int size, GLuint shader){
 
 }
 
-GLuint createStuff(){
+GLuint changeScatterPlot(int x, int y, GLfloat *data, int size, GLuint shader){
+
+	GLuint tempArray, tempBuffer;
+	glGenVertexArrays(1, &tempArray);
+	glBindVertexArray(tempArray);
+	glGenBuffers(1, &tempBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, tempBuffer);
+	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(glGetAttribLocation(shader, "in_PositionX"),1, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat),(GLvoid*)((2*x-1)*sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(glGetAttribLocation(shader, "in_PositionY"),1, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (GLvoid*)((2*y-1)*sizeof(GLfloat)));
+	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	return tempArray;
+}
+
+void createMouseMarker(GLuint &mouseArray, GLuint &mouseBuffer, GLfloat *data, int size, GLuint shader){
 	
 	//For rendering square around mouse pointer
 	glGenVertexArrays(1, &mouseArray);
 	glBindVertexArray(mouseArray);
 	glGenBuffers(1, &mouseBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(mouseVerts), mouseVerts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(glGetAttribLocation(mouseShader, "in_Position"),2, GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),0);
+	glVertexAttribPointer(glGetAttribLocation(shader, "in_Position"),2, GL_FLOAT,GL_FALSE,2*sizeof(GL_FLOAT),0);
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);			
-
-	return mouseArray;
-
+	glBindVertexArray(0);	
 }
 
 //Create texture and set attach it to a framebuffer object.
@@ -150,22 +165,6 @@ GLuint createTexture(int W1, int H1, int i){
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	return tex1;
-}
-
-GLuint changeScatter(int x, int y, GLfloat *data, int size, GLuint shader){
-
-	glGenVertexArrays(1, &tempArray);
-	glBindVertexArray(tempArray);
-	glGenBuffers(1, &tempBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, tempBuffer);
-	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(glGetAttribLocation(shader, "in_PositionX"),1, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat),(GLvoid*)			    ((2*x-1)*sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(glGetAttribLocation(shader, "in_PositionY"),1, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (GLvoid*)((2*y-1)*sizeof(GLfloat)));
-	glDisableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	return tempArray;
 }
 
 GLuint createFbo(GLuint tex1){
