@@ -76,18 +76,18 @@ float calcGaussVolume_Parallel(int x, int y, float markerSize, float texArray[W]
 				weight = 1.0f/(2.0f * M_PI* sigma*sigma) * exp( -(pow(i, 2) + pow(j, 2))/(2.0f * sigma*sigma ));
 				sum += weight*texArray[posX][posY];
 		
-				cout << weight << " ";
+				//cout << weight << " ";
 				count++;
 
 					if(count == markerSize) { 
-						cout << endl; 
+						//cout << endl; 
 						count = 0;
 					}				
 			}	
 		}		
 	}	
 
-	cout << "SUM IS " << sum << endl;
+	//cout << "SUM IS " << sum << endl;
 	return sum;
 }
 
@@ -112,18 +112,18 @@ float calcGaussVolume_Scatter(int x, int y, float markerSize, float scatterTex[s
 				weight = 1.0f/(2.0f * M_PI* sigma*sigma) * exp( -(pow(i, 2) + pow(j, 2))/(2.0f * sigma*sigma ));
 				sum += weight*scatterTex[posX][posY];
 		
-				cout << weight << " ";
+				//cout << weight << " ";
 				count++;
 
 					if(count == markerSize) { 
-						cout << endl; 
+						//cout << endl; 
 						count = 0;
 					}				
 			}	
 		}		
 	}	
 
-	cout << "SUM IS " << sum << endl;
+	//cout << "SUM IS " << sum << endl;
 	return sum;
 }
 

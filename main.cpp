@@ -38,8 +38,8 @@ GLuint drawShader, parallelShader, mouseShader, tempScatterShader, drawScatterSh
 //Pointers for vertices
 GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisArray;
 GLuint dataArray, mouseBuffer, mouseArray,tex, fbo, parTex, parFbo,  scatTex, scatFbo,tex2, fbo2, tempArray; 
-int counter=0, plot, scatterAxisX = 1, scatterAxisY = 2;
-const static int PARALLEL = 0, SCATTER = 1;
+int counter=0, plot, scatterAxisX = 1, scatterAxisY = 2, background = 0;
+const static int PARALLEL = 0, SCATTER = 1, BLACK = 0, WHITE = 1;
 bool xPressed = false, yPressed = false, hoover = false; 
 
 float texArray[W][H];
@@ -165,8 +165,8 @@ float calcVolume(int x, int y){
 void initTexture(GLuint fboTemp, GLuint texTemp){
 	
 	//set window color and clear last screenpixel
-	glClearColor(0,0,0,0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClearColor(0,0,0,0);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	glClampColor(GL_CLAMP_READ_COLOR, GL_FALSE);
 
@@ -333,7 +333,8 @@ void draw(){
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, parTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1, 0, 1, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0, 0.0, 1);
+		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	
@@ -354,6 +355,7 @@ void draw(){
 		glBindTexture(GL_TEXTURE_2D, scatTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
 		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 0, 1, 0, 1);
+		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	
@@ -453,6 +455,7 @@ void mouseEvent(int event, int state, int x, int y){
 		mouseClick = true;
 
 		if(plot == PARALLEL){
+			cout << markerSize<< endl;
 			vol = calcGaussVolume_Parallel(x, y, markerSize, texArray)/maxValue *10.0;
 		}
 		
@@ -585,7 +588,6 @@ void keyPressed(unsigned char key, int x, int y){
 		xPressed = false;
 		yPressed = true;
 	}
-	
 	else if(isdigit(key) && plot == SCATTER){
 			int axis = key - '0';
 			if(axis > 0 && axis <=dimX){
@@ -618,6 +620,10 @@ void keyPressed(unsigned char key, int x, int y){
 			playSound2(0);
 		}
 	}
+	else if(key == 'b'){
+		background = (background == BLACK) ? WHITE : BLACK;
+	}
+	
 }
 
 void fKeyPressed(int key, int x, int y){
