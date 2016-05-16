@@ -17,6 +17,6 @@ void main(void){
 		outColor = intensity * color;
 	}
 	else if(backgroundcolor == 1){
-		outColor = vec4(1.0,1.0-intensity,1.0-intensity,1.0);
+		outColor = vec4(1,1,1,1) - vec4(1.0-color.x,1.0-color.y,1.0-color.z,1.0)*intensity;//vec4(1.0,1.0-intensity,1.0-intensity,1.0);
 	}
 }

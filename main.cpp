@@ -10,6 +10,8 @@
 
 	THINGS TO ADD 	
 	
+	- Skapa volymer som variabler så att man kan stänga av och på ljud och få ljud ifall man placerat ut markör. 
+
 	- Återupprätta Hallströms heder - sänk familjen Wallenberg
 
 	- Problem med skalning i fönster när x=1 eller y=-1. Använder just nu Ingis version då man aldrig skalar upp till 1.0. 	
@@ -40,7 +42,7 @@ GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisAr
 GLuint dataArray, mouseBuffer, mouseArray,tex, fbo, parTex, parFbo,  scatTex, scatFbo,tex2, fbo2, tempArray; 
 int counter=0, plot, scatterAxisX = 1, scatterAxisY = 2, background = 0;
 const static int PARALLEL = 0, SCATTER = 1, BLACK = 0, WHITE = 1;
-bool xPressed = false, yPressed = false, hoover = false; 
+bool xPressed = false, yPressed = false, hoover = false, soundactive = true; 
 
 float texArray[W][H];
 float scatterTex[sW][sH];
@@ -61,11 +63,11 @@ GLfloat triVerts[12] =
 GLfloat scatterAxisPoints[6] =
 {
 	//Top left point
-	-0.9f, 0.9f,
+	-0.91f, 0.9f,
 	//Bottom left point
-	-0.9f, -0.9f,
+	-0.91f, -0.91f,
 	//Bottom right point
-	0.9f, -0.9f
+	0.9f, -0.91f
 };
 
 GLfloat mouseVerts[8] = 
@@ -333,7 +335,7 @@ void draw(){
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, parTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0, 0.0, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0.0, 0.0, 1);
 		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -354,7 +356,7 @@ void draw(){
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, scatTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 0, 1, 0, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0.0, 0.0, 1);
 		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -369,7 +371,7 @@ void draw(){
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);		
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		
 
 		glUseProgram(mouseShader);
 		glBindVertexArray(scatterAxisArray);
@@ -377,7 +379,10 @@ void draw(){
 		//Set line width of the axes
 		
 		glLineWidth(3.0f);
-		glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f, 0.3f);
+		if(background == BLACK)
+			glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f, 0.3f);
+		else if(background == WHITE)
+			glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 0.0f, 0.3f);
 		glDrawArrays(GL_LINE_STRIP, 0, 3);
 		
 		//Set regular line width	
@@ -464,7 +469,8 @@ void mouseEvent(int event, int state, int x, int y){
 		}
 
 		cout<<"On position x:"<<x<<" y: "<<y << "volume is "<<vol << " marker size: "<<markerSize<<endl;
-		playSound(vol);
+		if(soundactive)
+			playSound(vol);
 		mouseX = x;
 		mouseY = y;
 		glutPostRedisplay();
@@ -482,7 +488,8 @@ void mouseEvent(int event, int state, int x, int y){
 		}		
 
 		cout<<"On position x:"<<x<<" y: "<<y << "volume is "<<vol << " marker size: "<<markerSize<<endl;
-		playSound2(vol);	
+		if(soundactive)
+			playSound2(vol);	
 		mouse2X = x;
 		mouse2Y = y;
 		glutPostRedisplay();
@@ -495,13 +502,14 @@ void mouseMoveClick(int x, int y){
 		if(hoover){
 		mouseX = x;
 		mouseY = y;
-
-		if(plot == PARALLEL){
-			playSound((calcGaussVolume_Parallel(x, y, markerSize, texArray)/maxValue)*10);
-		}
+		if(soundactive){
+			if(plot == PARALLEL){
+				playSound((calcGaussVolume_Parallel(x, y, markerSize, texArray)/maxValue)*10);
+			}
 		
-		else if(plot == SCATTER){
-			playSound((calcGaussVolume_Scatter(x, y, markerSize, scatterTex)/maxValue)*1500);
+			else if(plot == SCATTER){
+				playSound((calcGaussVolume_Scatter(x, y, markerSize, scatterTex)/maxValue)*1500);
+			}
 		}
 
 		glutPostRedisplay();
@@ -546,37 +554,39 @@ void keyPressed(unsigned char key, int x, int y){
 		cout<<"marker size increased"<<endl;
 		markerSize+=2;
 
-
-		if(plot == PARALLEL){
-			vol1 = calcGaussVolume_Parallel(mouseX, mouseY, markerSize, texArray)/maxValue *10.0;
-			vol2 = calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, texArray)/maxValue *10.0;
-		}
+		if(soundactive){
+			if(plot == PARALLEL){
+				vol1 = calcGaussVolume_Parallel(mouseX, mouseY, markerSize, texArray)/maxValue *10.0;
+				vol2 = calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, texArray)/maxValue *10.0;
+			}
 		
-		else if(plot == SCATTER){
-			vol1 = calcGaussVolume_Scatter(mouseX, mouseY, markerSize, scatterTex)/maxValue *1500.0;
-			vol2 = calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex)/maxValue *1500.0;
-		}
+			else if(plot == SCATTER){
+				vol1 = calcGaussVolume_Scatter(mouseX, mouseY, markerSize, scatterTex)/maxValue *1500.0;
+				vol2 = calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex)/maxValue *1500.0;
+			}
 
-		playSound(vol1);
-		playSound2(vol2);
+			playSound(vol1);
+			playSound2(vol2);
+		}
 	}
 	
 	else	if(key == '-' && markerSize >=3){
 		cout<<"marker size decreased"<<endl;
 		markerSize-=2;
-
-		if(plot == PARALLEL){
-		vol1 = calcGaussVolume_Parallel(mouseX, mouseY, markerSize, texArray)/maxValue *10.0;
-		vol2 = calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, texArray)/maxValue *10.0;
-		}
+		if(soundactive){
+			if(plot == PARALLEL){
+			vol1 = calcGaussVolume_Parallel(mouseX, mouseY, markerSize, texArray)/maxValue *10.0;
+			vol2 = calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, texArray)/maxValue *10.0;
+			}
 		
-		else if(plot == SCATTER){
-			vol1 = calcGaussVolume_Scatter(mouseX, mouseY, markerSize, scatterTex)/maxValue *1500.0;
-			vol2 = calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex)/maxValue *1500.0;
-		}
+			else if(plot == SCATTER){
+				vol1 = calcGaussVolume_Scatter(mouseX, mouseY, markerSize, scatterTex)/maxValue *1500.0;
+				vol2 = calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex)/maxValue *1500.0;
+			}
 
-		playSound(vol1);
-		playSound2(vol2);
+			playSound(vol1);
+			playSound2(vol2);
+		}
 	}
 	
 	else if(key == 'x'){
@@ -635,6 +645,15 @@ void fKeyPressed(int key, int x, int y){
 		case GLUT_KEY_F2:
 			plot = SCATTER;
 			glutReshapeWindow(sW, sH);
+		break;
+		case GLUT_KEY_F3:
+			soundactive = (soundactive) ? false : true;
+			if(!soundactive){
+				playSound(0);
+				playSound2(0);
+			}
+				
+			cout << "sound on? " << soundactive << endl;
 		break;
 	}
 }
