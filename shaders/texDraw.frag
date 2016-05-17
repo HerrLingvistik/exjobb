@@ -3,22 +3,24 @@
 in vec2 texCoord;
 uniform sampler2D tex;
 uniform vec4 color;
-uniform int backgroundcolor;
-
-//#define BLACK = 0;
-//#define WHITE = 1;	
+uniform vec4 color2;
+uniform int backgroundcolor;	
 
 out vec4 outColor;
 
 void main(void){
 	float intensity = texture(tex, texCoord).r;
 	float intensity2 = texture(tex, texCoord).g;
-
-	//outColor = mix(vec4(1.0,1.0,1.0,1.0), color, intensity);
+	
 	if(backgroundcolor == 0){	
-		outColor = intensity * color + intensity2 * vec4(1.0, 0.0, 0.0, 1.0);
+		outColor = intensity * color + intensity2 * color2;
 	}
 	else if(backgroundcolor == 1){
-		outColor = vec4(1,1,1,1) - vec4(1.0-color.x,1.0-color.y,1.0-color.z,1.0)*intensity;//vec4(1.0,1.0-intensity,1.0-intensity,1.0);
+		//outColor = vec4(1,1,1,1) - vec4(1.0-color.x,1.0-color.y,1.0-color.z,0.0)*intensity + (vec4(1,1,1,1) - vec4(1.0-color2.x,1.0-color2.y,1.0-color2.z,0.0)*intensity2);
+		//vec4(1.0,1.0-intensity,1.0-intensity,1.0);
+		vec4 col1 = intensity * color;
+		vec4 col2 = intensity2 * color2;
+		float overshoot = max(intensity, intensity2);
+		outColor = vec4(1,1,1,1) + col1+col2 -vec4(overshoot, overshoot, overshoot, 0);
 	}
 }

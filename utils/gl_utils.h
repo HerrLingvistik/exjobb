@@ -12,6 +12,7 @@ GLuint loadShaders(const char* vertexShader, const char* fragmentShader);
 GLuint createVertArray(GLfloat *data, int size,GLuint shader);
 void createMouseMarker(GLuint &mouseArray, GLuint &mouseBuffer, GLfloat *data, int size, GLuint shader);
 GLuint createTexture(int W, int H, int i);
+GLuint createTexture2(int W, int H, int i);
 GLuint createFbo(GLuint tex);
 GLuint changeScatterPlot(int x, int y, GLfloat *data, int size, GLuint shader);
 

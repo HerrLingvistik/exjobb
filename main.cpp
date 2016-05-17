@@ -261,13 +261,15 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glBindVertexArray(triVertArray);
 		//Enable or disable a genedata[ric vertex attribute array
 		glEnableVertexAttribArray(0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex2);
+		
 		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex"), 0);
+		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex2"), 1);	
 
 		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex2);
+
+		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, tex3);
-		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex2"), 1);	
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -364,6 +366,7 @@ void draw(){
 		glBindTexture(GL_TEXTURE_2D, parTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
 		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0.0, 0.0, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 0.0, 0.0, 1.0, 1);
 		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -385,6 +388,7 @@ void draw(){
 		glBindTexture(GL_TEXTURE_2D, scatTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
 		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0.0, 0.0, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 0.0, 0.0, 1.0, 1);
 		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -758,11 +762,11 @@ void init(int W, int H){
 	//Create scatterplot texture
 	plot = SCATTER;
 	glViewport(0,0,sW,sH);
-	tex2 = createTexture(sW,sH, 2);
+	tex2 = createTexture(sW,sH, 0);
 	fbo2 = createFbo(tex2);
-	scatTex = createTexture(sW,sH, 3);
+	scatTex = createTexture2(sW,sH, 3);
 	scatFbo = createFbo(scatTex);
-	tex3 = createTexture(sW,sH, 2);
+	tex3 = createTexture(sW,sH, 0);
 	fbo3 = createFbo(tex3);
 	initTexture(fbo2, tex2);
 

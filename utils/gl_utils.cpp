@@ -167,6 +167,22 @@ GLuint createTexture(int W1, int H1, int i){
 	return tex1;
 }
 
+GLuint createTexture2(int W1, int H1, int i){
+
+	GLuint tex1;
+	glGenTextures(1, &tex1);
+	glActiveTexture(GL_TEXTURE0 + i); 
+	glBindTexture(GL_TEXTURE_2D, tex1); 
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RG32F, W1, H1, 0, GL_RG, GL_UNSIGNED_INT, NULL);	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	return tex1;
+}
+
 GLuint createFbo(GLuint tex1){
 	GLuint fbo1;
 	glBindTexture(GL_TEXTURE_2D, tex1); 
