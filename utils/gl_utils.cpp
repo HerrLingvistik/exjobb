@@ -199,3 +199,66 @@ GLuint createFbo(GLuint tex1){
 	glBindTexture(GL_TEXTURE_2D, 0);
 	return fbo1;
 }
+
+void createParallelArray(float texArray[][H], GLuint tex, float &maxValue){
+	float* texture = new float[ W*H ];
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, texture);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	//glActiveTexture(0);
+
+	int i = 0, row = 0, arrayRow = H-1, col = 0;//, xpos, ypos;
+
+	while(i<W*H){
+		if(texture[i] > maxValue){
+			maxValue = texture[i];
+			//maxPos = i;
+			//xpos = col; 
+			//ypos = row; 
+		}
+
+		texArray[col][arrayRow] = texture[i];
+		col++;
+		i++;
+		if(col == W){
+			col = 0;
+			row++;
+			arrayRow--;
+		}
+	}
+}
+void createScatterArray(float scatterTex[][sH], GLuint tex2){
+	float* texture2 = new float[sW*sH];
+
+		glActiveTexture(GL_TEXTURE1);
+	
+		glBindTexture(GL_TEXTURE_2D, tex2);
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, texture2);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	
+		int i = 0, row = sH-1, col = 0, scatterMax=0, xpos, ypos, row2=0;
+		int count = 0;
+
+		while(i<sW*sH){
+			if(texture2[i] > scatterMax){
+				scatterMax = texture2[i];
+				xpos = col; 
+				ypos = row;
+			}
+			if(texture2[i] != 0)
+				count+=texture2[i];
+			scatterTex[col][row] = texture2[i];
+			col++;
+			i++;
+
+			if(col == sW){
+				col = 0;
+				row--;
+				row2++;
+			}
+		}
+
+		cout << "maximum value in scatterplot: "<< scatterMax<< " pos: "<<xpos << " : "<<ypos << endl;
+		cout << "counter: "<<count<<endl;
+}

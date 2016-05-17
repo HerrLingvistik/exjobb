@@ -46,6 +46,7 @@ bool xPressed = false, yPressed = false, hoover = false, soundactive = true;
 
 float texArray[W][H];
 float scatterTex[sW][sH];
+float scatterTex2[sW][sH];
 
 //Vertices used to draw to triangles(one quad) upon which the texture will be drawn
 GLfloat triVerts[12] = 
@@ -239,7 +240,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo3);
 		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
 		cout << "create scatter texture"<<endl;
 		glUseProgram(tempScatterShader);
 		glBindVertexArray(tempArray2);
@@ -281,7 +282,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 
 	
 	if(plot == PARALLEL){
-		glActiveTexture(GL_TEXTURE0);
+		/*glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, tex);
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, texture);
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -305,16 +306,17 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 				row++;
 				arrayRow--;
 			}
-		}
-
-		glUseProgram(drawShader);
-		glUniform1f(glGetUniformLocation(drawShader, "maxValue"), maxValue);
-		glUseProgram(0);
+		}*/
+		createParallelArray(texArray, tex, maxValue);
+		//glUseProgram(drawShader);
+		//glUniform1f(glGetUniformLocation(drawShader, "maxValue"), maxValue);
+		//glUseProgram(0);
 	
-		cout << "DONE WITH TEXTURE. Max value: "<<maxValue << "pos: "<<xpos << " : " <<ypos<<endl;
+		//cout << "DONE WITH TEXTURE. Max value: "<<maxValue << "pos: "<<xpos << " : " <<ypos<<endl;
 	}	
 
 	if(plot == SCATTER){
+		/*
 		float* texture2 = new float[sW*sH];
 
 		glActiveTexture(GL_TEXTURE1);
@@ -347,7 +349,9 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 
 		cout << "maximum value in scatterplot: "<< scatterMax<< " pos: "<<xpos << " : "<<ypos << endl;
 		cout << "counter: "<<count<<endl;
-
+		*/
+		createScatterArray(scatterTex, tex2);
+		createScatterArray(scatterTex2, tex3);
 	}
 }
 
@@ -541,6 +545,8 @@ void mouseMoveClick(int x, int y){
 		
 			else if(plot == SCATTER){
 				playSound((calcGaussVolume_Scatter(x, y, markerSize, scatterTex)/maxValue)*1500);
+				//Temporary does this work?				
+				playSound2((calcGaussVolume_Scatter(x, y, markerSize, scatterTex2)/maxValue)*1500);
 			}
 		}
 
