@@ -58,6 +58,52 @@ void readFile_pCoords(){
 
 }
 
+void readFile_cluster(vector<float>& cluster, const char* filename){
+	
+	cluster.clear(); //Clear the vector storing data values	
+	ifstream infile;
+	infile.open(filename); 
+	string line;
+	string number, dim;
+	//int col=0;
+	//float startPos = -1.0, axisSpacing;
+
+	if(infile.is_open()){		
+		//Read first line to get dimensions.
+		//getline(infile, line);
+		//istringstream is1(line);
+		//getline(is1, dim, ' ') ;
+		//axisSpacing = 2.0/(stof(dim)-1);
+
+		while(getline(infile, line)){
+			istringstream is(line);
+			//first.push_back(dimX);			
+			//dimY++;		
+			
+			//Read element by element
+			while( getline(is, number, ' ') ) {	
+				//Add all data items to a one dimensional vector.		
+			//	if(!isdigit(number[0]))
+			//		break;
+				//Add X 
+				//cluster.push_back(startPos + axisSpacing*col);
+				//Add Y
+				cluster.push_back((float)stof(number));
+				//col++;			
+				//dimX++;
+    	}	
+			//col=0;
+		}	
+
+		//dimX/=dimY;
+		//count.assign(first.size(), dimX);
+		infile.close();
+	}
+
+	else cout<<"fail"<<endl;
+
+}
+
 void writeFile(){
 
 	ofstream myfile;

@@ -88,6 +88,8 @@ GLfloat mouse2Verts[8] =
 };
 
 vector<float> data;
+vector<float> data2;
+vector<float> data3;
 vector<int> first;
 vector<int> count;
 
@@ -227,7 +229,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		//Draw lines tell opengl how many values will be sent to the shaders
-		glDrawArrays(GL_POINTS, 0, data.size()*(1.0f/10.0f));
+		glDrawArrays(GL_POINTS, 0, data2.size());
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		//Disable and unbind just to be safe
 		glDisableVertexAttribArray(0);
@@ -248,7 +250,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		//Draw lines tell opengl how many values will be sent to the shaders
-		glDrawArrays(GL_POINTS, 0, data.size()*(1.0f/10.0f));
+		glDrawArrays(GL_POINTS, 0, data3.size());
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		//Disable and unbind just to be safe
 		glDisableVertexAttribArray(0);
@@ -733,7 +735,16 @@ void init(int W, int H){
 	
 	//read data set into data array
 	readFile_pCoords();
+	readFile_cluster(data2, "./data/cluster1.txt");	
+	readFile_cluster(data3, "./data/cluster2.txt");		
+
 	normalizeAxis();
+
+	//cout << "Data size: " << data.size() << endl;
+	cout << "vec size: " << data2.size() << endl;
+	cout << "vec size: " << data2[0] << endl;
+	normalizeAxis2(data2);
+	normalizeAxis2(data3);
 
 	markerSize = 5.0f;	
 
@@ -750,11 +761,12 @@ void init(int W, int H){
 	triVertArray2 = createVertArray(triVerts, sizeof(triVerts), drawTexShader);
 	dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
 	
-	 
 	createMouseMarker(mouseArray, mouseBuffer, mouseVerts, sizeof(mouseVerts),  mouseShader);
 
-	tempArray = changeScatterPlot(1,2, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
-	tempArray2 = changeScatterPlot(3,4, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
+	tempArray = changeScatterPlot(1,2, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
+	tempArray2 = changeScatterPlot(1,2, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
+
+	
 
 	//Create parallel coordinates texture
 	plot = PARALLEL;

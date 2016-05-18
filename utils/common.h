@@ -26,6 +26,7 @@ extern int dimX, dimY;
 //Extern vector data to store the data points
 extern vector<float> data;
 extern vector<float> data2;
+extern vector<float> data3;
 
 //Vectors in order to have a dynamic amount of lines drawn 
 extern vector<int> first;

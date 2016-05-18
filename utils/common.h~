@@ -10,9 +10,9 @@ using namespace std;
 const int W = 1299;
 const int H = 620;
 
-//Sets the width and height of the window for the scatter plot
-const int sW = 600;
-const int sH = 600;
+
+const int sW = 512;
+const int sH = 512;
 
 //Two dimensional array to store the parallel texture
 extern float texArray[W][H];

@@ -46,6 +46,7 @@ bool xPressed = false, yPressed = false, hoover = false, soundactive = true;
 
 float texArray[W][H];
 float scatterTex[sW][sH];
+float scatterTex2[sW][sH];
 
 //Vertices used to draw to triangles(one quad) upon which the texture will be drawn
 GLfloat triVerts[12] = 
@@ -87,6 +88,8 @@ GLfloat mouse2Verts[8] =
 };
 
 vector<float> data;
+vector<float> data2;
+vector<float> data3;
 vector<int> first;
 vector<int> count;
 
@@ -226,7 +229,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		//Draw lines tell opengl how many values will be sent to the shaders
-		glDrawArrays(GL_POINTS, 0, data.size()*(1.0f/10.0f));
+		glDrawArrays(GL_POINTS, 0, data2.size());
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		//Disable and unbind just to be safe
 		glDisableVertexAttribArray(0);
@@ -239,7 +242,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo3);
 		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
 		cout << "create scatter texture"<<endl;
 		glUseProgram(tempScatterShader);
 		glBindVertexArray(tempArray2);
@@ -247,7 +250,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		//Draw lines tell opengl how many values will be sent to the shaders
-		glDrawArrays(GL_POINTS, 0, data.size()*(1.0f/10.0f));
+		glDrawArrays(GL_POINTS, 0, data3.size());
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		//Disable and unbind just to be safe
 		glDisableVertexAttribArray(0);
@@ -261,13 +264,15 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glBindVertexArray(triVertArray);
 		//Enable or disable a genedata[ric vertex attribute array
 		glEnableVertexAttribArray(0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex2);
+		
 		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex"), 0);
+		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex2"), 1);	
 
 		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tex2);
+
+		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, tex3);
-		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex2"), 1);	
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -279,7 +284,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 
 	
 	if(plot == PARALLEL){
-		glActiveTexture(GL_TEXTURE0);
+		/*glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, tex);
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, texture);
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -303,16 +308,17 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 				row++;
 				arrayRow--;
 			}
-		}
-
-		glUseProgram(drawShader);
-		glUniform1f(glGetUniformLocation(drawShader, "maxValue"), maxValue);
-		glUseProgram(0);
+		}*/
+		createParallelArray(texArray, tex, maxValue);
+		//glUseProgram(drawShader);
+		//glUniform1f(glGetUniformLocation(drawShader, "maxValue"), maxValue);
+		//glUseProgram(0);
 	
-		cout << "DONE WITH TEXTURE. Max value: "<<maxValue << "pos: "<<xpos << " : " <<ypos<<endl;
+		//cout << "DONE WITH TEXTURE. Max value: "<<maxValue << "pos: "<<xpos << " : " <<ypos<<endl;
 	}	
 
 	if(plot == SCATTER){
+		/*
 		float* texture2 = new float[sW*sH];
 
 		glActiveTexture(GL_TEXTURE1);
@@ -345,7 +351,9 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 
 		cout << "maximum value in scatterplot: "<< scatterMax<< " pos: "<<xpos << " : "<<ypos << endl;
 		cout << "counter: "<<count<<endl;
-
+		*/
+		createScatterArray(scatterTex, tex2);
+		createScatterArray(scatterTex2, tex3);
 	}
 }
 
@@ -364,6 +372,7 @@ void draw(){
 		glBindTexture(GL_TEXTURE_2D, parTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
 		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0.0, 0.0, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 0.0, 0.0, 1.0, 1);
 		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -385,6 +394,7 @@ void draw(){
 		glBindTexture(GL_TEXTURE_2D, scatTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
 		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0.0, 0.0, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 0.0, 0.0, 1.0, 1);
 		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -537,6 +547,8 @@ void mouseMoveClick(int x, int y){
 		
 			else if(plot == SCATTER){
 				playSound((calcGaussVolume_Scatter(x, y, markerSize, scatterTex)/maxValue)*1500);
+				//Temporary does this work?				
+				playSound2((calcGaussVolume_Scatter(x, y, markerSize, scatterTex2)/maxValue)*1500);
 			}
 		}
 
@@ -723,7 +735,16 @@ void init(int W, int H){
 	
 	//read data set into data array
 	readFile_pCoords();
+	readFile_cluster(data2, "./data/cluster1.txt");	
+	readFile_cluster(data3, "./data/cluster2.txt");		
+
 	normalizeAxis();
+
+	//cout << "Data size: " << data.size() << endl;
+	cout << "vec size: " << data2.size() << endl;
+	cout << "vec size: " << data2[0] << endl;
+	//normalizeAxis2(data2);
+	//normalizeAxis2(data3);
 
 	markerSize = 5.0f;	
 
@@ -740,11 +761,12 @@ void init(int W, int H){
 	triVertArray2 = createVertArray(triVerts, sizeof(triVerts), drawTexShader);
 	dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
 	
-	 
 	createMouseMarker(mouseArray, mouseBuffer, mouseVerts, sizeof(mouseVerts),  mouseShader);
 
-	tempArray = changeScatterPlot(1,2, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
-	tempArray2 = changeScatterPlot(3,4, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
+	tempArray = changeScatterPlot(1,2, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
+	tempArray2 = changeScatterPlot(1,2, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
+
+	
 
 	//Create parallel coordinates texture
 	plot = PARALLEL;
@@ -758,11 +780,11 @@ void init(int W, int H){
 	//Create scatterplot texture
 	plot = SCATTER;
 	glViewport(0,0,sW,sH);
-	tex2 = createTexture(sW,sH, 2);
+	tex2 = createTexture(sW,sH, 0);
 	fbo2 = createFbo(tex2);
-	scatTex = createTexture(sW,sH, 3);
+	scatTex = createTexture2(sW,sH, 3);
 	scatFbo = createFbo(scatTex);
-	tex3 = createTexture(sW,sH, 2);
+	tex3 = createTexture(sW,sH, 0);
 	fbo3 = createFbo(tex3);
 	initTexture(fbo2, tex2);
 

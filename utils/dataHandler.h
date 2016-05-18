@@ -4,7 +4,7 @@
 #include "common.h"
 
 void readFile_pCoords();
-void readFile_sPlot();
+void readFile_cluster(vector<float>& cluster, const char* filename);
 void writeFile();
 
 #endif
