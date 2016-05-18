@@ -117,7 +117,7 @@ GLuint createVertArray(GLfloat *data, int size, GLuint shader){
 
 }
 
-GLuint changeScatterPlot(int x, int y, GLfloat *data, int size, GLuint shader){
+GLuint changeScatterPlot(int x, int y, int skip, GLfloat *data, int size, GLuint shader){
 
 	GLuint tempArray, tempBuffer;
 	glGenVertexArrays(1, &tempArray);
@@ -126,9 +126,11 @@ GLuint changeScatterPlot(int x, int y, GLfloat *data, int size, GLuint shader){
 	glBindBuffer(GL_ARRAY_BUFFER, tempBuffer);
 	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(glGetAttribLocation(shader, "in_PositionX"),1, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat),(GLvoid*)((2*x-1)*sizeof(GLfloat)));
+	//glVertexAttribPointer(glGetAttribLocation(shader, "in_PositionX"),1, GL_FLOAT, GL_FALSE, skip*sizeof(GLfloat),(GLvoid*)((2*x-1)*sizeof(GLfloat)));
+	glVertexAttribPointer(glGetAttribLocation(shader, "in_PositionX"),1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat),(GLvoid*)(0*sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(glGetAttribLocation(shader, "in_PositionY"),1, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), (GLvoid*)((2*y-1)*sizeof(GLfloat)));
+	//glVertexAttribPointer(glGetAttribLocation(shader, "in_PositionY"),1, GL_FLOAT, GL_FALSE, skip*sizeof(GLfloat), (GLvoid*)((2*y-1)*sizeof(GLfloat)));
+	glVertexAttribPointer(glGetAttribLocation(shader, "in_PositionY"),1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), (GLvoid*)(1*sizeof(GLfloat)));
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	return tempArray;

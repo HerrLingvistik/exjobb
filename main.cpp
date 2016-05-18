@@ -229,7 +229,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		//Draw lines tell opengl how many values will be sent to the shaders
-		glDrawArrays(GL_POINTS, 0, data2.size());
+		glDrawArrays(GL_POINTS, 0, data2.size()/2.0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		//Disable and unbind just to be safe
 		glDisableVertexAttribArray(0);
@@ -250,7 +250,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		//Draw lines tell opengl how many values will be sent to the shaders
-		glDrawArrays(GL_POINTS, 0, data3.size());
+		glDrawArrays(GL_POINTS, 0, data3.size()/2.0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		//Disable and unbind just to be safe
 		glDisableVertexAttribArray(0);
@@ -371,8 +371,8 @@ void draw(){
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, parTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0.0, 0.0, 1);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 0.0, 0.0, 1.0, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 0.0, 0.0, 1.0, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0, 0.0, 0.0, 1);
 		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -393,8 +393,8 @@ void draw(){
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, scatTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0.0, 0.0, 1);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 0.0, 0.0, 1.0, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 0.0, 0.0, 1.0, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0, 0.0, 0.0, 1);
 		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -646,14 +646,14 @@ void keyPressed(unsigned char key, int x, int y){
 					scatterAxisX = axis;
 					cout << "chosen value is: "<< axis << endl;
 					glViewport(0,0,sW,sH);
-					tempArray = changeScatterPlot(scatterAxisX,scatterAxisY, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
+					tempArray = changeScatterPlot(scatterAxisX,scatterAxisY, 0, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
 					initTexture(fbo2, tex2);
 
 				}else if(yPressed){
 					scatterAxisY = axis;
 					cout << "chosen value is: "<< axis << endl;
 					glViewport(0,0,sW,sH);
-					tempArray = changeScatterPlot(scatterAxisX,scatterAxisY, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
+					tempArray = changeScatterPlot(scatterAxisX,scatterAxisY, 0, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
 					initTexture(fbo2, tex2);
 				}
 			}
@@ -763,8 +763,8 @@ void init(int W, int H){
 	
 	createMouseMarker(mouseArray, mouseBuffer, mouseVerts, sizeof(mouseVerts),  mouseShader);
 
-	tempArray = changeScatterPlot(1,2, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
-	tempArray2 = changeScatterPlot(1,2, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
+	tempArray = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
+	tempArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
 
 	
 

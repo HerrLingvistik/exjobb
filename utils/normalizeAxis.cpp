@@ -58,7 +58,10 @@ void normalizeAxis(){
 }
 
 void normalizeAxis2(vector<float>& cluster){
-	
+	/*for(int i=0; i<2*699; i+=2)
+	{
+		cout<< cluster[i] << " " << cluster[i+1]<<endl;
+	}*/
 	int startPoint=0;
 	int dimensionCounter=0;
 	
@@ -67,10 +70,10 @@ void normalizeAxis2(vector<float>& cluster){
 	float maxValue = -9999999999999999;
 	
 	//Start on the first y.
-	while(startPoint < 2*699 && dimensionCounter < 2) {
+	while(startPoint < 2*700 && dimensionCounter < 2) {
 
 		//Find largest and smallest values per column to be used for the normalization.
-		for(int i = startPoint; i < 2*699; ) {
+		for(int i = startPoint; i < 2*700; ) {
 
 			if(cluster[i] < minValue) {
 				minValue = cluster[i];				
@@ -87,7 +90,7 @@ void normalizeAxis2(vector<float>& cluster){
 		cout << "min of this col: " <<  minValue << endl;		
 		
 		//Perform feature scaling on this column, this gives values between 0 to 1.
-		for(int i = startPoint; i < 2*699; ) {
+		for(int i = startPoint; i < 2*700; ) {
 						
 			cluster[i] = (cluster[i] - minValue)/(maxValue - minValue) * sW;	
 			i+=2;
@@ -101,6 +104,10 @@ void normalizeAxis2(vector<float>& cluster){
 		//Go to the first y-value of the next dimension.
 		startPoint+=1;
 	}
+	/*for(int i=0; i<2*699; i+=2)
+	{
+		cout<< cluster[i] << " " << cluster[i+1]<<endl;
+	}*/
 }
 
 //Output the normalized values of the data set
