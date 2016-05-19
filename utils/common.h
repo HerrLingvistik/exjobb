@@ -15,7 +15,7 @@ const int sW = 512;
 const int sH = 512;
 
 //Two dimensional array to store the parallel texture
-extern float texArray[W][H];
+extern float parallelTex[W][H];
 
 //Two dimensional array to store the scatter plot texture
 extern float scatterTex[sW][sH];

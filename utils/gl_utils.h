@@ -6,7 +6,7 @@
 #include "common.h"
 
 using namespace std;
-
+void glErrorCheck();
 string readFile(const char* filename);
 GLuint loadShaders(const char* vertexShader, const char* fragmentShader);
 GLuint createVertArray(GLfloat *data, int size,GLuint shader);

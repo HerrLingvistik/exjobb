@@ -7,6 +7,16 @@
 #include <vector>
 
 
+void glErrorCheck()
+{
+    int errCode;
+    if ((errCode = glGetError()) != GL_NO_ERROR)
+    {
+        printf("Failure in OpenGL %d \n", errCode);
+        //exit(0);
+    }
+}
+
 string readShaderFile(const char* filename){
 
 	ifstream infile;
@@ -230,16 +240,16 @@ void createParallelArray(float texArray[][H], GLuint tex, float &maxValue){
 		}
 	}
 }
-void createScatterArray(float scatterTex[][sH], GLuint tex2){
+void createScatterArray(float readTex[][sH], GLuint texIn){
 	float* texture2 = new float[sW*sH];
 
 		glActiveTexture(GL_TEXTURE1);
 	
-		glBindTexture(GL_TEXTURE_2D, tex2);
+		glBindTexture(GL_TEXTURE_2D, texIn);
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, texture2);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	
-		int i = 0, row = sH-1, col = 0, scatterMax=0, xpos, ypos, row2=0;
+		int i = 0, row = sH-1, col = 0, scatterMax=0, xpos=0, ypos=0;//, row2=0;
 		int count = 0;
 
 		while(i<sW*sH){
@@ -250,14 +260,14 @@ void createScatterArray(float scatterTex[][sH], GLuint tex2){
 			}
 			if(texture2[i] != 0)
 				count+=texture2[i];
-			scatterTex[col][row] = texture2[i];
+			readTex[col][row] = texture2[i];
 			col++;
 			i++;
 
 			if(col == sW){
 				col = 0;
 				row--;
-				row2++;
+				//row2++;
 			}
 		}
 
