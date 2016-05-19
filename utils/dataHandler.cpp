@@ -58,7 +58,7 @@ void readFile_pCoords(){
 
 }
 
-void readFile_cluster(vector<float>& cluster, const char* filename){
+void readFile_cluster(vector<float>& cluster, const char* filename, int& rowCounter){
 	
 	cluster.clear(); //Clear the vector storing data values	
 	ifstream infile;
@@ -79,7 +79,7 @@ void readFile_cluster(vector<float>& cluster, const char* filename){
 			istringstream is(line);
 			//first.push_back(dimX);			
 			//dimY++;		
-			
+			rowCounter++;
 			//Read element by element
 			while( getline(is, number, ' ') ) {	
 				//Add all data items to a one dimensional vector.		
@@ -99,9 +99,8 @@ void readFile_cluster(vector<float>& cluster, const char* filename){
 		//count.assign(first.size(), dimX);
 		infile.close();
 	}
-
 	else cout<<"fail"<<endl;
-
+	cout << "Number of rows in this data-set: "<< rowCounter << endl;
 }
 
 void writeFile(){
@@ -111,7 +110,7 @@ void writeFile(){
 	int i = 0;
 	int row = 0, col=0;
 	while(i<W*H){
-		myfile << texArray[col][row] << " "; 
+		myfile << parallelTex[col][row] << " "; 
 		i++;
 		col++;	
 		if(col==W){

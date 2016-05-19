@@ -47,7 +47,7 @@ float calcVolume(int x, int y, float markerSize){
 			
 			if(posX>=0 && posX < W && posY>=0 && posY < H){
 				elements++;
-				sum+=texArray[posX][posY];
+				sum+=parallelTex[posX][posY];
 			}	
 		}		
 	}	
@@ -55,7 +55,7 @@ float calcVolume(int x, int y, float markerSize){
 }
 
 
-float calcGaussVolume_Parallel(int x, int y, float markerSize, float texArray[W][620]){
+float calcGaussVolume_Parallel(int x, int y, float markerSize, float parallelTex[W][620]){
 	
 	float sigma = 1.0;
 	float weight = 0;
@@ -74,7 +74,7 @@ float calcGaussVolume_Parallel(int x, int y, float markerSize, float texArray[W]
 
 				//elements++;
 				weight = 1.0f/(2.0f * M_PI* sigma*sigma) * exp( -(pow(i, 2) + pow(j, 2))/(2.0f * sigma*sigma ));
-				sum += weight*texArray[posX][posY];
+				sum += weight*parallelTex[posX][posY];
 		
 				//cout << weight << " ";
 				count++;
