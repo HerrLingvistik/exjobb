@@ -70,7 +70,7 @@ void normalizeAxis2(vector<float>& cluster){
 	float maxValue = -9999999999999999;
 	
 	//Start on the first y.
-	cout << "size in normalize: "<<cluster.size()/2.0 << endl;
+	//cout << "size in normalize: "<<cluster.size()/2.0 << endl;
 	while(startPoint < cluster.size() && dimensionCounter < 2) {
 
 		//Find largest and smallest values per column to be used for the normalization.
@@ -87,8 +87,8 @@ void normalizeAxis2(vector<float>& cluster){
 			i+=2;
 		}
 		
-		cout << "max of this col: " <<  maxValue << endl;
-		cout << "min of this col: " <<  minValue << endl;		
+		//cout << "max of this col: " <<  maxValue << endl;
+		//cout << "min of this col: " <<  minValue << endl;		
 		
 		//Perform feature scaling on this column, this gives values between 0 to 1.
 		for(uint i = startPoint; i < cluster.size(); ) {

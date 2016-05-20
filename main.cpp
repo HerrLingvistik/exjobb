@@ -518,19 +518,20 @@ void keyPressed(unsigned char key, int x, int y){
 				cout << "chose file: "<<clusterFile<<endl;
 				
 				if(bPressed){
-					cout << "chosen cluster is: "<< cluster << endl;
+					cout << "blue cluster chosen, cluster is: "<< cluster << endl;
 					glViewport(0,0,sW,sH);
 					readFile_cluster(data2, clusterFile, clusterCounter1);
+					//readFile_cluster(data2, "./data/cluster6.txt", clusterCounter1);
 					normalizeAxis2(data2);
 					clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
 					initTexture(fbo2, tex2);
 				}else if(rPressed){
-					cout << "chosen cluster is: "<< cluster << endl;
+					cout << "red cluster chosen, cluster is: "<< cluster << endl;
 					glViewport(0,0,sW,sH);	
 					readFile_cluster(data3, clusterFile, clusterCounter2);
 					normalizeAxis2(data3);
 					clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-					initTexture(fbo2, tex2);
+					initTexture(fbo3, tex3);
 				}
 
 			}

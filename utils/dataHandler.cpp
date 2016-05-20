@@ -59,7 +59,7 @@ void readFile_pCoords(){
 }
 
 void readFile_cluster(vector<float>& cluster, const char* filename, int& rowCounter){
-	
+	rowCounter = 0;
 	cluster.clear(); //Clear the vector storing data values	
 	ifstream infile;
 	infile.open(filename); 
