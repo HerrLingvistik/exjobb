@@ -11,8 +11,8 @@ const int W = 1299;
 const int H = 620;
 
 
-const int sW = 512;
-const int sH = 512;
+const int sW = 600;
+const int sH = 600;
 
 //Two dimensional array to store the parallel texture
 extern float parallelTex[W][H];

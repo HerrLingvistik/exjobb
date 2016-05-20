@@ -21,6 +21,8 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <string.h>
+#include <stdio.h>
 #include "utils/common.h"
 #include "utils/dataHandler.h"
 #include "utils/gl_utils.h"
@@ -38,7 +40,7 @@ GLuint tex, fbo, parTex, parFbo,  scatTex, scatFbo, tex2, tex3, fbo2, fbo3;
 int plot, scatterAxisX = 1, scatterAxisY = 2, background = 0, clusterCounter1=1, clusterCounter2=1, dimX = 0, dimY = 0, maxPos = 0, mouseX, mouseY, mouse2X, mouse2Y;
 
 const static int PARALLEL = 0, SCATTER = 1, BLACK = 0, WHITE = 1;
-bool xPressed = false, yPressed = false, hoover = false, soundactive = true; 
+bool bPressed = false, rPressed = false, hoover = false, soundactive = true; 
 
 float parallelTex[W][H];
 float scatterTex[sW][sH];
@@ -173,6 +175,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cout << "create scatter texture"<<endl;
 		glUseProgram(tempScatterShader);
+		glUniform1i(glGetUniformLocation(tempScatterShader, "resolution"), sW);
 		glBindVertexArray(clusterArray1);
 		//Enable or disable a generic vertex attribute array
 		glEnableVertexAttribArray(0);
@@ -192,6 +195,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cout << "create scatter texture"<<endl;
 		glUseProgram(tempScatterShader);
+		glUniform1f(glGetUniformLocation(tempScatterShader, "resolution"), 512.0f);
 		glBindVertexArray(clusterArray2);
 		//Enable or disable a generic vertex attribute array
 		glEnableVertexAttribArray(0);
@@ -248,8 +252,11 @@ void draw(){
 		glEnableVertexAttribArray(0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, parTex);
-		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 0.0, 0.0, 1.0, 1);
+		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);if(background == WHITE)
+			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 0.0, 0.0, 1.0, 1);
+		else
+			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0.0, 0.0, 1);
+		
 		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0, 0.0, 0.0, 1);
 		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
@@ -490,34 +497,43 @@ void keyPressed(unsigned char key, int x, int y){
 		}
 	}
 	
-	else if(key == 'x'){
-		yPressed = false;
-		xPressed = true;
+	else if(key == 'b'){
+		rPressed = false;
+		bPressed = true;
 	}
 	
-	else if(key == 'y'){
-		xPressed = false;
-		yPressed = true;
+	else if(key == 'r'){
+		bPressed = false;
+		rPressed = true;
 	}
 	else if(isdigit(key) && plot == SCATTER){
-			/*int axis = key - '0';
-			if(axis > 0 && axis <=dimX){
-				cout << "chose axis"<<axis<<endl;
-				if(xPressed){
-					scatterAxisX = axis;
-					cout << "chosen value is: "<< axis << endl;
+			int cluster = key - '0';
+			//string str(key);
+			if(cluster > 0 && cluster <= 8){
+				char* clusterFile = new char[19]; 
+				clusterFile = strcpy(clusterFile,"./data/cluster");//+cluster+".txt";
+				clusterFile[14] = key;
+				clusterFile = strcat(clusterFile, ".txt");
+			//clusterFile.append(cluster);
+				cout << "chose file: "<<clusterFile<<endl;
+				
+				if(bPressed){
+					cout << "chosen cluster is: "<< cluster << endl;
 					glViewport(0,0,sW,sH);
-					tempArray = changeScatterPlot(scatterAxisX,scatterAxisY, 0, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
+					readFile_cluster(data2, clusterFile, clusterCounter1);
+					normalizeAxis2(data2);
+					clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
 					initTexture(fbo2, tex2);
-
-				}else if(yPressed){
-					scatterAxisY = axis;
-					cout << "chosen value is: "<< axis << endl;
-					glViewport(0,0,sW,sH);
-					tempArray = changeScatterPlot(scatterAxisX,scatterAxisY, 0, &data.front(), sizeof(GL_FLOAT)*data.size(), tempScatterShader);
+				}else if(rPressed){
+					cout << "chosen cluster is: "<< cluster << endl;
+					glViewport(0,0,sW,sH);	
+					readFile_cluster(data3, clusterFile, clusterCounter2);
+					normalizeAxis2(data3);
+					clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
 					initTexture(fbo2, tex2);
 				}
-			}*/
+
+			}
 	}
 	
 	else if(key == 'h'){	
@@ -528,9 +544,6 @@ void keyPressed(unsigned char key, int x, int y){
 			hoover = true;
 			playSound2(0);
 		}
-	}
-	else if(key == 'b'){
-		background = (background == BLACK) ? WHITE : BLACK;
 	}
 	
 }
@@ -546,6 +559,9 @@ void fKeyPressed(int key, int x, int y){
 			glutReshapeWindow(sW, sH);
 		break;
 		case GLUT_KEY_F3:
+			background = (background == BLACK) ? WHITE : BLACK;
+		break;
+		case GLUT_KEY_F4:
 			soundactive = (soundactive) ? false : true;
 			if(!soundactive){
 				playSound(0);
@@ -606,6 +622,9 @@ void init(int W, int H){
 	mouseShader = loadShaders("./shaders/mouse.vert", "./shaders/mouse.frag");
 	drawTexShader = loadShaders("./shaders/texDraw.vert", "./shaders/texDraw.frag");
 	
+
+	
+
 	//Create fbos and textures 
 	triVertArray = createVertArray(triVerts, sizeof(triVerts), drawShader);
 	scatterAxisArray = createVertArray(scatterAxisPoints, sizeof(scatterAxisPoints), mouseShader);

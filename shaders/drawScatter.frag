@@ -48,6 +48,6 @@ void main(void){
 		}
 	}
 
-	out_Color = vec4(intensity, intensity2, 0, 0);
-	
+	out_Color = vec4(intensity, intensity2, 0, 0)/10.0*2.0;
+	//out_Color = vec4(log(log(log(intensity+1)/log(10) +1)/log(10) +1)/log(10), log(log(log(intensity2+1)/log(10) +1)/log(10) +1)/log(10),0, 1);
 }

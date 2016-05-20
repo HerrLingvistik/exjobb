@@ -91,7 +91,7 @@ float calcGaussVolume_Parallel(int x, int y, float markerSize, float parallelTex
 	return sum;
 }
 
-float calcGaussVolume_Scatter(int x, int y, float markerSize, float scatterTex[sW][512]){
+float calcGaussVolume_Scatter(int x, int y, float markerSize, float scatterTex[sW][sH]){
 	
 	float sigma = 1.0;
 	float weight = 0;
