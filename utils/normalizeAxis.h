@@ -2,8 +2,8 @@
 #define NORMALIZEAXIS_H
 #include "common.h"
 
-void normalizeAxis();
-void normalizeAxis2(vector<float>& cluster);
-void outputNormalized();
+void normalizeAxis(vector<float>& data);
+void normalizeAxis2(vector<float>& cluster1, vector<float>& cluster2);
+//void outputNormalized();
 
 #endif

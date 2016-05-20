@@ -2,9 +2,11 @@
 #define DATAHANDLER_H
 
 #include "common.h"
+#include <iostream>
+#include <string.h>
 
-void readFile_pCoords();
-void readFile_cluster(vector<float>& cluster, const char* filename, int& rowCounter);
+void readFile_pCoords(vector<float>& data);
+void readFile_cluster(vector<float>& cluster, std::string filename, int& rowCounter);
 void writeFile();
 
 #endif

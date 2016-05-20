@@ -6,13 +6,13 @@
 #include <math.h>
 #include <fstream>
 #include <sstream>
-#include <string.h>
+
 
 using namespace std;
 
 //The aim of this function is to read ASCII-data from a text file and store it into a one dimensional array.
 //This function is specifically for the parallel coordinates model with arbitrary dimensions
-void readFile_pCoords(){
+void readFile_pCoords(vector<float>& data){
 	
 	data.clear(); //Clear the vector storing data values	
 	ifstream infile;
@@ -58,10 +58,12 @@ void readFile_pCoords(){
 
 }
 
-void readFile_cluster(vector<float>& cluster, const char* filename, int& rowCounter){
+void readFile_cluster(vector<float>& cluster, std::string filename, int& rowCounter){
 	rowCounter = 0;
 	cluster.clear(); //Clear the vector storing data values	
 	ifstream infile;
+	//cout << "in file reader "<< filename<< endl;
+	//filename = "data/cluster5.txt";
 	infile.open(filename); 
 	string line;
 	string number, dim;
@@ -99,8 +101,8 @@ void readFile_cluster(vector<float>& cluster, const char* filename, int& rowCoun
 		//count.assign(first.size(), dimX);
 		infile.close();
 	}
-	else cout<<"fail"<<endl;
-	cout << "Number of rows in this data-set: "<< rowCounter << endl;
+	else cout<<"FAIIIIIIIIIIIIIIL!!!"<<endl;
+	//cout << "Number of rows in this data-set: "<< rowCounter << endl;
 }
 
 void writeFile(){
