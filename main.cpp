@@ -7,10 +7,8 @@
 ** -------------------------------------------------------------------------*/
 
 /*
-	THINGS TO ADD 	
-	- Skapa volymer som variabler så att man kan stänga av och på ljud och få ljud ifall man placerat ut markör. 
+	THINGS TO ADD 	 
 	- Återupprätta Hallströms heder - sänk familjen Wallenberg
-	- Calcvolume behövs nog inte?!
 	- Städa kod
 */
 
@@ -165,7 +163,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glUseProgram(drawShader);
 		glBindFramebuffer(GL_FRAMEBUFFER, parFbo);
 		glBindVertexArray(triVertArray);
-		//Enable or disable a genedata[ric vertex attribute array
+		//Enable or disable a generic vertex attribute array
 		glEnableVertexAttribArray(0);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, tex);
@@ -177,48 +175,48 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 
 	else{
 		
-			glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
-			glClearColor(0,0,0,0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			cout << "create scatter text#include <iostream>ure"<<endl;
-			glUseProgram(tempScatterShader);
-			glUniform1i(glGetUniformLocation(tempScatterShader, "resolution"), sW);
-			glBindVertexArray(clusterArray1);
-			//Enable or disable a generic vertex attribute array
-			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-			//Draw lines tell opengl how many values will be sent to the shaders
-			if(DRAWBLUE){
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
+		glClearColor(0,0,0,0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		cout << "create scatter texture"<<endl;
+		glUseProgram(tempScatterShader);
+		glUniform1i(glGetUniformLocation(tempScatterShader, "resolution"), sW);
+		glBindVertexArray(clusterArray1);
+		//Enable or disable a generic vertex attribute array
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		//Draw lines tell opengl how many values will be sent to the shaders
+		if(DRAWBLUE){
 			glDrawArrays(GL_POINTS, 0, data2.size()/2.0);
-			}
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			//Disable and unbind just to be safe
-			glDisableVertexAttribArray(0);
-			glDisableVertexAttribArray(1);
-			glBindVertexArray(0);	
-			glUseProgram(0);
-		
-		
-			glBindFramebuffer(GL_FRAMEBUFFER, fbo3);
-			glClearColor(0,0,0,0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			cout << "create scatter texture"<<endl;
-			glUseProgram(tempScatterShader);
-			glUniform1f(glGetUniformLocation(tempScatterShader, "resolution"), 512.0f);
-			glBindVertexArray(clusterArray2);
-			//Enable or disable a generic vertex attribute array
-			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-			//Draw lines tell opengl how many values will be sent to the shaders
-			if(DRAWRED){
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//Disable and unbind just to be safe
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glBindVertexArray(0);	
+		glUseProgram(0);
+	
+	
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo3);
+		glClearColor(0,0,0,0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		cout << "create scatter texture"<<endl;
+		glUseProgram(tempScatterShader);
+		glUniform1f(glGetUniformLocation(tempScatterShader, "resolution"), 512.0f);
+		glBindVertexArray(clusterArray2);
+		//Enable or disable a generic vertex attribute array
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		//Draw lines tell opengl how many values will be sent to the shaders
+		if(DRAWRED){
 			glDrawArrays(GL_POINTS, 0, data3.size()/2.0);
-			}
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			//Disable and unbind just to be safe
-			glDisableVertexAttribArray(0);
-			glDisableVertexAttribArray(1);
-			glBindVertexArray(0);	
-			glUseProgram(0);
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//Disable and unbind just to be safe
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glBindVertexArray(0);	
+		glUseProgram(0);
 		
 		glDisable(GL_BLEND);
 
@@ -560,7 +558,7 @@ void keyPressed(unsigned char key, int x, int y){
 						//clusterFileR = strcpy(clusterFileR,"./data/cluster");//+cluster+".txt";
 						clusterFileR[14] = key;
 						//clusterFileR = strcat(clusterFileR, ".txt");
-					//clusterFile.append(cluster);
+						//clusterFile.append(cluster);
 						//cout << "chose file: "<<clusterFileR<<endl;
 
 						//cout << "red cluster chosen, cluster is: "<< cluster << endl;
@@ -662,7 +660,8 @@ void init(int W, int H){
 	normalizeAxis2(data2, data3);
 	//normalizeAxis2(data3);
 	//Set size of mouse marker
-	markerSize = 5.0f;	
+	//Marker size must be an uneven number	
+	markerSize = 11.0f;	
 
 	drawShader = loadShaders("./shaders/draw.vert", "./shaders/draw.frag");
 	parallelShader = loadShaders("./shaders/paralell.vert", "./shaders/paralell.frag");

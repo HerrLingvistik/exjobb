@@ -123,3 +123,7 @@ void writeFile(){
 	}
 	myfile.close();
 }
+
+void writeAnswer(){
+	
+}
