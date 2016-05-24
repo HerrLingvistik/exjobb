@@ -26,6 +26,7 @@
 #include "utils/gl_utils.h"
 #include "utils/normalizeAxis.h"
 #include "utils/sound.h"
+#include "utils/usertest.h"
 
 using namespace std;
 //Shader handles
@@ -35,10 +36,10 @@ GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisAr
 //Texture and fbo handles
 GLuint tex, fbo, parTex, parFbo,  scatTex, scatFbo, tex2, tex3, fbo2, fbo3; 
 
-int plot, scatterAxisX = 1, scatterAxisY = 2, background = 0, clusterCounter1=1, clusterCounter2=1, dimX = 0, dimY = 0, maxPos = 0, mouseX, mouseY, mouse2X, mouse2Y;
+int plot, scatterAxisX = 1, scatterAxisY = 2, background = 0, clusterCounter1=1, clusterCounter2=1, dimX = 0, dimY = 0, maxPos = 0, mouseX, mouseY, mouse2X, mouse2Y, taskNumber=1;
 
 const static int PARALLEL = 0, SCATTER = 1, BLACK = 0, WHITE = 1;
-bool bPressed = false, rPressed = false, hoover = false, soundactive = true, DRAWRED=true, DRAWBLUE=true; 
+bool bPressed = false, rPressed = false, hoover = false, soundactive = true, DRAWRED=true, DRAWBLUE=true, USERTEST=false; 
 
 float parallelTex[W][H];
 float scatterTex[sW][sH];
@@ -50,12 +51,9 @@ vector<float> data, data2, data3;
 vector<int> first;
 vector<int> count;
 
-//char* clusterFileB = new char[19]; 
-//char* clusterFileR = new char[19];
-
-string clusterFileB;// = new char[19]; 
-string clusterFileR;// = new char[19];
-
+string clusterFileB;
+string clusterFileR;
+string resultString;
 //Booleans used for deciding when to play the sounds
 bool mouseClick = false, mouse2Click = false;
  
@@ -97,7 +95,6 @@ GLfloat mouse2Verts[8] =
 	0.5f, 0.5f
 };
 
-//http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit
 //Calculate position for this mouse markers vertices.
 void calcMouseSquare(){
 	int width = glutGet(GLUT_WINDOW_WIDTH);
@@ -172,9 +169,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glUseProgram(0);
 	}
-
 	else{
-		
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
 		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -247,7 +242,6 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		createScatterArray(scatterTex2, tex3);
 	}
 }
-
 void draw(){
 	
 	glClearColor(0,0,0,0);
@@ -317,7 +311,6 @@ void draw(){
 		else if(background == WHITE)
 			glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 0.0f, 0.3f);
 		glDrawArrays(GL_LINE_STRIP, 0, 3);
-		
 		//Set regular line width	
 		glLineWidth(1.0f);
 
@@ -479,7 +472,6 @@ void keyPressed(unsigned char key, int x, int y){
 				vol1 = calcGaussVolume_Parallel(mouseX, mouseY, markerSize, parallelTex)/maxValue *10.0;
 				vol2 = calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, parallelTex)/maxValue *10.0;
 			}
-		
 			else if(plot == SCATTER){
 				vol1 = calcGaussVolume_Scatter(mouseX, mouseY, markerSize, scatterTex)/maxValue *1500.0;
 				vol2 = calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex)/maxValue *1500.0;
@@ -488,8 +480,7 @@ void keyPressed(unsigned char key, int x, int y){
 			playSound(vol1);
 			playSound2(vol2);
 		}
-	}
-	
+	}	
 	else	if(key == '-' && markerSize >=3){
 		cout<<"marker size decreased"<<endl;
 		markerSize-=2;
@@ -517,69 +508,45 @@ void keyPressed(unsigned char key, int x, int y){
 		rPressed = true;
 	}
 	else if(isdigit(key) && plot == SCATTER){
-			int cluster = key - '0';
-			//string str(key);
-			
-				
-			
-				
-				if(bPressed){
-					if(cluster > 0 && cluster <= 8){
-					DRAWBLUE = true;
-					/*clusterFileB = "./data/cluster1.txt";
-					cout << "contents; " << clusterFileB<<endl;
-					//clusterFileB = strcpy(clusterFileB,"./data/cluster");//+cluster+".txt";
-					cout << "contents; " << clusterFileB<<endl;*/
-					clusterFileB[14] = key;
-					cout << "contents; " << clusterFileB<<endl;
-					/*clusterFileB = strcat(clusterFileB, ".txt");
-					cout << "contents; " << clusterFileB<<endl;
-				//clusterFile.append(cluster);
-					cout << "chose file: "<<clusterFileB<<endl;*/
+		int cluster = key - '0';
+		//string str(key);	
+		if(bPressed){
+			if(cluster > 0 && cluster <= 8){
+				DRAWBLUE = true;
+				clusterFileB[14] = key;
 
-					//cout << "blue cluster chosen, cluster is: "<< cluster << endl;
-					glViewport(0,0,sW,sH);
-					readFile_cluster(data2, clusterFileB, clusterCounter1);
-					readFile_cluster(data3, clusterFileR, clusterCounter2);
-					//readFile_cluster(data2, "./data/cluster6.txt", clusterCounter1);
-					normalizeAxis2(data2, data3);
-					clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
-					clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-					
-					initTexture(fbo2, tex2);
-					bPressed = false;
-					}else if( cluster == 0){
-						DRAWBLUE = false;
-						initTexture(fbo2, tex2);
-					}
-				}else if(rPressed){
-					if(cluster > 0 && cluster <= 8){
-						DRAWRED = true;
-						//clusterFileR = strcpy(clusterFileR,"./data/cluster");//+cluster+".txt";
-						clusterFileR[14] = key;
-						//clusterFileR = strcat(clusterFileR, ".txt");
-						//clusterFile.append(cluster);
-						//cout << "chose file: "<<clusterFileR<<endl;
+				glViewport(0,0,sW,sH);
+				readFile_cluster(data2, clusterFileB, clusterCounter1);
+				readFile_cluster(data3, clusterFileR, clusterCounter2);
+				normalizeAxis2(data2, data3);
+				clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
+				clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
+				initTexture(fbo2, tex2);
+				bPressed = false;
+			}else if( cluster == 0){
+				DRAWBLUE = false;
+				initTexture(fbo2, tex2);
+			}
+		}else if(rPressed){
+			if(cluster > 0 && cluster <= 8){
+				DRAWRED = true;
+				clusterFileR[14] = key;
 
-						//cout << "red cluster chosen, cluster is: "<< cluster << endl;
-						glViewport(0,0,sW,sH);	
-						readFile_cluster(data2, clusterFileB, clusterCounter1);
-						readFile_cluster(data3, clusterFileR, clusterCounter2);
-						normalizeAxis2(data2, data3);
-						clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
-						clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-						initTexture(fbo3, tex3);
-						rPressed = false;
-					}else if( cluster == 0){
-						DRAWRED = false;
-						initTexture(fbo3, tex3);
-					}
-				}
-				cout <<endl<<"blue cluster: "<< clusterFileB << endl;
-				cout <<"red cluster: "<< clusterFileR << endl<<endl;
+				glViewport(0,0,sW,sH);	
+				readFile_cluster(data2, clusterFileB, clusterCounter1);
+				readFile_cluster(data3, clusterFileR, clusterCounter2);
+				normalizeAxis2(data2, data3);
+				clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
+				clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
+				initTexture(fbo3, tex3);
+				rPressed = false;
+			}else if( cluster == 0){
+				DRAWRED = false;
+				initTexture(fbo3, tex3);
+			}
+		}
 			
 	}
-	
 	else if(key == 'h'){	
 		if(hoover == true){
 			hoover = false;
@@ -588,8 +555,24 @@ void keyPressed(unsigned char key, int x, int y){
 			hoover = true;
 			playSound2(0);
 		}
+	}else if(key == 13){
+		if(USERTEST){
+			cout << "test user "<<endl;
+			switch(taskNumber){
+				case 1:
+					task1(resultString, mouseX, mouseY, parallelTex);
+					taskNumber++;
+					cout<< "ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖH! -> "<<resultString<<endl;
+				break;
+				case 2:
+				
+				break;
+				case 3:
+				
+				break;
+			}
+		}
 	}
-	
 }
 
 void fKeyPressed(int key, int x, int y){
@@ -610,9 +593,11 @@ void fKeyPressed(int key, int x, int y){
 			if(!soundactive){
 				playSound(0);
 				playSound2(0);
-			}
-				
+			}		
 			cout << "sound on? " << soundactive << endl;
+		break;
+		case GLUT_KEY_F12:
+			USERTEST = true;
 		break;
 	}
 }
@@ -653,12 +638,9 @@ void init(int W, int H){
 	readFile_pCoords(data);
 	readFile_cluster(data2, clusterFileR, clusterCounter1);	
 	readFile_cluster(data3, clusterFileB, clusterCounter2);	
-	cout<<"cluster 1 has nr components: "<< data2.size() << endl;
-	cout<<"cluster 2 has nr components: "<< data3.size() << endl;	
 	//Normalize clusters
 	normalizeAxis(data);
 	normalizeAxis2(data2, data3);
-	//normalizeAxis2(data3);
 	//Set size of mouse marker
 	//Marker size must be an uneven number	
 	markerSize = 11.0f;	
@@ -670,9 +652,6 @@ void init(int W, int H){
 	mouseShader = loadShaders("./shaders/mouse.vert", "./shaders/mouse.frag");
 	drawTexShader = loadShaders("./shaders/texDraw.vert", "./shaders/texDraw.frag");
 	
-
-	
-
 	//Create fbos and textures 
 	triVertArray = createVertArray(triVerts, sizeof(triVerts), drawShader);
 	scatterAxisArray = createVertArray(scatterAxisPoints, sizeof(scatterAxisPoints), mouseShader);
