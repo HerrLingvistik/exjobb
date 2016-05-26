@@ -12,13 +12,17 @@ using namespace std;
 
 //The aim of this function is to read ASCII-data from a text file and store it into a one dimensional array.
 //This function is specifically for the parallel coordinates model with arbitrary dimensions
-void readFile_pCoords(vector<float>& data){
+void readFile_pCoords(vector<float>& data, std::string filename){
 	
 	data.clear(); //Clear the vector storing data values	
 	ifstream infile;
-	infile.open("./data/out5d.txt"); 
+	infile.open(filename); 
 	string line;
 	string number, dim;
+	dimX = 0;
+	dimY = 0;
+	count.clear();
+	first.clear();
 	int col=0;
 	float startPos = -1.0, axisSpacing;
 
