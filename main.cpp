@@ -54,6 +54,7 @@ vector<int> count;
 string clusterFileB;
 string clusterFileR;
 string resultString;
+
 //Booleans used for deciding when to play the sounds
 bool mouseClick = false, mouse2Click = false;
  
@@ -272,6 +273,7 @@ void draw(){
 		glBindVertexArray(0);	
 		//Don't draw using the parallel coordinates shader anymore.
 		glUseProgram(0);
+
 	}
 	else if(plot == SCATTER){		
 
@@ -357,6 +359,9 @@ void draw(){
 	//Enable or disable a generic vertex attribute array
 	glDisableVertexAttribArray(0);
 	glUseProgram(0);
+   
+	
+
 	//Swaps the buffers of the current window if double buffered(draw)
 	glutSwapBuffers();
 
@@ -443,7 +448,7 @@ void mouseMove(int x, int y){
 		std::string s;
 		s = "x: " + std::to_string(x) + " y: " + to_string(y) + " value " + to_string(pxlValue);
 		char const *pchar = s.c_str();
-		glutSetWindowTitle(pchar);
+		//glutSetWindowTitle(pchar);
 		glutPostRedisplay();
 	}
 		
@@ -453,7 +458,7 @@ void mouseMove(int x, int y){
 		std::string s;
 		s = "x: " + std::to_string(x) + " y: " + to_string(y) + " value " + to_string(pxlValue);
 		char const *pchar = s.c_str();
-		glutSetWindowTitle(pchar);
+		//glutSetWindowTitle(pchar);
 		glutPostRedisplay();
 	}	
 }
@@ -559,14 +564,17 @@ void keyPressed(unsigned char key, int x, int y){
 		if(USERTEST){
 			switch(taskNumber){
 				case 1:
+					glutSetWindowTitle("Task 1");
 					task1(resultString, mouseX, mouseY, parallelTex);
 					taskNumber++;
 				break;
 				case 2:
+					glutSetWindowTitle("Task 2");
 					task2(resultString);
 					taskNumber++;
 				break;
 				case 3:
+					glutSetWindowTitle("Task 3");
 					task3(resultString);
 					writeResultFile(resultString);
 					taskNumber++;
