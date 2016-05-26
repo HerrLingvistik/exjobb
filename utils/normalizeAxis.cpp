@@ -10,7 +10,7 @@ using namespace std;
 //so that the highest value of each axis will be on top of the window, and the lowest axis on the lowest point. 
 //The loop is performed column by column and data values are normalized within the rage -1 to 1.
 //Note that this normalization requires that all data is stored in a one-dimensional array with a set x-coordinate for each y.
-void normalizeAxis(vector<float>& data){
+void normalizeAxis(vector<float>& data, vector<float>& data2){
 	
 	/*for(int i = 0; i < 5; i++){
 		cout << setw(2) << setw(8) <<  data[1+i*10] <<  setw(8) << data[3+i*10]<< setw(8) << data[5+i*10]<< setw(8) << setw(8) << 		data[7+i*10]<< setw(8) << setw(8) << data[9+i*10] << setw(8) <<endl;
@@ -39,6 +39,19 @@ void normalizeAxis(vector<float>& data){
 
 			i+=dimX*2;
 		}
+
+		for(int i = startPoint; i < 2*dimX*dimY; ) {
+
+			if(data2[i] < minValue) {
+				minValue = data2[i];				
+			}
+			
+			if(data2[i] > maxValue) {
+				maxValue = data2[i];				
+			}
+
+			i+=dimX*2;
+		}
 		
 		//Perform feature scaling on this column, this gives values between 0 to 1.
 		for(int i = startPoint; i < 2*dimX*dimY; ) {
@@ -47,6 +60,13 @@ void normalizeAxis(vector<float>& data){
 			i+=dimX*2.0f;
 		} 
 		
+		//Perform feature scaling on this column, this gives values between 0 to 1.
+		for(int i = startPoint; i < 2*dimX*dimY; ) {
+						
+			data2[i] = (data2[i] - minValue)/(maxValue - minValue) * 599.0f;	
+			i+=dimX*2.0f;
+		} 
+
 		//Reset the temporary variables to be able to find min/max in the next column
 		minValue = 9999999999999999;
 		maxValue = -9999999999999999;

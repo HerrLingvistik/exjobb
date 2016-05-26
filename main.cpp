@@ -32,9 +32,9 @@ using namespace std;
 //Shader handles
 GLuint drawShader, parallelShader, mouseShader, tempScatterShader, drawScatterShader, drawTexShader;
 //Pointers for vertices
-GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisArray, dataArray, mouseBuffer, mouseArray, clusterArray1, clusterArray2;
+GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisArray, dataArray, dataArray2, mouseBuffer, mouseArray, clusterArray1, clusterArray2;
 //Texture and fbo handles
-GLuint tex, fbo, parTex, parFbo,  scatTex, scatFbo, tex2, tex3, fbo2, fbo3; 
+GLuint parTex1, parFbo1, parTex2, parFbo2, finalParTex, finalParFbo,  finalScatTex, finalScatFbo, scatTex1, scatTex2, scatFbo1, scatFbo2; 
 
 int plot, scatterAxisX = 1, scatterAxisY = 2, background = 0, clusterCounter1=1, clusterCounter2=1, dimX = 0, dimY = 0, maxPos = 0, mouseX, mouseY, mouse2X, mouse2Y, taskNumber=1;
 
@@ -42,12 +42,13 @@ const static int PARALLEL = 0, SCATTER = 1, BLACK = 0, WHITE = 1;
 bool bPressed = false, rPressed = false, hoover = false, soundactive = true, DRAWRED=true, DRAWBLUE=true, USERTEST=false; 
 
 float parallelTex[W][H];
+float parallelTex2[W][H];
 float scatterTex[sW][sH];
 float scatterTex2[sW][sH];
 //https://www.opengl.org/sdk/docs/man/docbook4/xhtml/glActiveTexture.xml
 float* texture = new float[ W*H ];
 
-vector<float> data, data2, data3;
+vector<float> data, parData2, data2, data3;
 vector<int> first;
 vector<int> count;
 
@@ -58,7 +59,7 @@ string resultString;
 //Booleans used for deciding when to play the sounds
 bool mouseClick = false, mouse2Click = false;
  
-float maxValue=0, markerSize;	
+float maxValue=0, maxValue2 = 0,markerSize;	
 
 //Vertices used to draw to triangles(one quad) upon which the texture will be drawn
 GLfloat triVerts[12] = 
@@ -138,15 +139,16 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 	
 	//Bind data array containing coordinates for drawing lines between
+	//Do almost all here two times one for each parallel cluster <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	if(plot == PARALLEL){	
+		//Create texture with first parallel cluster
 		glUseProgram(parallelShader);
 		cout << "create parallel texture"<<endl;
 		glBindVertexArray(dataArray);
 		glEnableVertexAttribArray(0);
-
 		//Draw lines tell opengl how many values will be sent to the shaders
 		//Bind frambuffer to draw into texture
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, parFbo1);
 		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//use parallel coordinates shader
@@ -155,23 +157,56 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		//Disable and unbind just to be safe
 		glDisableVertexAttribArray(0);
 		glBindVertexArray(0);	
-		glDisable(GL_BLEND);
+		//glDisable(GL_BLEND);
 		glUseProgram(0);
 		
+		//Create texture with second parallel cluster
+		glUseProgram(parallelShader);
+		cout << "create parallel texture"<<endl;
+		glBindVertexArray(dataArray2);
+		glEnableVertexAttribArray(0);
+		//Draw lines tell opengl how many values will be sent to the shaders
+		//Bind frambuffer to draw into texture
+		glBindFramebuffer(GL_FRAMEBUFFER, parFbo2);
+		glClearColor(0,0,0,0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//use parallel coordinates shader
+		glMultiDrawArrays(GL_LINE_STRIP, &first.front(), &count.front(),count.size());
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//Disable and unbind just to be safe
+		glDisableVertexAttribArray(0);
+		glBindVertexArray(0);	
+		//glDisable(GL_BLEND);
+		glUseProgram(0);
+
 		glUseProgram(drawShader);
-		glBindFramebuffer(GL_FRAMEBUFFER, parFbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, finalParFbo);
 		glBindVertexArray(triVertArray);
 		//Enable or disable a generic vertex attribute array
 		glEnableVertexAttribArray(0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex);
 		glUniform1i(glGetUniformLocation(drawShader, "parallelTex"), 0);
+		glUniform1i(glGetUniformLocation(drawShader, "parallelTex2"), 1);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, parTex1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, parTex2);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glUseProgram(0);
+
+		/*
+			glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex"), 0);
+		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex2"), 1);	
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, scatTex1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, scatTex2);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		*/
+
 	}
 	else{
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo2);
+		glBindFramebuffer(GL_FRAMEBUFFER, scatFbo1);
 		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cout << "create scatter texture"<<endl;
@@ -193,7 +228,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glUseProgram(0);
 	
 	
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo3);
+		glBindFramebuffer(GL_FRAMEBUFFER, scatFbo2);
 		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cout << "create scatter texture"<<endl;
@@ -217,16 +252,16 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glDisable(GL_BLEND);
 
 		glUseProgram(drawScatterShader);
-		glBindFramebuffer(GL_FRAMEBUFFER, scatFbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, finalScatFbo);
 		glBindVertexArray(triVertArray);
 		//Enable or disable a genedata[ric vertex attribute array
 		glEnableVertexAttribArray(0);
 		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex"), 0);
 		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex2"), 1);	
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, tex2);
+		glBindTexture(GL_TEXTURE_2D, scatTex1);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, tex3);
+		glBindTexture(GL_TEXTURE_2D, scatTex2);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glUseProgram(0);
@@ -235,12 +270,13 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 
 	
 	if(plot == PARALLEL){
-		createParallelArray(parallelTex, tex, maxValue);
+		createParallelArray(parallelTex, parTex1, maxValue);
+		createParallelArray(parallelTex2, parTex2, maxValue2);
 	}	
 
 	if(plot == SCATTER){
-		createScatterArray(scatterTex, tex2);
-		createScatterArray(scatterTex2, tex3);
+		createScatterArray(scatterTex, scatTex1);
+		createScatterArray(scatterTex2, scatTex2);
 	}
 }
 void draw(){
@@ -255,14 +291,18 @@ void draw(){
 		//Enable or disable a genedata[ric vertex attribute array
 		glEnableVertexAttribArray(0);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, parTex);
+		glBindTexture(GL_TEXTURE_2D, finalParTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
-		if(background == WHITE)
+		if(background == WHITE){
 			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 0.0, 0.0, 1.0, 1);
-		else
+			glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0, 0.0, 0.0, 1);
+		}
+		else{
 			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0.0, 0.0, 1);
+			glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 0.0, 0.0, 1.0, 1);
+		}
 		
-		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0, 0.0, 0.0, 1);
+		
 		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -282,7 +322,7 @@ void draw(){
 		//Enable or disable a genedata[ric vertex attribute array
 		glEnableVertexAttribArray(0);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, scatTex);
+		glBindTexture(GL_TEXTURE_2D, finalScatTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
 		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 0.0, 0.0, 1.0, 1);
 		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0, 0.0, 0.0, 1);
@@ -423,6 +463,7 @@ void mouseMoveClick(int x, int y){
 		if(soundactive){
 			if(plot == PARALLEL){
 				playSound((calcGaussVolume_Parallel(x, y, markerSize, parallelTex)/maxValue)*10);
+				playSound2((calcGaussVolume_Parallel(x, y, markerSize, parallelTex2)/maxValue)*10);
 			}
 			else if(plot == SCATTER){
 				playSound((calcGaussVolume_Scatter(x, y, markerSize, scatterTex)/maxValue)*1500);
@@ -526,11 +567,11 @@ void keyPressed(unsigned char key, int x, int y){
 				normalizeAxis2(data2, data3);
 				clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
 				clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-				initTexture(fbo2, tex2);
+				initTexture(scatFbo1, scatTex1);
 				bPressed = false;
 			}else if( cluster == 0){
 				DRAWBLUE = false;
-				initTexture(fbo2, tex2);
+				initTexture(scatFbo1, scatTex1);
 			}
 		}else if(rPressed){
 			if(cluster > 0 && cluster <= 8){
@@ -543,11 +584,11 @@ void keyPressed(unsigned char key, int x, int y){
 				normalizeAxis2(data2, data3);
 				clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
 				clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-				initTexture(fbo3, tex3);
+				initTexture(scatFbo2, scatTex2);
 				rPressed = false;
 			}else if( cluster == 0){
 				DRAWRED = false;
-				initTexture(fbo3, tex3);
+				initTexture(scatFbo2, scatTex2);
 			}
 		}
 			
@@ -643,12 +684,15 @@ void init(int W, int H){
 	clusterFileR = "./data/cluster1.txt";
 	clusterFileB = "./data/cluster2.txt";
 	clusterFileR[14] = '1';
+	//Read in data for two different parallel coordinates here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	//read data set into data array
-	readFile_pCoords(data);
+	readFile_pCoords(data, "./data/out5d.txt");
+	readFile_pCoords(parData2, "./data/out5d.txt");
 	readFile_cluster(data2, clusterFileR, clusterCounter1);	
 	readFile_cluster(data3, clusterFileB, clusterCounter2);	
 	//Normalize clusters
-	normalizeAxis(data);
+	//NOrmalize both parallel coordinates here together or separatly? <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	normalizeAxis(data, parData2);
 	normalizeAxis2(data2, data3);
 	//Set size of mouse marker
 	//Marker size must be an uneven number	
@@ -665,7 +709,9 @@ void init(int W, int H){
 	triVertArray = createVertArray(triVerts, sizeof(triVerts), drawShader);
 	scatterAxisArray = createVertArray(scatterAxisPoints, sizeof(scatterAxisPoints), mouseShader);
 	triVertArray2 = createVertArray(triVerts, sizeof(triVerts), drawTexShader);
+	//create second dataArray, one for each cluster <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
+	dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
 	//Create vertex arrays for the mouse markers
 	createMouseMarker(mouseArray, mouseBuffer, mouseVerts, sizeof(mouseVerts),  mouseShader);
 	//Create vertex arrays for the scatter plot
@@ -673,22 +719,25 @@ void init(int W, int H){
 	clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
 
 	//Create parallel coordinates texture
+	//create second texture and fbo for second parallel cluster, one more for merging them? <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	plot = PARALLEL;
-	tex = createTexture(W,H,0);
-	fbo = createFbo(tex);
-	parTex = createTexture(W,H,0);
-	parFbo = createFbo(parTex); 
-	initTexture(fbo, tex);
+	parTex1 = createTexture(W,H,0);
+	parFbo1 = createFbo(parTex1);
+	parTex2 = createTexture(W,H,0);
+	parFbo2 = createFbo(parTex2);
+	finalParTex = createTexture2(W,H,0);
+	finalParFbo = createFbo(finalParTex); 
+	initTexture(parFbo1, parTex1);
 	//Create scatterplot texture
 	plot = SCATTER;
 	glViewport(0,0,sW,sH);
-	tex2 = createTexture(sW,sH, 0);
-	fbo2 = createFbo(tex2);
-	scatTex = createTexture2(sW,sH, 3);
-	scatFbo = createFbo(scatTex);
-	tex3 = createTexture(sW,sH, 0);
-	fbo3 = createFbo(tex3);
-	initTexture(fbo2, tex2);
+	scatTex1 = createTexture(sW,sH, 0);
+	scatFbo1 = createFbo(scatTex1);
+	finalScatTex = createTexture2(sW,sH, 3);
+	finalScatFbo = createFbo(finalScatTex);
+	scatTex2 = createTexture(sW,sH, 0);
+	scatFbo2 = createFbo(scatTex2);
+	initTexture(scatFbo1, scatTex1);
 	
 	//Set initial display to parallel coordinates plot
 	plot = PARALLEL;
