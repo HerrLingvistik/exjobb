@@ -557,18 +557,19 @@ void keyPressed(unsigned char key, int x, int y){
 		}
 	}else if(key == 13){
 		if(USERTEST){
-			cout << "test user "<<endl;
 			switch(taskNumber){
 				case 1:
 					task1(resultString, mouseX, mouseY, parallelTex);
 					taskNumber++;
-					cout<< "ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖH! -> "<<resultString<<endl;
 				break;
 				case 2:
-				
+					task2(resultString);
+					taskNumber++;
 				break;
 				case 3:
-				
+					task3(resultString);
+					writeResultFile(resultString);
+					taskNumber++;
 				break;
 			}
 		}

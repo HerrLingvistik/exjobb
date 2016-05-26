@@ -124,6 +124,19 @@ void writeFile(){
 	myfile.close();
 }
 
-void writeAnswer(){
+void writeResultFile(string &resultString){
+	time_t rawtime;
+  struct tm * timeinfo;
+
+  time (&rawtime);
+  timeinfo = localtime (&rawtime);
+	string hour = (timeinfo->tm_hour) > 9 ? to_string(timeinfo->tm_hour) :  "0" +to_string(timeinfo->tm_hour);
+	string min = (timeinfo->tm_min) > 9 ? to_string(timeinfo->tm_min) :  "0" +to_string(timeinfo->tm_min);
+	string time = "user test: " + to_string(timeinfo->tm_mday) + "-" + to_string(timeinfo->tm_mon+1) + " kl " + hour + ":" + min + ".txt";
+  cout <<  time << endl;
+	ofstream myfile;
+	myfile.open ("./testResults/" + time);
+	myfile << resultString;
+	myfile.close();
 	
 }

@@ -7,6 +7,6 @@
 
 void readFile_pCoords(vector<float>& data);
 void readFile_cluster(vector<float>& cluster, std::string filename, int& rowCounter);
-void writeFile();
+void writeResultFile(string &resultString);
 
 #endif
