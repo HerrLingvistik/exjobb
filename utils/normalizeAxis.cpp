@@ -22,6 +22,9 @@ void normalizeAxis(vector<float>& data, vector<float>& data2){
 	//Temporary values for finding min/max as needed for the feature scaling.
 	float minValue = 9999999999999999;
 	float maxValue = -9999999999999999;
+
+	//float minValue2 = 9999999999999999;
+	//float maxValue2 = -9999999999999999;
 	
 	//Start on the first y.
 	while(startPoint < 2*dimX*dimY && dimensionCounter < dimX) {
@@ -70,6 +73,9 @@ void normalizeAxis(vector<float>& data, vector<float>& data2){
 		//Reset the temporary variables to be able to find min/max in the next column
 		minValue = 9999999999999999;
 		maxValue = -9999999999999999;
+
+		//minValue2 = 9999999999999999;
+		//maxValue2 = -9999999999999999;
 		
 		dimensionCounter++;
 		//Go to the first y-value of the next dimension.

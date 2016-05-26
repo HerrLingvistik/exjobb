@@ -41,8 +41,8 @@ void readFile_pCoords(vector<float>& data, std::string filename){
 			//Read element by element
 			while( getline(is, number, ' ') ) {	
 				//Add all data items to a one dimensional vector.		
-				if(!isdigit(number[0]))
-					break;
+				//if(!isdigit(number[0]))
+					//break;
 				//Add X 
 				data.push_back(startPos + axisSpacing*col);
 				//Add Y

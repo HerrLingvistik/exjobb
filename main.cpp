@@ -686,10 +686,13 @@ void init(int W, int H){
 	clusterFileR[14] = '1';
 	//Read in data for two different parallel coordinates here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	//read data set into data array
-	readFile_pCoords(data, "./data/out5d.txt");
-	readFile_pCoords(parData2, "./data/out5d.txt");
+	readFile_pCoords(data, "./data/clusterspara1.txt");
+	readFile_pCoords(parData2, "./data/clusterspara2.txt");
 	readFile_cluster(data2, clusterFileR, clusterCounter1);	
 	readFile_cluster(data3, clusterFileB, clusterCounter2);	
+	
+	cout << "size of cluster 1 "<< data.size()<<endl;
+	cout << "size of cluster 2 "<< parData2.size()<<endl;
 	//Normalize clusters
 	//NOrmalize both parallel coordinates here together or separatly? <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	normalizeAxis(data, parData2);
