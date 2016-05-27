@@ -32,7 +32,7 @@ using namespace std;
 //Shader handles
 GLuint drawShader, parallelShader, mouseShader, tempScatterShader, drawScatterShader, drawTexShader;
 //Pointers for vertices
-GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisArray, dataArray, dataArray2, mouseBuffer, mouseArray, clusterArray1, clusterArray2;
+GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisArray, paraAxisArray, dataArray, dataArray2, mouseBuffer, mouseArray, clusterArray1, clusterArray2;
 //Texture and fbo handles
 GLuint parTex1, parFbo1, parTex2, parFbo2, finalParTex, finalParFbo,  finalScatTex, finalScatFbo, scatTex1, scatTex2, scatFbo1, scatFbo2; 
 
@@ -96,6 +96,8 @@ GLfloat mouse2Verts[8] =
 	0.5f, -0.5f, 
 	0.5f, 0.5f
 };
+
+vector <GLfloat> paraAxes;
 
 //Calculate position for this mouse markers vertices.
 void calcMouseSquare(){
@@ -313,6 +315,29 @@ void draw(){
 		glBindVertexArray(0);	
 		//Don't draw using the parallel coordinates shader anymore.
 		glUseProgram(0);
+
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		
+
+		glUseProgram(mouseShader);
+		glBindVertexArray(paraAxisArray);
+		glEnableVertexAttribArray(0);
+		//Set line width of the axes
+		
+		glLineWidth(3.0f);
+		if(background == BLACK)
+			glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f, 0.2f);
+		else if(background == WHITE)
+			glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 0.0f, 0.2f);
+		glDrawArrays(GL_LINES, 0, 8);
+		//Set regular line width	
+		glLineWidth(1.0f);
+
+		glUseProgram(0);
+		
+		glDisable(GL_BLEND);
 
 	}
 	else if(plot == SCATTER){		
@@ -686,8 +711,8 @@ void init(int W, int H){
 	clusterFileR[14] = '1';
 	//Read in data for two different parallel coordinates here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	//read data set into data array
-	readFile_pCoords(data, "./data/clusterspara1.txt");
-	readFile_pCoords(parData2, "./data/clusterspara2.txt");
+	readFile_pCoords(data, "./data/clusterspara1.txt", paraAxes);
+	readFile_pCoords(parData2, "./data/clusterspara2.txt", paraAxes);
 	readFile_cluster(data2, clusterFileR, clusterCounter1);	
 	readFile_cluster(data3, clusterFileB, clusterCounter2);	
 	
@@ -720,6 +745,8 @@ void init(int W, int H){
 	//Create vertex arrays for the scatter plot
 	clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
 	clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
+
+	paraAxisArray = createVertArray(&paraAxes.front(), sizeof(GL_FLOAT)*paraAxes.size(), mouseShader);
 
 	//Create parallel coordinates texture
 	//create second texture and fbo for second parallel cluster, one more for merging them? <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
