@@ -711,8 +711,8 @@ void init(int W, int H){
 	clusterFileR[14] = '1';
 	//Read in data for two different parallel coordinates here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	//read data set into data array
-	readFile_pCoords(data, "./data/clusterspara1.txt", paraAxes);
-	readFile_pCoords(parData2, "./data/clusterspara2.txt", paraAxes);
+	readFile_pCoords(data, "./data/clusterspara5.txt", paraAxes);
+	readFile_pCoords(parData2, "./data/clusterspara3.txt", paraAxes);
 	readFile_cluster(data2, clusterFileR, clusterCounter1);	
 	readFile_cluster(data3, clusterFileB, clusterCounter2);	
 	
