@@ -8,8 +8,11 @@
 
 /*
 	THINGS TO ADD 	 
+	
+	- Utför rigorösa tester!
 	- Återupprätta Hallströms heder - sänk familjen Wallenberg
 	- Städa kod
+	- Fixa så ljudet används med hjälp av soundgains-arrayen
 */
 
 #define GL_GLEXT_PROTOTYPES	
@@ -59,7 +62,7 @@ string resultString;
 //Booleans used for deciding when to play the sounds
 bool mouseClick = false, mouse2Click = false;
  
-float maxValue=0, maxValue2 = 0,markerSize;	
+float maxValue=0, maxValue2 = 0, markerSize, scatterMax1, scatterMax2;	
 
 //Vertices used to draw to triangles(one quad) upon which the texture will be drawn
 GLfloat triVerts[12] = 
@@ -96,6 +99,21 @@ GLfloat mouse2Verts[8] =
 	0.5f, -0.5f, 
 	0.5f, 0.5f
 };
+/*
+float soundGains[6] = 
+{
+	0.00f, 0.10f, 0.18f, 
+	0.32f, 0.56f, 1.00f 
+};
+*/
+
+float soundGains[11] = 
+{
+	0.00f, 0.01f, 0.02f, 
+	0.03f, 0.04f, 0.06f, 
+	0.10f, 0.16f, 0.25f, 
+	0.40f, 0.63f 
+};
 
 vector <GLfloat> paraAxes;
 
@@ -124,6 +142,13 @@ void calcMouseSquare(){
 	mouse2Verts[6] = ((mouse2X+space)/(float)width)*2.0-1.0;
 	mouse2Verts[7] = -(((mouse2Y-space)/(float)height)*2.0-1.0);
 }
+
+float getGains(float key){
+	int pos = ceil(key * (sizeof(soundGains)/sizeof(float)-1));
+	//cout << "key: "<< key  << "*" << sizeof(soundGains)/sizeof(float)-1 << " gives arraypos "<< pos << endl;
+	return soundGains[pos]; 
+}
+
 
 //Problem med texture blending som skriver över istället för att blenda. 
 //Alternativt att den blendar och sedan clampar;
@@ -235,7 +260,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cout << "create scatter texture"<<endl;
 		glUseProgram(tempScatterShader);
-		glUniform1f(glGetUniformLocation(tempScatterShader, "resolution"), 512.0f);
+		glUniform1f(glGetUniformLocation(tempScatterShader, "resolution"), sH);
 		glBindVertexArray(clusterArray2);
 		//Enable or disable a generic vertex attribute array
 		glEnableVertexAttribArray(0);
@@ -277,8 +302,8 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 	}	
 
 	if(plot == SCATTER){
-		createScatterArray(scatterTex, scatTex1);
-		createScatterArray(scatterTex2, scatTex2);
+		createScatterArray(scatterTex, scatTex1, scatterMax1);
+		createScatterArray(scatterTex2, scatTex2, scatterMax2);
 	}
 }
 void draw(){
@@ -349,8 +374,8 @@ void draw(){
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, finalScatTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 0.0, 0.0, 1.0, 1);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0, 0.0, 0.0, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0.0, 0.0, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 0.0, 0.0, 1.0, 1);
 		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -438,7 +463,7 @@ void idle()
 {
 	glutPostRedisplay();
 }
-
+/*
 //Interaction function for clicking mouse button
 void mouseEvent(int event, int state, int x, int y){	
 
@@ -478,57 +503,97 @@ void mouseEvent(int event, int state, int x, int y){
 		glutPostRedisplay();
 	}
 }
-
+*/
 //Interaction function for clicking mouse button
 //Here it would do to calculate the vertices only when clicking mouse and not in every frame. 
 void mouseMoveClick(int x, int y){
+	int newX = x, newY = y;
+	//cout << to_string(x) << " " << to_string(y) << endl;
 	if(hoover){
-		mouseX = x;
-		mouseY = y;
+		
 		if(soundactive){
-			if(plot == PARALLEL){
-				playSound((calcGaussVolume_Parallel(x, y, markerSize, parallelTex)/maxValue)*10);
-				playSound2((calcGaussVolume_Parallel(x, y, markerSize, parallelTex2)/maxValue)*10);
+			if(plot == PARALLEL && x>=0  && x<W && y>=0 && y<H){
+				mouseX = x;
+				mouseY = y;
+				movePosParallel(newX, newY, markerSize, parallelTex);
+				float vol1 = getGains((calcGaussVolume_Parallel(newX, newY, markerSize, parallelTex)/maxValue));
+				newX=x;
+				newY=y;
+				movePosParallel(newX, newY, markerSize, parallelTex2);
+				float vol2 = getGains((calcGaussVolume_Parallel(newX, newY, markerSize, parallelTex2)/maxValue2));
+
+				playSound(vol1);
+				playSound2(vol2);
+
+				//playSound((calcGaussVolume_Parallel(x, y, markerSize, parallelTex)/maxValue));
+				//playSound2((calcGaussVolume_Parallel(x, y, markerSize, parallelTex2)/maxValue2));
+				//cout << "playing 1st sound at volume: " << (calcGaussVolume_Parallel(x, y, markerSize, parallelTex)/maxValue) << endl;
+				//cout << "playing 2nd sound at volume: " << (calcGaussVolume_Parallel(x, y, markerSize, parallelTex2)/maxValue2) << endl;
 			}
-			else if(plot == SCATTER){
-				playSound((calcGaussVolume_Scatter(x, y, markerSize, scatterTex)/maxValue)*1500);
+			else if(plot == SCATTER && x>=0  && x<sW && y>=0 && y<sH){
+				mouseX = x;
+				mouseY = y;
+				movePosScatter(newX, newY, markerSize, scatterTex);
+				
+				float vol1 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex)/scatterMax1));
+				cout << "moved ("<<to_string(x)<<","<<to_string(y)<<") giving "<< scatterTex[x][y] <<"to ("<<newX<<","<<newY<<")giving "<< scatterTex[newX][newY] <<endl;
+				newX=x;
+				newY=y;
+								
+				movePosScatter(newX, newY, markerSize, scatterTex2);
+				float vol2 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex2)/scatterMax2));
+				//cout << "moved ("<<to_string(x)<<","<<to_string(y)<<") giving "<< scatterTex2[x][y] <<"to ("<<newX<<","<<newY<<")giving "<< scatterTex2[newX][newY] <<endl;
+				//cout << vol1 << " vs "<< vol2 << endl;
+
+				playSound(vol1);
 				//Temporary does this work?				
-				playSound2((calcGaussVolume_Scatter(x, y, markerSize, scatterTex2)/maxValue)*1500);
+				playSound2(vol2);
 			}
 		}
 		glutPostRedisplay();
 	}
 }
-
+/*
 //Interaction function for moving mouse marker
 void mouseMove(int x, int y){	
 	float pxlValue;
-	if(plot == PARALLEL)
-		pxlValue = parallelTex[x][y];
-	else
-		pxlValue = scatterTex[x][y];
+	int newX=x, newY=y;
+	if(plot == PARALLEL){
+		movePosParallel(newX, newY, markerSize, parallelTex);
+		pxlValue = sampleDensityParallel(newX, newY, markerSize, parallelTex);
+	}
+	else{
+		movePosScatter(newX, newY, markerSize, scatterTex);
+		pxlValue = sampleDensityScatter(newX, newY, markerSize, scatterTex);
+	}
 
-	if(!mouseClick){
+	//if(!mouseClick){
 		mouseX = x;
 		mouseY = y;		
 		std::string s;
-		s = "x: " + std::to_string(x) + " y: " + to_string(y) + " value " + to_string(pxlValue);
+		if(plot == PARALLEL)
+		s = " value " + to_string(parallelTex[x][y]) + " changed to " + to_string(pxlValue) + " x " + std::to_string(x) + " -> " + std::to_string(newX) + " y " + to_string(y) + " -> " + to_string(newY);
+		else
+			s = " value " + to_string(scatterTex[x][y]) + " changed to " + to_string(pxlValue) + " x " + std::to_string(x) + " -> " + std::to_string(newX) + " y " + to_string(y) + " -> " + to_string(newY);
 		char const *pchar = s.c_str();
-		//glutSetWindowTitle(pchar);
+		glutSetWindowTitle(pchar);
 		glutPostRedisplay();
-	}
+	//}
 		
-	if(!mouse2Click){
+	/*if(!mouse2Click){
 		mouse2X = x;
 		mouse2Y = y;		
 		std::string s;
-		s = "x: " + std::to_string(x) + " y: " + to_string(y) + " value " + to_string(pxlValue);
+		if(plot == PARALLEL)
+		s = " value " + to_string(parallelTex[x][y]) + " changed to " + to_string(pxlValue) + " x " + std::to_string(x) + " -> " + std::to_string(newX) + " y " + to_string(y) + " -> " + to_string(newY);
+		else
+			s = " value " + to_string(scatterTex[x][y]) + " changed to " + to_string(pxlValue) + " x " + std::to_string(x) + " -> " + std::to_string(newX) + " y " + to_string(y) + " -> " + to_string(newY);
 		char const *pchar = s.c_str();
-		//glutSetWindowTitle(pchar);
+		glutSetWindowTitle(pchar);
 		glutPostRedisplay();
 	}	
 }
-
+*/
 void keyPressed(unsigned char key, int x, int y){	
 	
 	float vol1 = 0.0;
@@ -700,8 +765,8 @@ void init(int W, int H){
 	glutReshapeFunc(reshape);
 	//Initiate stuff for the drawing
 	//glutSetCursor(GLUT_CURSOR_NONE);
-	glutMouseFunc(mouseEvent);
-	glutPassiveMotionFunc(mouseMove);
+	//glutMouseFunc(mouseEvent);
+	//glutPassiveMotionFunc(mouseMove);
 	glutMotionFunc(mouseMoveClick);
 	glutKeyboardFunc(keyPressed);
 	glutSpecialFunc(fKeyPressed);
@@ -709,7 +774,6 @@ void init(int W, int H){
 	clusterFileR = "./data/cluster1.txt";
 	clusterFileB = "./data/cluster2.txt";
 	clusterFileR[14] = '1';
-	//Read in data for two different parallel coordinates here <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	//read data set into data array
 	readFile_pCoords(data, "./data/clusterspara5.txt", paraAxes);
 	readFile_pCoords(parData2, "./data/clusterspara3.txt", paraAxes);
@@ -719,7 +783,6 @@ void init(int W, int H){
 	cout << "size of cluster 1 "<< data.size()<<endl;
 	cout << "size of cluster 2 "<< parData2.size()<<endl;
 	//Normalize clusters
-	//NOrmalize both parallel coordinates here together or separatly? <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	normalizeAxis(data, parData2);
 	normalizeAxis2(data2, data3);
 	//Set size of mouse marker
@@ -737,7 +800,7 @@ void init(int W, int H){
 	triVertArray = createVertArray(triVerts, sizeof(triVerts), drawShader);
 	scatterAxisArray = createVertArray(scatterAxisPoints, sizeof(scatterAxisPoints), mouseShader);
 	triVertArray2 = createVertArray(triVerts, sizeof(triVerts), drawTexShader);
-	//create second dataArray, one for each cluster <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	
 	dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
 	dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
 	//Create vertex arrays for the mouse markers
@@ -749,7 +812,6 @@ void init(int W, int H){
 	paraAxisArray = createVertArray(&paraAxes.front(), sizeof(GL_FLOAT)*paraAxes.size(), mouseShader);
 
 	//Create parallel coordinates texture
-	//create second texture and fbo for second parallel cluster, one more for merging them? <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	plot = PARALLEL;
 	parTex1 = createTexture(W,H,0);
 	parFbo1 = createFbo(parTex1);
@@ -767,7 +829,7 @@ void init(int W, int H){
 	finalScatFbo = createFbo(finalScatTex);
 	scatTex2 = createTexture(sW,sH, 0);
 	scatFbo2 = createFbo(scatTex2);
-	initTexture(scatFbo1, scatTex1);
+	initTexture(scatFbo2, scatTex2);
 	
 	//Set initial display to parallel coordinates plot
 	plot = PARALLEL;
