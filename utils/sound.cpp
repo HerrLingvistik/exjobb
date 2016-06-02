@@ -106,7 +106,7 @@ float calcGaussVolume_Scatter(int x, int y, float markerSize, float scatterTex[s
 			posX = x+i;
 			posY = y+j;
 			
-			if(posX>=0 && posX < W && posY>=0 && posY < H){
+			if(posX>=0 && posX < sW && posY>=0 && posY < sH){
 
 				//elements++;
 				weight = 1.0f/(2.0f * M_PI* sigma*sigma) * exp( -(pow(i, 2) + pow(j, 2))/(2.0f * sigma*sigma ));

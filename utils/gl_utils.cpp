@@ -220,14 +220,13 @@ void createParallelArray(float texArray[][H], GLuint tex, float &maxValue){
 	glBindTexture(GL_TEXTURE_2D, 0);
 	//glActiveTexture(0);
 
-	int i = 0, row = 0, arrayRow = H-1, col = 0;//, xpos, ypos;
+	int i = 0, row = 0, arrayRow = H-1, col = 0, xpos, ypos;
 
 	while(i<W*H){
 		if(texture[i] > maxValue){
 			maxValue = texture[i];
-			//maxPos = i;
-			//xpos = col; 
-			//ypos = row; 
+			xpos = col; 
+			ypos = arrayRow; 
 		}
 
 		texArray[col][arrayRow] = texture[i];
@@ -239,8 +238,11 @@ void createParallelArray(float texArray[][H], GLuint tex, float &maxValue){
 			arrayRow--;
 		}
 	}
+
+	cout << "maximum value in parallel plot: "<< maxValue<< " pos: "<<xpos << " : "<<ypos << endl;
+
 }
-void createScatterArray(float readTex[][sH], GLuint texIn){
+void createScatterArray(float readTex[][sH], GLuint texIn, float &scatterMax){
 	float* texture2 = new float[sW*sH];
 
 		glActiveTexture(GL_TEXTURE1);
@@ -249,7 +251,7 @@ void createScatterArray(float readTex[][sH], GLuint texIn){
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, texture2);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	
-		int i = 0, row = sH-1, col = 0, scatterMax=0, xpos=0, ypos=0;//, row2=0;
+		int i = 0, row = sH-1, col = 0, xpos=0, ypos=0;//, row2=0;
 		int count = 0;
 
 		while(i<sW*sH){
