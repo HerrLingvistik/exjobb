@@ -4,6 +4,7 @@ in vec2 texCoord;
 in vec2 pass_Position;
 uniform sampler2D scatterTex;
 uniform sampler2D scatterTex2;
+uniform float maxValue;
 out vec4 out_Color;
 float offset = 1.0/600.0;
 
@@ -14,6 +15,7 @@ float ypos = 0.0;
 float M_PI = 3.14;
 float intensity = 0.0;
 float intensity2 = 0.0;
+int gaussVar = 5;
 
 //will sample texture and set color from the texture
 void main(void){
@@ -23,8 +25,8 @@ void main(void){
  	float var2 = 2.0*sigma*sigma;
 	float var1 = 1.0/(2.0 * M_PI * sigma*sigma);	
 
-	 for(int i = -15; i < 15; i++){
-		for(int j = -15; j < 15; j++){ 
+	 for(int i = -gaussVar; i < gaussVar; i++){
+		for(int j = -gaussVar; j < gaussVar; j++){ 
 			xpos = texCoord.x + j*offset;
 			ypos = texCoord.y + i*offset;
 			
@@ -36,8 +38,8 @@ void main(void){
 		}
 	}
 
-	 for(int i = -15; i < 15; i++){
-		for(int j = -15; j < 15; j++){ 
+	 for(int i = -gaussVar; i < gaussVar; i++){
+		for(int j = -gaussVar; j < gaussVar; j++){ 
 			xpos = texCoord.x + j*offset;
 			ypos = texCoord.y + i*offset;
 			
@@ -48,6 +50,9 @@ void main(void){
 		}
 	}
 
-	out_Color = vec4(intensity, intensity2, 0, 0)/10.0*2.0;
+	intensity = log(intensity/maxValue*10 + 1)/log(10);
+	intensity2 = log(intensity2/maxValue*10 + 1)/log(10);
+	
+	out_Color = vec4(intensity, intensity2, 0, 0);
 	//out_Color = vec4(log(log(log(intensity+1)/log(10) +1)/log(10) +1)/log(10), log(log(log(intensity2+1)/log(10) +1)/log(10) +1)/log(10),0, 1);
 }

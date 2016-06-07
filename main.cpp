@@ -278,6 +278,12 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		
 		glDisable(GL_BLEND);
 
+		createScatterArray(scatterTex, scatTex1, scatterMax1);
+		createScatterArray(scatterTex2, scatTex2, scatterMax2);
+
+		float scatterMaxTot_Balle = (scatterMax1 > scatterMax2) ? scatterMax1 : scatterMax2;
+		cout << "scatterMaxTot_Balle = " << scatterMaxTot_Balle << endl;
+
 		glUseProgram(drawScatterShader);
 		glBindFramebuffer(GL_FRAMEBUFFER, finalScatFbo);
 		glBindVertexArray(triVertArray);
@@ -285,6 +291,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glEnableVertexAttribArray(0);
 		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex"), 0);
 		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex2"), 1);	
+		glUniform1f(glGetUniformLocation(drawScatterShader, "maxValue"), scatterMaxTot_Balle);	
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, scatTex1);
 		glActiveTexture(GL_TEXTURE1);
@@ -301,10 +308,6 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		createParallelArray(parallelTex2, parTex2, maxValue2);
 	}	
 
-	if(plot == SCATTER){
-		createScatterArray(scatterTex, scatTex1, scatterMax1);
-		createScatterArray(scatterTex2, scatTex2, scatterMax2);
-	}
 }
 void draw(){
 	
@@ -321,12 +324,12 @@ void draw(){
 		glBindTexture(GL_TEXTURE_2D, finalParTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
 		if(background == WHITE){
-			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 0.0, 0.0, 1.0, 1);
-			glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0, 0.0, 0.0, 1);
+			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
+			glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
 		}
 		else{
-			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0.0, 0.0, 1);
-			glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 0.0, 0.0, 1.0, 1);
+			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
+			glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
 		}
 		
 		
@@ -374,8 +377,8 @@ void draw(){
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, finalScatTex);
 		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 1.0, 0.0, 0.0, 1);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 0.0, 0.0, 1.0, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
+		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
 		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
