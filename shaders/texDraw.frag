@@ -13,8 +13,9 @@ void main(void){
 	float intensity2 = texture(tex, texCoord).g;
 	
 	if(backgroundcolor == 0){	
+		
 		outColor = intensity * color + intensity2 * color2;
-		float overshoot = max(outColor.x, outColor.z);
+		//float overshoot = max(outColor.x, outColor.z);
 		//if(overshoot != 0 )
 			//outColor.xyz = outColor.xyz/5.0;
 	}
