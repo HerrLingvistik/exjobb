@@ -40,9 +40,10 @@ void readFile_pCoords(vector<float>& data, std::string filename, vector<GLfloat>
 			
 			//Read element by element
 			while( getline(is, number, ' ') ) {	
-				//Add all data items to a one dimensional vector.		
-				//if(!isdigit(number[0]))
-					//break;
+				//This if-statement is only needed if one wants to load out5d	
+				//if(number == ' ')
+					//break;//cout << number.back() << endl;
+				cout << number.back() << endl;
 				//Add X 
 				data.push_back(startPos + axisSpacing*col);
 				//Add Y
@@ -74,47 +75,28 @@ void readFile_cluster(vector<float>& cluster, std::string filename, int& rowCoun
 	rowCounter = 0;
 	cluster.clear(); //Clear the vector storing data values	
 	ifstream infile;
-	//cout << "in file reader "<< filename<< endl;
-	//filename = "data/cluster5.txt";
+
 	infile.open(filename); 
 	string line;
 	string number, dim;
-	//int col=0;
-	//float startPos = -1.0, axisSpacing;
-
+	
 	if(infile.is_open()){		
-		//Read first line to get dimensions.
-		//getline(infile, line);
-		//istringstream is1(line);
-		//getline(is1, dim, ' ') ;
-		//axisSpacing = 2.0/(stof(dim)-1);
 
 		while(getline(infile, line)){
-			istringstream is(line);
-			//first.push_back(dimX);			
-			//dimY++;		
+			istringstream is(line);		
 			rowCounter++;
 			//Read element by element
 			while( getline(is, number, ' ') ) {	
-				//Add all data items to a one dimensional vector.		
-			//	if(!isdigit(number[0]))
-			//		break;
-				//Add X 
-				//cluster.push_back(startPos + axisSpacing*col);
-				//Add Y
+			
 				cluster.push_back((float)stof(number));
-				//col++;			
-				//dimX++;
+				
     	}	
-			//col=0;
 		}	
 
-		//dimX/=dimY;
-		//count.assign(first.size(), dimX);
 		infile.close();
 	}
 	else cout<<"FAIIIIIIIIIIIIIIL!!!"<<endl;
-	//cout << "Number of rows in this data-set: "<< rowCounter << endl;
+	
 }
 
 void writeFile(){

@@ -8,7 +8,8 @@
 
 /*
 	THINGS TO ADD 	 
-	
+	- Se till så att markören flyttar även när man klickar. 
+	- Kom på frågor!
 	- Utför rigorösa tester!
 	- Återupprätta Hallströms heder - sänk familjen Wallenberg
 	- Städa kod
@@ -48,7 +49,6 @@ float parallelTex[W][H];
 float parallelTex2[W][H];
 float scatterTex[sW][sH];
 float scatterTex2[sW][sH];
-//https://www.opengl.org/sdk/docs/man/docbook4/xhtml/glActiveTexture.xml
 float* texture = new float[ W*H ];
 
 vector<float> data, parData2, data2, data3;
@@ -166,7 +166,6 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 	
 	//Bind data array containing coordinates for drawing lines between
-	//Do almost all here two times one for each parallel cluster <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	if(plot == PARALLEL){	
 		//Create texture with first parallel cluster
 		glUseProgram(parallelShader);
@@ -220,17 +219,6 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glUseProgram(0);
-
-		/*
-			glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex"), 0);
-		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex2"), 1);	
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, scatTex1);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, scatTex2);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		*/
-
 	}
 	else{
 		glBindFramebuffer(GL_FRAMEBUFFER, scatFbo1);
@@ -244,7 +232,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		//Draw lines tell opengl how many values will be sent to the shaders
-		if(DRAWBLUE){
+		if(DRAWRED){
 			glDrawArrays(GL_POINTS, 0, data2.size()/2.0);
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -266,7 +254,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		//Draw lines tell opengl how many values will be sent to the shaders
-		if(DRAWRED){
+		if(DRAWBLUE){
 			glDrawArrays(GL_POINTS, 0, data3.size()/2.0);
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -278,11 +266,13 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		
 		glDisable(GL_BLEND);
 
+
 		createScatterArray(scatterTex, scatTex1, scatterMax1);
 		createScatterArray(scatterTex2, scatTex2, scatterMax2);
 
 		float scatterMaxTot_Balle = (scatterMax1 > scatterMax2) ? scatterMax1 : scatterMax2;
 		cout << "scatterMaxTot_Balle = " << scatterMaxTot_Balle << endl;
+
 
 		glUseProgram(drawScatterShader);
 		glBindFramebuffer(GL_FRAMEBUFFER, finalScatFbo);
@@ -307,6 +297,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		createParallelArray(parallelTex, parTex1, maxValue);
 		createParallelArray(parallelTex2, parTex2, maxValue2);
 	}	
+
 
 }
 void draw(){
@@ -528,10 +519,6 @@ void mouseMoveClick(int x, int y){
 				playSound(vol1);
 				playSound2(vol2);
 
-				//playSound((calcGaussVolume_Parallel(x, y, markerSize, parallelTex)/maxValue));
-				//playSound2((calcGaussVolume_Parallel(x, y, markerSize, parallelTex2)/maxValue2));
-				//cout << "playing 1st sound at volume: " << (calcGaussVolume_Parallel(x, y, markerSize, parallelTex)/maxValue) << endl;
-				//cout << "playing 2nd sound at volume: " << (calcGaussVolume_Parallel(x, y, markerSize, parallelTex2)/maxValue2) << endl;
 			}
 			else if(plot == SCATTER && x>=0  && x<sW && y>=0 && y<sH){
 				mouseX = x;
@@ -545,8 +532,6 @@ void mouseMoveClick(int x, int y){
 								
 				movePosScatter(newX, newY, markerSize, scatterTex2);
 				float vol2 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex2)/scatterMax2));
-				//cout << "moved ("<<to_string(x)<<","<<to_string(y)<<") giving "<< scatterTex2[x][y] <<"to ("<<newX<<","<<newY<<")giving "<< scatterTex2[newX][newY] <<endl;
-				//cout << vol1 << " vs "<< vol2 << endl;
 
 				playSound(vol1);
 				//Temporary does this work?				
@@ -608,12 +593,16 @@ void keyPressed(unsigned char key, int x, int y){
 
 		if(soundactive){
 			if(plot == PARALLEL){
-				vol1 = calcGaussVolume_Parallel(mouseX, mouseY, markerSize, parallelTex)/maxValue *10.0;
-				vol2 = calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, parallelTex)/maxValue *10.0;
+				//vol1 = calcGaussVolume_Parallel(mouseX, mouseY, markerSize, parallelTex)/maxValue *10.0;
+				//vol2 = calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, parallelTex)/maxValue *10.0;
+				vol1 = getGains((calcGaussVolume_Parallel(mouseX, mouseY, markerSize, parallelTex)/maxValue));
+				vol2 = getGains((calcGaussVolume_Parallel(mouseX, mouseY, markerSize, parallelTex2)/maxValue2));
 			}
 			else if(plot == SCATTER){
-				vol1 = calcGaussVolume_Scatter(mouseX, mouseY, markerSize, scatterTex)/maxValue *1500.0;
-				vol2 = calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex)/maxValue *1500.0;
+				//vol1 = calcGaussVolume_Scatter(mouseX, mouseY, markerSize, scatterTex)/maxValue *1500.0;
+				//vol2 = calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex)/maxValue *1500.0;
+				vol1 = getGains((calcGaussVolume_Scatter(mouseX, mouseY, markerSize, scatterTex)/scatterMax1));
+				vol2 = getGains((calcGaussVolume_Scatter(mouseY, mouseY, markerSize, scatterTex2)/scatterMax2));
 			}
 
 			playSound(vol1);
@@ -625,12 +614,16 @@ void keyPressed(unsigned char key, int x, int y){
 		markerSize-=2;
 		if(soundactive){
 			if(plot == PARALLEL){
-			vol1 = calcGaussVolume_Parallel(mouseX, mouseY, markerSize, parallelTex)/maxValue *10.0;
-			vol2 = calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, parallelTex)/maxValue *10.0;
+			//vol1 = calcGaussVolume_Parallel(mouseX, mouseY, markerSize, parallelTex)/maxValue *10.0;
+			//vol2 = calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, parallelTex)/maxValue *10.0;
+				vol1 = getGains((calcGaussVolume_Parallel(mouseX, mouseY, markerSize, parallelTex)/maxValue));
+				vol2 = getGains((calcGaussVolume_Parallel(mouseX, mouseY, markerSize, parallelTex2)/maxValue2));
 			}
 			else if(plot == SCATTER){
-				vol1 = calcGaussVolume_Scatter(mouseX, mouseY, markerSize, scatterTex)/maxValue *1500.0;
-				vol2 = calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex)/maxValue *1500.0;
+				//vol1 = calcGaussVolume_Scatter(mouseX, mouseY, markerSize, scatterTex)/maxValue *1500.0;
+				//vol2 = calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex)/maxValue *1500.0;
+				vol1 = getGains((calcGaussVolume_Scatter(mouseX, mouseY, markerSize, scatterTex)/scatterMax1));
+				vol2 = getGains((calcGaussVolume_Scatter(mouseY, mouseY, markerSize, scatterTex2)/scatterMax2));
 			}
 			playSound(vol1);
 			playSound2(vol2);
@@ -722,10 +715,14 @@ void fKeyPressed(int key, int x, int y){
 	switch(key){
 		case GLUT_KEY_F1:
 			plot = PARALLEL;
+			playSound(0);
+			playSound2(0);
 			glutReshapeWindow(W, H);
 		break;
 		case GLUT_KEY_F2:
 			plot = SCATTER;
+			playSound(0);
+			playSound2(0);
 			glutReshapeWindow(sW, sH);
 		break;
 		case GLUT_KEY_F3:
