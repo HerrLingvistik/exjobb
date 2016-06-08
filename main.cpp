@@ -107,12 +107,20 @@ float soundGains[6] =
 };
 */
 
-float soundGains[11] = 
+/*float soundGains[11] = 
 {
 	0.00f, 0.01f, 0.02f, 
 	0.03f, 0.04f, 0.06f, 
 	0.10f, 0.16f, 0.25f, 
 	0.40f, 0.63f 
+};*/
+
+float soundGains[11] = 
+{
+	0.00f, 0.02f, 
+	0.03f, 0.04f, 0.06f, 
+	0.10f, 0.16f, 0.25f, 
+	0.40f, 0.63f, 1.0f 
 };
 
 vector <GLfloat> paraAxes;
@@ -145,7 +153,7 @@ void calcMouseSquare(){
 
 float getGains(float key){
 	int pos = ceil(key * (sizeof(soundGains)/sizeof(float)-1));
-	//cout << "key: "<< key  << "*" << sizeof(soundGains)/sizeof(float)-1 << " gives arraypos "<< pos << endl;
+	cout << "key: "<< key  << "*" << sizeof(soundGains)/sizeof(float)-1 << " gives arraypos "<< pos << endl;
 	return soundGains[pos]; 
 }
 
@@ -457,54 +465,58 @@ void idle()
 {
 	glutPostRedisplay();
 }
-/*
+
 //Interaction function for clicking mouse button
 void mouseEvent(int event, int state, int x, int y){	
 
-	float vol = 0.0;
-
+	int newX = x, newY = y;
 	if(event == GLUT_LEFT_BUTTON && state == GLUT_DOWN){	
+		float vol1;		
 		mouseClick = true;
 		if(plot == PARALLEL){
-			cout << markerSize<< endl;
-			vol = calcGaussVolume_Parallel(x, y, markerSize, parallelTex)/maxValue *10.0;
+			mouseX = x;
+			mouseY = y;
+			movePosParallel(newX, newY, markerSize, parallelTex);
+			vol1 = getGains((calcGaussVolume_Parallel(newX, newY, markerSize, parallelTex)/maxValue));
 		}else if(plot == SCATTER){
-			vol = calcGaussVolume_Scatter(x, y, markerSize, scatterTex)/maxValue *1500.0;
+			mouseX = x;
+			mouseY = y;
+			movePosScatter(newX, newY, markerSize, scatterTex);
+			vol1 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex)/scatterMax1));
 		}
-
-		cout<<"On position x:"<<x<<" y: "<<y << "volume is "<<vol << " marker size: "<<markerSize<<endl;
-		if(soundactive)
-			playSound(vol);
 		mouseX = x;
 		mouseY = y;
-		glutPostRedisplay();
+		playSound(vol1);
 	}
 	
 	if(event == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
+		float vol2;
 		mouse2Click = true;
 		if(plot == PARALLEL){
-			vol = calcGaussVolume_Parallel(x, y, markerSize, parallelTex)/maxValue *10.0;
+			newX=x;
+			newY=y;
+			movePosParallel(newX, newY, markerSize, parallelTex2);
+			vol2 = getGains((calcGaussVolume_Parallel(newX, newY, markerSize, parallelTex2)/maxValue2));
 		}
 		else if(plot == SCATTER){
-			vol = calcGaussVolume_Scatter(x, y, markerSize, scatterTex)/maxValue *1500.0;
-		}		
-
-		cout<<"On position x:"<<x<<" y: "<<y << "volume is "<<vol << " marker size: "<<markerSize<<endl;
-		if(soundactive)
-			playSound2(vol);	
+			newX=x;
+			newY=y;
+			movePosScatter(newX, newY, markerSize, scatterTex2);
+			vol2 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex2)/scatterMax2));
+		}			
 		mouse2X = x;
 		mouse2Y = y;
-		glutPostRedisplay();
+		playSound2(vol2);
 	}
 }
-*/
+
 //Interaction function for clicking mouse button
 //Here it would do to calculate the vertices only when clicking mouse and not in every frame. 
-void mouseMoveClick(int x, int y){
+//void mouseMoveClick(int x, int y){
+void mouseMove(int x, int y){
 	int newX = x, newY = y;
 	//cout << to_string(x) << " " << to_string(y) << endl;
 	if(hoover){
-		
 		if(soundactive){
 			if(plot == PARALLEL && x>=0  && x<W && y>=0 && y<H){
 				mouseX = x;
@@ -525,25 +537,75 @@ void mouseMoveClick(int x, int y){
 				mouseY = y;
 				movePosScatter(newX, newY, markerSize, scatterTex);
 				
+				cout << "playing sound percentage "<<(calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex)/scatterMax1)<<endl;
+	
 				float vol1 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex)/scatterMax1));
-				cout << "moved ("<<to_string(x)<<","<<to_string(y)<<") giving "<< scatterTex[x][y] <<"to ("<<newX<<","<<newY<<")giving "<< scatterTex[newX][newY] <<endl;
+				//cout << "moved ("<<to_string(x)<<","<<to_string(y)<<") giving "<< scatterTex[x][y] <<"to ("<<newX<<","<<newY<<")giving "<< scatterTex[newX][newY] <<endl;
 				newX=x;
 				newY=y;
-								
 				movePosScatter(newX, newY, markerSize, scatterTex2);
 				float vol2 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex2)/scatterMax2));
 
-				playSound(vol1);
-				//Temporary does this work?				
+				cout <<endl;
+
+				playSound(vol1);			
 				playSound2(vol2);
 			}
 		}
-		glutPostRedisplay();
-	}
+		//glutPostRedisplay();
+	}/*else{
+			//Spela ljud från båda klustren.
+			//Bör man kanske kolla så att man bara spelar upp från det klustret med flest punkter?
+			if(soundactive){
+			if(plot == PARALLEL && x>=0  && x<W && y>=0 && y<H){
+				mouseX = x;
+				mouseY = y;
+				movePosParallel(newX, newY, markerSize, parallelTex);
+				float vol1 = getGains((calcGaussVolume_Parallel(newX, newY, markerSize, parallelTex)/maxValue));
+				newX=x;
+				newY=y;
+				movePosParallel(newX, newY, markerSize, parallelTex2);
+				float vol2 = getGains((calcGaussVolume_Parallel(newX, newY, markerSize, parallelTex2)/maxValue2));
+
+				playSound(vol1);
+				playSound2(vol2);
+
+			}
+			else if(plot == SCATTER && x>=0  && x<sW && y>=0 && y<sH){
+				mouseX = x;
+				mouseY = y;
+				movePosScatter(newX, newY, markerSize, scatterTex);
+				
+				cout << "playing sound percentage "<<(calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex)/scatterMax1)<<endl;
+	
+				float vol1 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex)/scatterMax1));
+				//cout << "moved ("<<to_string(x)<<","<<to_string(y)<<") giving "<< scatterTex[x][y] <<"to ("<<newX<<","<<newY<<")giving "<< scatterTex[newX][newY] <<endl;
+				newX=x;
+				newY=y;
+				movePosScatter(newX, newY, markerSize, scatterTex2);
+				float vol2 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex2)/scatterMax2));
+
+				cout <<endl;
+
+				playSound(vol1);				
+				playSound2(vol2);
+			
+			}
+		}
+
+	}*/
+		
+
+	std::string s;
+	s = " pos " + std::to_string(newX) + " y "  + to_string(newY);			
+	char const *pchar = s.c_str();
+	glutSetWindowTitle(pchar);
+
 }
-/*
+
+
 //Interaction function for moving mouse marker
-void mouseMove(int x, int y){	
+/*void mouseMove(int x, int y){	
 	float pxlValue;
 	int newX=x, newY=y;
 	if(plot == PARALLEL){
@@ -568,7 +630,7 @@ void mouseMove(int x, int y){
 		glutPostRedisplay();
 	//}
 		
-	/*if(!mouse2Click){
+	if(!mouse2Click){
 		mouse2X = x;
 		mouse2Y = y;		
 		std::string s;
@@ -580,14 +642,14 @@ void mouseMove(int x, int y){
 		glutSetWindowTitle(pchar);
 		glutPostRedisplay();
 	}	
-}
-*/
+}*/
+
 void keyPressed(unsigned char key, int x, int y){	
 	
-	float vol1 = 0.0;
-	float vol2 = 0.0;
+	//float vol1 = 0.0;
+	//float vol2 = 0.0;
 	
-	if(key == '+' && markerSize <= 21){
+	/*if(key == '+' && markerSize <= 21){
 		cout<<"marker size increased"<<endl;
 		markerSize+=2;
 
@@ -628,9 +690,9 @@ void keyPressed(unsigned char key, int x, int y){
 			playSound(vol1);
 			playSound2(vol2);
 		}
-	}
+	}*/
 	
-	else if(key == 'b'){
+	if(key == 'b'){
 		rPressed = false;
 		bPressed = true;
 	}
@@ -688,24 +750,35 @@ void keyPressed(unsigned char key, int x, int y){
 			playSound2(0);
 		}
 	}else if(key == 13){
+		//Gör tre tester variera texturer som presenteras i dessa!
 		if(USERTEST){
 			switch(taskNumber){
+				//högst densitet i första klustret
+				//räkna ut hur nära högsta densitet
+				//byt texturer 
+				//om 10 test är körda öka tasknumber
 				case 1:
 					glutSetWindowTitle("Task 1");
 					task1(resultString, mouseX, mouseY, parallelTex);
 					taskNumber++;
 				break;
+				//högst densitet i andra klustret
+				//gör samma som innan fast med andra klustret
 				case 2:
 					glutSetWindowTitle("Task 2");
 					task2(resultString);
 					taskNumber++;
 				break;
+				//Hitta 50/50
+				//samma som innan eventuellt andra plots
+				//byt till parallella koordinater
 				case 3:
 					glutSetWindowTitle("Task 3");
 					task3(resultString);
 					writeResultFile(resultString);
 					taskNumber++;
 				break;
+				//kör case 4-6 för parallella koordinater
 			}
 		}
 	}
@@ -765,9 +838,9 @@ void init(int W, int H){
 	glutReshapeFunc(reshape);
 	//Initiate stuff for the drawing
 	//glutSetCursor(GLUT_CURSOR_NONE);
-	//glutMouseFunc(mouseEvent);
-	//glutPassiveMotionFunc(mouseMove);
-	glutMotionFunc(mouseMoveClick);
+	glutMouseFunc(mouseEvent);
+	glutPassiveMotionFunc(mouseMove);
+	//glutMotionFunc(mouseMoveClick);
 	glutKeyboardFunc(keyPressed);
 	glutSpecialFunc(fKeyPressed);
 	

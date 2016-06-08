@@ -245,6 +245,8 @@ void createParallelArray(float texArray[][H], GLuint tex, float &maxValue){
 void createScatterArray(float readTex[][sH], GLuint texIn, float &scatterMax){
 	float* texture2 = new float[sW*sH];
 
+		scatterMax=0;
+
 		glActiveTexture(GL_TEXTURE1);
 	
 		glBindTexture(GL_TEXTURE_2D, texIn);
@@ -259,6 +261,7 @@ void createScatterArray(float readTex[][sH], GLuint texIn, float &scatterMax){
 				scatterMax = texture2[i];
 				xpos = col; 
 				ypos = row;
+				//cout << "changed stuff "<< endl;
 			}
 			if(texture2[i] != 0)
 				count+=texture2[i];
