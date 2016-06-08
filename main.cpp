@@ -778,6 +778,27 @@ void keyPressed(unsigned char key, int x, int y){
 					writeResultFile(resultString);
 					taskNumber++;
 				break;
+
+				case 4:
+					glutSetWindowTitle("Task 3");
+					task3(resultString);
+					writeResultFile(resultString);
+					taskNumber++;
+				break;
+
+				case 5:
+					glutSetWindowTitle("Task 3");
+					task3(resultString);
+					writeResultFile(resultString);
+					taskNumber++;
+				break;
+		
+				case 6:
+					glutSetWindowTitle("Task 3");
+					task3(resultString);
+					writeResultFile(resultString);
+					taskNumber++;
+				break;
 				//kör case 4-6 för parallella koordinater
 			}
 		}
@@ -848,8 +869,12 @@ void init(int W, int H){
 	clusterFileB = "./data/cluster2.txt";
 	clusterFileR[14] = '1';
 	//read data set into data array
-	readFile_pCoords(data, "./data/clusterspara5.txt", paraAxes);
-	readFile_pCoords(parData2, "./data/clusterspara3.txt", paraAxes);
+	//readFile_pCoords(data, "./data/clusterspara5.txt", paraAxes);
+	//readFile_pCoords(parData2, "./data/clusterspara3.txt", paraAxes);
+
+	readFile_pCoords(data, "./data/3dpara2.txt", paraAxes);
+	readFile_pCoords(parData2, "./data/3dpara4.txt", paraAxes);
+
 	readFile_cluster(data2, clusterFileR, clusterCounter1);	
 	readFile_cluster(data3, clusterFileB, clusterCounter2);	
 	

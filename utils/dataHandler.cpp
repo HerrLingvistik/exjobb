@@ -24,14 +24,14 @@ void readFile_pCoords(vector<float>& data, std::string filename, vector<GLfloat>
 	count.clear();
 	first.clear();
 	int col=0;
-	float startPos = -0.98, axisSpacing;
+	float startPos = -0.96, axisSpacing;
 
 	if(infile.is_open()){		
 		//Read first line to get dimensions.
 		getline(infile, line);
 		istringstream is1(line);
 		getline(is1, dim, ' ') ;
-		axisSpacing = 1.96/(stof(dim)-1);
+		axisSpacing = 1.92/(stof(dim)-1);
 
 		while(getline(infile, line)){
 			istringstream is(line);
@@ -58,7 +58,7 @@ void readFile_pCoords(vector<float>& data, std::string filename, vector<GLfloat>
 		count.assign(first.size(), dimX);
 		infile.close();
 
-		for(float x=-0.98; x <= 0.98; x+=axisSpacing){
+		for(float x=-0.96; x <= 0.96; x+=axisSpacing){
 			axes.push_back((GLfloat)x);
 			axes.push_back((GLfloat)-1.0f);
 			axes.push_back((GLfloat)x);
