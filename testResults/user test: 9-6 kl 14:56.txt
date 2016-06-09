@@ -1,0 +1,41 @@
+1: 
+maxValue is 22.000000 chose value 15.000000 how close 68.181816%
+maxValue is 40.000000 chose value 36.000000 how close 90.000000%
+maxValue is 28.000000 chose value 21.000000 how close 75.000000%
+maxValue is 34.000000 chose value 26.000000 how close 76.470589%
+maxValue is 34.000000 chose value 27.000000 how close 79.411766%
+
+2:
+maxValue is 42.000000 chose value 38.000000 how close 90.476189%
+maxValue is 20.000000 chose value 14.000000 how close 70.000000%
+maxValue is 39.000000 chose value 27.000000 how close 69.230766%
+maxValue is 74.000000 chose value 71.000000 how close 95.945946%
+maxValue is 26.000000 chose value 20.000000 how close 76.923080%
+
+3:
+31.914894% vs 68.085106%
+76.923080% vs 23.076923%
+38.636364% vs 61.363636%
+50.000000% vs 50.000000%
+53.658535% vs 46.341465%
+
+4:
+10.000000 how close 76.923080%
+44.000000 how close 91.666664%
+37.000000 how close 100.000000%
+27.000000 how close 100.000000%
+13.000000 how close 100.000000%
+
+5:
+18.000000 how close 72.000000%
+31.000000 how close 96.875000%
+11.000000 how close 84.615387%
+8.000000 how close 61.538460%
+10.000000 how close 90.909088%
+
+6:
+34.375000% vs 65.625000%
+54.385963% vs 45.614037%
+82.222221% vs 17.777779%
+66.666664% vs 33.333332%
+59.090908% vs 40.909092%

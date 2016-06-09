@@ -43,7 +43,7 @@ void readFile_pCoords(vector<float>& data, std::string filename, vector<GLfloat>
 				//This if-statement is only needed if one wants to load out5d	
 				//if(number == ' ')
 					//break;//cout << number.back() << endl;
-				cout << number.back() << endl;
+				//cout << number.back() << endl;
 				//Add X 
 				data.push_back(startPos + axisSpacing*col);
 				//Add Y

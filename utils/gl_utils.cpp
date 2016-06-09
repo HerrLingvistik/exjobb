@@ -213,6 +213,8 @@ GLuint createFbo(GLuint tex1){
 }
 
 void createParallelArray(float texArray[][H], GLuint tex, float &maxValue){
+
+	maxValue = 0;
 	float* texture = new float[ W*H ];
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex);
