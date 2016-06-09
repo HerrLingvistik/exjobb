@@ -1,0 +1,28 @@
+1: maxValue is 22.000000 chose value 14.000000 how close 0.636364%
+ 
+maxValue is 40.000000 chose value 14.000000 how close 0.350000%
+ 
+maxValue is 28.000000 chose value 14.000000 how close 0.500000%
+ 
+maxValue is 34.000000 chose value 14.000000 how close 0.411765%
+ 
+maxValue is 34.000000 chose value 14.000000 how close 0.411765%
+ 
+2: maxValue is 26.000000 chose value 0.000000 how close 0.000000%
+ 
+maxValue is 20.000000 chose value 0.000000 how close 0.000000%
+ 
+maxValue is 39.000000 chose value 0.000000 how close 0.000000%
+ 
+maxValue is 74.000000 chose value 71.000000 how close 0.959459%
+ 
+maxValue is 26.000000 chose value 18.000000 how close 0.692308%
+ 
+3. resultatish 
+ 
+3. resultatish 
+ 
+3. resultatish 
+ 
+3. resultatish 
+ 

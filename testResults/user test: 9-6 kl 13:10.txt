@@ -1,0 +1,22 @@
+1: 
+maxValue is 22.000000 chose value 19.000000 how close 0.863636%
+maxValue is 40.000000 chose value 36.000000 how close 0.900000%
+maxValue is 28.000000 chose value 22.000000 how close 0.785714%
+maxValue is 34.000000 chose value 23.000000 how close 0.676471%
+maxValue is 34.000000 chose value 29.000000 how close 0.852941%
+
+2:
+maxValue is 26.000000 chose value 20.000000 how close 0.769231%
+maxValue is 20.000000 chose value 14.000000 how close 0.700000%
+maxValue is 39.000000 chose value 32.000000 how close 0.820513%
+maxValue is 74.000000 chose value 71.000000 how close 0.959459%
+maxValue is 26.000000 chose value 21.000000 how close 0.807692%
+
+3:
+31.000000 vs 18.000000
+33.000000 vs 12.000000
+22.000000 vs 28.000000
+31.000000 vs 44.000000
+28.000000 vs 18.000000
+
+3:
