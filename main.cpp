@@ -810,6 +810,10 @@ void keyPressed(unsigned char key, int x, int y){
 					dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
 					dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
 					initTexture(scatFbo1, scatTex1);
+					mouseX=W/2;
+					mouseY=H/2;
+					mouse2X=W/2;
+					mouse2Y=H/2;
 				break;
 
 				case 4:
@@ -910,6 +914,7 @@ void keyPressed(unsigned char key, int x, int y){
 							writeResultFile(resultString);
 							exit(0);
 						}else{
+							
 							resultString += "\n\n sound off 1: \n";
 							glutSetWindowTitle("Running test - Task 1 - Sample that green stuff(chronic)");
 							hoover = true;
@@ -926,6 +931,10 @@ void keyPressed(unsigned char key, int x, int y){
 							dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
 							dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
 							initTexture(scatFbo1, scatTex1);
+							mouseX=W/2;
+							mouseY=H/2;
+							mouse2X=W/2;
+							mouse2Y=H/2;
 							glutReshapeWindow(W, H);
 							USERTEST = true;
 							taskNumber = 1;
@@ -1000,6 +1009,7 @@ void fKeyPressed(int key, int x, int y){
 			USERTEST = true;
 			taskNumber = 1;
 			subTask = 1;
+			pauseScreen = true;
 			//cout << parData2.size()<<endl;
 		break;
 	}
