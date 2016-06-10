@@ -1,0 +1,84 @@
+1: 
+maxValue is 22.000000 chose value 0.000000 how close 0.000000%
+maxValue is 40.000000 chose value 40.000000 how close 100.000000%
+maxValue is 28.000000 chose value 15.000000 how close 53.571430%
+maxValue is 34.000000 chose value 0.000000 how close 0.000000%
+maxValue is 34.000000 chose value 0.000000 how close 0.000000%
+
+2:
+maxValue is 42.000000 chose value 23.000000 how close 54.761906%
+maxValue is 20.000000 chose value 0.000000 how close 0.000000%
+maxValue is 39.000000 chose value 0.000000 how close 0.000000%
+maxValue is 74.000000 chose value 2.000000 how close 2.702703%
+maxValue is 26.000000 chose value 4.000000 how close 15.384615%
+
+3:
+10.000000% vs 90.000000%
+70.000000% vs 30.000000%
+100.000000% vs 0.000000%
+-nan% vs -nan%
+0.000000% vs 100.000000%
+
+4:
+7.000000 how close 53.846153%
+41.000000 how close 85.416664%
+0.000000 how close 0.000000%
+9.000000 how close 33.333332%
+1.000000 how close 7.692307%
+
+5:
+1.000000 how close 4.000000%
+4.000000 how close 12.500000%
+5.000000 how close 38.461540%
+3.000000 how close 23.076923%
+7.000000 how close 63.636364%
+
+6:
+100.000000% vs 0.000000%
+-nan% vs -nan%
+0.000000% vs 100.000000%
+33.333332% vs 66.666664%
+25.000000% vs 75.000000%
+
+
+ sound off 1: 
+maxValue is 22.000000 chose value 5.000000 how close 22.727272%
+maxValue is 40.000000 chose value 21.000000 how close 52.500000%
+maxValue is 28.000000 chose value 0.000000 how close 0.000000%
+maxValue is 34.000000 chose value 0.000000 how close 0.000000%
+maxValue is 34.000000 chose value 1.000000 how close 2.941176%
+
+2:
+maxValue is 42.000000 chose value 20.000000 how close 47.619049%
+maxValue is 20.000000 chose value 16.000000 how close 80.000000%
+maxValue is 39.000000 chose value 0.000000 how close 0.000000%
+maxValue is 74.000000 chose value 5.000000 how close 6.756757%
+maxValue is 26.000000 chose value 9.000000 how close 34.615383%
+
+3:
+52.631580% vs 47.368420%
+87.500000% vs 12.500000%
+-nan% vs -nan%
+-nan% vs -nan%
+20.000000% vs 80.000000%
+
+4:
+4.000000 how close 30.769230%
+0.000000 how close 0.000000%
+0.000000 how close 0.000000%
+0.000000 how close 0.000000%
+0.000000 how close 0.000000%
+
+5:
+0.000000 how close 0.000000%
+0.000000 how close 0.000000%
+0.000000 how close 0.000000%
+0.000000 how close 0.000000%
+0.000000 how close 0.000000%
+
+6:
+-nan% vs -nan%
+-nan% vs -nan%
+0.000000% vs 100.000000%
+0.000000% vs 100.000000%
+0.000000% vs 100.000000%
