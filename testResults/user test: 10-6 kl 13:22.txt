@@ -1,0 +1,84 @@
+1: 
+maxValue is 22.000000 chose value 16.000000 how close 72.727272%
+maxValue is 40.000000 chose value 31.000000 how close 77.500000%
+maxValue is 28.000000 chose value 25.000000 how close 89.285713%
+maxValue is 34.000000 chose value 25.000000 how close 73.529411%
+maxValue is 34.000000 chose value 27.000000 how close 79.411766%
+
+2:
+maxValue is 42.000000 chose value 0.000000 how close 0.000000%
+maxValue is 20.000000 chose value 0.000000 how close 0.000000%
+maxValue is 39.000000 chose value 0.000000 how close 0.000000%
+maxValue is 74.000000 chose value 0.000000 how close 0.000000%
+maxValue is 26.000000 chose value 15.000000 how close 57.692307%
+
+3:
+26.666666% vs 73.333336%
+74.000000% vs 26.000000%
+39.215687% vs 60.784313%
+27.472527% vs 72.527473%
+54.901962% vs 45.098038%
+
+4:
+11.000000 how close 84.615387%
+44.000000 how close 91.666664%
+37.000000 how close 100.000000%
+27.000000 how close 100.000000%
+13.000000 how close 100.000000%
+
+5:
+25.000000 how close 100.000000%
+31.000000 how close 96.875000%
+12.000000 how close 92.307693%
+8.000000 how close 61.538460%
+7.000000 how close 63.636364%
+
+6:
+35.135136% vs 64.864868%
+63.492062% vs 36.507938%
+70.270271% vs 29.729731%
+66.666664% vs 33.333332%
+52.631580% vs 47.368420%
+
+
+ sound off 1: 
+maxValue is 22.000000 chose value 14.000000 how close 63.636364%
+maxValue is 40.000000 chose value 37.000000 how close 92.500000%
+maxValue is 28.000000 chose value 22.000000 how close 78.571426%
+maxValue is 34.000000 chose value 24.000000 how close 70.588234%
+maxValue is 34.000000 chose value 30.000000 how close 88.235291%
+
+2:
+maxValue is 42.000000 chose value 31.000000 how close 73.809525%
+maxValue is 20.000000 chose value 12.000000 how close 60.000000%
+maxValue is 39.000000 chose value 28.000000 how close 71.794868%
+maxValue is 74.000000 chose value 68.000000 how close 91.891891%
+maxValue is 26.000000 chose value 16.000000 how close 61.538460%
+
+3:
+22.222221% vs 77.777779%
+78.431374% vs 21.568628%
+39.622643% vs 60.377357%
+57.142857% vs 42.857143%
+58.695652% vs 41.304348%
+
+4:
+13.000000 how close 100.000000%
+31.000000 how close 64.583336%
+32.000000 how close 86.486488%
+18.000000 how close 66.666664%
+13.000000 how close 100.000000%
+
+5:
+17.000000 how close 68.000000%
+28.000000 how close 87.500000%
+11.000000 how close 84.615387%
+8.000000 how close 61.538460%
+10.000000 how close 90.909088%
+
+6:
+57.894737% vs 42.105263%
+75.000000% vs 25.000000%
+52.631580% vs 47.368420%
+71.428574% vs 28.571428%
+55.555557% vs 44.444443%
