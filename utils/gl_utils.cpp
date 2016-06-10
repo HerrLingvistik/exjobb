@@ -283,7 +283,7 @@ void createScatterArray(float readTex[][sH], GLuint texIn, float &scatterMax){
 		cout << "counter: "<<count<<endl;
 }
 //http://www.opengl-tutorial.org/beginners-tutorials/tutorial-5-a-textured-cube/
-GLuint loadBMP(char* bmpFile){
+GLuint loadBMP(string bmpFile){
 	// Data read from the header of the BMP file
 	unsigned char header[54]; // Each BMP file begins by a 54-bytes header
 	unsigned int dataPos;     // Position in the file where the actual data begins
@@ -292,7 +292,7 @@ GLuint loadBMP(char* bmpFile){
 	// Actual RGB data
 	unsigned char * data;
 	
-	FILE * file = fopen(bmpFile,"rb");
+	FILE * file = fopen(bmpFile.c_str(),"rb");
 	if (!file){printf("YOOOOOOOOOOO Image could not be opened\n"); return 0;}
 
 	if ( fread(header, 1, 54, file)!=54 ){ // If not 54 bytes read : problem
