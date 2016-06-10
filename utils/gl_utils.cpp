@@ -292,8 +292,8 @@ GLuint loadBMP(char* bmpFile){
 	// Actual RGB data
 	unsigned char * data;
 	
-	FILE * file = fopen((char*)bmpFile,"rb");
-	if (!file){printf("Image could not be opened\n"); return 0;}
+	FILE * file = fopen(bmpFile,"rb");
+	if (!file){printf("YOOOOOOOOOOO Image could not be opened\n"); return 0;}
 
 	if ( fread(header, 1, 54, file)!=54 ){ // If not 54 bytes read : problem
     printf("Not a correct BMP file\n");
