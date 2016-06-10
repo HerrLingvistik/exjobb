@@ -17,5 +17,6 @@ GLuint createFbo(GLuint tex);
 GLuint changeScatterPlot(int x, int y, int skip, GLfloat *data, int size, GLuint shader);
 void createParallelArray(float texArray[][H], GLuint tex, float &maxValue);
 void createScatterArray(float texture[][sH], GLuint tex, float &scatterMax);
+GLuint loadBMP(char* bmpFile);
 
 #endif
