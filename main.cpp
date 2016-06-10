@@ -34,16 +34,16 @@
 
 using namespace std;
 //Shader handles
-GLuint drawShader, parallelShader, mouseShader, tempScatterShader, drawScatterShader, drawTexShader;
+GLuint drawShader, parallelShader, mouseShader, tempScatterShader, drawScatterShader, drawTexShader, simpleTexShader;
 //Pointers for vertices
-GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisArray, paraAxisArray, dataArray, dataArray2, mouseBuffer, mouseArray, clusterArray1, clusterArray2;
+GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisArray, paraAxisArray, dataArray, dataArray2, mouseBuffer, mouseArray, clusterArray1, clusterArray2, texVertsArray;
 //Texture and fbo handles
-GLuint parTex1, parFbo1, parTex2, parFbo2, finalParTex, finalParFbo,  finalScatTex, finalScatFbo, scatTex1, scatTex2, scatFbo1, scatFbo2; 
+GLuint parTex1, parFbo1, parTex2, parFbo2, finalParTex, finalParFbo,  finalScatTex, finalScatFbo, scatTex1, scatTex2, scatFbo1, scatFbo2, pauseTexPara, pauseTexScatter; 
 
 int plot, scatterAxisX = 1, scatterAxisY = 2, background = 0, clusterCounter1=1, clusterCounter2=1, dimX = 0, dimY = 0, maxPos = 0, mouseX, mouseY, mouse2X, mouse2Y, taskNumber=1, subTask = 1, numberOfRuns=0;
 
 const static int PARALLEL = 0, SCATTER = 1, BLACK = 0, WHITE = 1;
-bool bPressed = false, rPressed = false, hoover = false, soundactive = true, DRAWRED=true, DRAWBLUE=true, USERTEST=false; 
+bool bPressed = false, rPressed = false, hoover = false, soundactive = true, DRAWRED=true, DRAWBLUE=true, USERTEST=false, pauseScreen=false; 
 
 float parallelTex[W][H];
 float parallelTex2[W][H];
@@ -315,145 +315,165 @@ void draw(){
 	glClearColor(0,0,0,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-	if(plot == PARALLEL){
-		glUseProgram(drawTexShader);
-		glBindVertexArray(triVertArray2);
+	if(pauseScreen){
+		glUseProgram(simpleTexShader);
+		glBindVertexArray(texVertsArray);
 		//Enable or disable a genedata[ric vertex attribute array
 		glEnableVertexAttribArray(0);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, finalParTex);
-		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
-		if(background == WHITE){
-			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
-			glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
-		}
-		else{
-			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
-			glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
-		}
-		
-		
-		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
-
+		if(plot == PARALLEL)
+			glBindTexture(GL_TEXTURE_2D, pauseTexPara);
+		else
+			glBindTexture(GL_TEXTURE_2D, pauseTexScatter);	
+		glUniform1i(glGetUniformLocation(simpleTexShader, "tex"), 0);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-	
+
 		glBindTexture(GL_TEXTURE_2D, 0); 
 		//Disable and unbind just to be safe
 		glDisableVertexAttribArray(0);
 		glBindVertexArray(0);	
 		//Don't draw using the parallel coordinates shader anymore.
 		glUseProgram(0);
-
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_CULL_FACE);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		
-
-		glUseProgram(mouseShader);
-		glBindVertexArray(paraAxisArray);
-		glEnableVertexAttribArray(0);
-		//Set line width of the axes
+	//cout << "DASE!!!"<<endl;
+	}else{
+		if(plot == PARALLEL){
+			glUseProgram(drawTexShader);
+			glBindVertexArray(triVertArray2);
+			//Enable or disable a genedata[ric vertex attribute array
+			glEnableVertexAttribArray(0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, finalParTex);
+			glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
+			if(background == WHITE){
+				glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
+				glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
+			}
+			else{
+				glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
+				glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
+			}
 		
-		glLineWidth(3.0f);
-		if(background == BLACK)
-			glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f, 0.2f);
-		else if(background == WHITE)
-			glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 0.0f, 0.2f);
-		glDrawArrays(GL_LINES, 0, 8);
-		//Set regular line width	
-		glLineWidth(1.0f);
-
-		glUseProgram(0);
 		
-		glDisable(GL_BLEND);
+			glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
-	}
-	else if(plot == SCATTER){		
-
-		glUseProgram(drawTexShader);
-		glBindVertexArray(triVertArray2);
-		//Enable or disable a genedata[ric vertex attribute array
-		glEnableVertexAttribArray(0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, finalScatTex);
-		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
-		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
-
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
 	
-		glBindTexture(GL_TEXTURE_2D, 0); 
-		//Disable and unbind just to be safe
-		glDisableVertexAttribArray(0);
-		glBindVertexArray(0);	
-		//Don't draw using the parallel coordinates shader anymore.
-		glUseProgram(0);
+			glBindTexture(GL_TEXTURE_2D, 0); 
+			//Disable and unbind just to be safe
+			glDisableVertexAttribArray(0);
+			glBindVertexArray(0);	
+			//Don't draw using the parallel coordinates shader anymore.
+			glUseProgram(0);
 
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_CULL_FACE);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		
+			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_CULL_FACE);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		
 
-		glUseProgram(mouseShader);
-		glBindVertexArray(scatterAxisArray);
-		glEnableVertexAttribArray(0);
-		//Set line width of the axes
+			glUseProgram(mouseShader);
+			glBindVertexArray(paraAxisArray);
+			glEnableVertexAttribArray(0);
+			//Set line width of the axes
 		
-		glLineWidth(3.0f);
-		if(background == BLACK)
-			glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f, 0.3f);
-		else if(background == WHITE)
-			glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 0.0f, 0.3f);
-		glDrawArrays(GL_LINE_STRIP, 0, 3);
-		//Set regular line width	
-		glLineWidth(1.0f);
+			glLineWidth(3.0f);
+			if(background == BLACK)
+				glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f, 0.2f);
+			else if(background == WHITE)
+				glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 0.0f, 0.2f);
+			glDrawArrays(GL_LINES, 0, 8);
+			//Set regular line width	
+			glLineWidth(1.0f);
 
-		glUseProgram(0);
+			glUseProgram(0);
 		
-		glDisable(GL_BLEND);
+			glDisable(GL_BLEND);
 
-	}
-   
-	glUseProgram(mouseShader);
-	//Recalculate mouse marker area
-	calcMouseSquare();
-	glBindVertexArray(mouseArray);
-	glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(mouseVerts), mouseVerts, GL_STATIC_DRAW);
-	glBindVertexArray(mouseArray);
-	//Enable or disable a generic vertex attribute array
-	glEnableVertexAttribArray(0);
-
-	if(!hoover){
-		glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 0.0f, 0.0f, 1.0f);
 		}
+		else if(plot == SCATTER){		
 
-	else if(hoover){
-		glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 1.0f, 0.0f, 1.0f);
-	}
+			glUseProgram(drawTexShader);
+			glBindVertexArray(triVertArray2);
+			//Enable or disable a genedata[ric vertex attribute array
+			glEnableVertexAttribArray(0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, finalScatTex);
+			glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
+			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
+			glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
+			glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
-	glDrawArrays(GL_LINE_LOOP, 0, 4);
-	//Bind data array containing coordinates for drawing lines between
-	glBindVertexArray(0);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
 	
-	if(!hoover){	
+			glBindTexture(GL_TEXTURE_2D, 0); 
+			//Disable and unbind just to be safe
+			glDisableVertexAttribArray(0);
+			glBindVertexArray(0);	
+			//Don't draw using the parallel coordinates shader anymore.
+			glUseProgram(0);
+
+			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_CULL_FACE);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		
+
+			glUseProgram(mouseShader);
+			glBindVertexArray(scatterAxisArray);
+			glEnableVertexAttribArray(0);
+			//Set line width of the axes
+		
+			glLineWidth(3.0f);
+			if(background == BLACK)
+				glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f, 0.3f);
+			else if(background == WHITE)
+				glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 0.0f, 0.3f);
+			glDrawArrays(GL_LINE_STRIP, 0, 3);
+			//Set regular line width	
+			glLineWidth(1.0f);
+
+			glUseProgram(0);
+		
+			glDisable(GL_BLEND);
+
+		}
+		 
+		glUseProgram(mouseShader);
+		//Recalculate mouse marker area
+		calcMouseSquare();
 		glBindVertexArray(mouseArray);
 		glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(mouse2Verts), mouse2Verts, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(mouseVerts), mouseVerts, GL_STATIC_DRAW);
 		glBindVertexArray(mouseArray);
 		//Enable or disable a generic vertex attribute array
 		glEnableVertexAttribArray(0);
-		glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 1.0f, 1.0f);
+
+		if(!hoover){
+			glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 0.0f, 0.0f, 1.0f);
+		}
+
+		else if(hoover){
+			glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 1.0f, 0.0f, 1.0f);
+		}
+
 		glDrawArrays(GL_LINE_LOOP, 0, 4);
 		//Bind data array containing coordinates for drawing lines between
 		glBindVertexArray(0);
-	}
-	//Enable or disable a generic vertex attribute array
-	glDisableVertexAttribArray(0);
-	glUseProgram(0);
-   
+	
+		if(!hoover){	
+			glBindVertexArray(mouseArray);
+			glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(mouse2Verts), mouse2Verts, GL_STATIC_DRAW);
+			glBindVertexArray(mouseArray);
+			//Enable or disable a generic vertex attribute array
+			glEnableVertexAttribArray(0);
+			glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 1.0f, 1.0f);
+			glDrawArrays(GL_LINE_LOOP, 0, 4);
+			//Bind data array containing coordinates for drawing lines between
+			glBindVertexArray(0);
+		}
+		//Enable or disable a generic vertex attribute array
+		glDisableVertexAttribArray(0);
+		glUseProgram(0);
+	}	 
 	
 
 	//Swaps the buffers of the current window if double buffered(draw)
@@ -638,9 +658,12 @@ void keyPressed(unsigned char key, int x, int y){
 			hoover = true;
 			playSound2(0);
 		}
-	}else if(key == 13){
+	}else if(key == 32){
+		pauseScreen=false;
+	}
+	else if(key == 13){
 		//Gör tre tester variera texturer som presenteras i dessa!
-		if(USERTEST){
+		if(USERTEST && !pauseScreen){
 			switch(taskNumber){
 				//högst densitet i första klustret
 				//räkna ut hur nära högsta densitet
@@ -675,6 +698,7 @@ void keyPressed(unsigned char key, int x, int y){
 						dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
 						dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
 						initTexture(scatFbo1, scatTex1);
+						pauseScreen=true;
 						break;
 					}
 
@@ -722,6 +746,7 @@ void keyPressed(unsigned char key, int x, int y){
 						dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
 						dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
 						initTexture(scatFbo1, scatTex1);
+						pauseScreen=true;
 						break;
 					}
 
@@ -769,6 +794,7 @@ void keyPressed(unsigned char key, int x, int y){
 						clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
 						clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
 						initTexture(scatFbo1, scatTex1);
+						pauseScreen=true;
 						break;
 					}
 
@@ -808,6 +834,7 @@ void keyPressed(unsigned char key, int x, int y){
 						clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
 						clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
 						initTexture(scatFbo1, scatTex1);
+						pauseScreen=true;
 						break;
 					}
 
@@ -846,6 +873,7 @@ void keyPressed(unsigned char key, int x, int y){
 						clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
 						clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
 						initTexture(scatFbo1, scatTex1);
+						pauseScreen=true;
 						break;
 					}
 
@@ -888,7 +916,7 @@ void keyPressed(unsigned char key, int x, int y){
 							plot = PARALLEL;
 
 							glViewport(0,0,W,H);
-							//glutReshapeWindow(W, H);
+							glutReshapeWindow(W, H);
 							paraFile1 = "./data/parallel/3dpara1.txt";
 							paraFile2 = "./data/parallel/3dpara2.txt";
 							readFile_pCoords(data, paraFile1, paraAxes);
@@ -1008,7 +1036,7 @@ void init(int W, int H){
 	
 	clusterFileR = "./data/scatter/cluster1.txt";
 	clusterFileB = "./data/scatter/cluster2.txt";
-	clusterFileR[14] = '1';
+	//clusterFileR[14] = '1';
 	//read data set into data array
 	//readFile_pCoords(data, "./data/clusterspara5.txt", paraAxes);
 	//readFile_pCoords(parData2, "./data/clusterspara3.txt", paraAxes);
@@ -1034,11 +1062,13 @@ void init(int W, int H){
 	tempScatterShader = loadShaders("./shaders/tempScatter.vert", "./shaders/tempScatter.frag");
 	mouseShader = loadShaders("./shaders/mouse.vert", "./shaders/mouse.frag");
 	drawTexShader = loadShaders("./shaders/texDraw.vert", "./shaders/texDraw.frag");
+	simpleTexShader = loadShaders("./shaders/simpleTex.vert", "./shaders/simpleTex.frag");
 	
 	//Create fbos and textures 
 	triVertArray = createVertArray(triVerts, sizeof(triVerts), drawShader);
 	scatterAxisArray = createVertArray(scatterAxisPoints, sizeof(scatterAxisPoints), mouseShader);
 	triVertArray2 = createVertArray(triVerts, sizeof(triVerts), drawTexShader);
+	texVertsArray = createVertArray(triVerts, sizeof(triVerts), simpleTexShader);
 	
 	dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
 	dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
@@ -1049,6 +1079,9 @@ void init(int W, int H){
 	clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
 
 	paraAxisArray = createVertArray(&paraAxes.front(), sizeof(GL_FLOAT)*paraAxes.size(), mouseShader);
+	
+	pauseTexPara = loadBMP("./bitmap/large.bmp");
+	pauseTexScatter = loadBMP("./bitmap/small.bmp");
 
 	//Create parallel coordinates texture
 	plot = PARALLEL;
@@ -1073,7 +1106,7 @@ void init(int W, int H){
 	//Set initial display to parallel coordinates plot
 	plot = PARALLEL;
 	glViewport(0,0,W,H);
-
+	//pauseScreen = true;
 	glErrorCheck();
 }
 
