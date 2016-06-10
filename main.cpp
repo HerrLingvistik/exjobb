@@ -427,11 +427,11 @@ void draw(){
 	glEnableVertexAttribArray(0);
 
 	if(!hoover){
-		glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 0.0f, 0.0f, 1.0f);
+		glUniform4f(glGetUniformLocation(mouseShader, "color"), 161.0/255.0, 1.0, 66.0/255.0, 1.0f);
 		}
 
 	else if(hoover){
-		glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 1.0f, 0.0f, 1.0f);
+		glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0, 161.0/255.0, 66.0/255.0, 1.0f);
 	}
 
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
@@ -445,7 +445,7 @@ void draw(){
 		glBindVertexArray(mouseArray);
 		//Enable or disable a generic vertex attribute array
 		glEnableVertexAttribArray(0);
-		glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 1.0f, 1.0f);
+		glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0, 64.0/255.0, 1.0, 1.0f);
 		glDrawArrays(GL_LINE_LOOP, 0, 4);
 		//Bind data array containing coordinates for drawing lines between
 		glBindVertexArray(0);
