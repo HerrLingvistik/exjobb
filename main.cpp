@@ -8,12 +8,15 @@
 
 /*
 	THINGS TO ADD 	 
+	- Fixa några nya kluster.
+	- Sekunder till millisekunder. 
+	- Kör tidtagning för varje enskild plot.
+	- Placera ut en markör bestämt och jämför med den andra markören. 
+	- Fixa tutorial så användaren kan prova innan test. Spara inte resultatet! Kör detta som ett separat test!
 	- Se till att man skriver ut inte bara task number utan vad man gör!
-	- Kom på frågor!
-	- Utför rigorösa tester!
-	- Återupprätta Hallströms heder - sänk familjen Wallenberg
-	- Städa kod
-	- Fixa så ljudet används med hjälp av soundgains-arrayen
+
+	- Återupprätta Hallströms heder - sänk familjen Wallenberg.
+	-
 */
 
 #define GL_GLEXT_PROTOTYPES	
@@ -26,6 +29,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#include <sys/time.h>
 #include "utils/common.h"
 #include "utils/dataHandler.h"
 #include "utils/gl_utils.h"
@@ -53,7 +57,8 @@ float scatterTex2[sW][sH];
 float* texture = new float[ W*H ];
 time_t testStartTime;
 time_t testEndTime;
-
+clock_t clock_start;
+struct timeval startTime, endTime;
 
 vector<float> data, parData2, data2, data3;
 vector<int> first;
@@ -665,6 +670,8 @@ void keyPressed(unsigned char key, int x, int y){
 	}else if(key == 32){
 		time(&testStartTime);
 		pauseScreen=false;
+		//clock_start = clock();
+		gettimeofday(&startTime, NULL);
 	}
 	else if(key == 13){
 		//Gör tre tester variera texturer som presenteras i dessa!
@@ -672,22 +679,33 @@ void keyPressed(unsigned char key, int x, int y){
 			switch(taskNumber){
 				int newX, newY, newX2, newY2;
 				double timer;
+				float ellapsedTime;
+				//=clock();
 				case 1:
 					//glutSetWindowTitle("Task 1");
 					
+					// ...
+					
+					
+					time(&testEndTime);
+					timer = difftime(testEndTime, testStartTime);
+					//cout << "timer is " << to_string((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f) <<endl;
+					gettimeofday(&endTime, NULL);					
+					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
 					newX = mouseX;
 					newY = mouseY;
 					movePosParallel(newX, newY, markerSize, parallelTex);
 					resultString += "maxValue is "+ to_string(maxValue) + " chose value ";					
 					task1(resultString, newX, newY, parallelTex, maxValue);
-
+					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
+					
 					if(subTask == 9){
 						taskNumber++;
 						subTask = 1;
-						time(&testEndTime);
-						timer = difftime(testEndTime, testStartTime);
+						//time(&testEndTime);
+						//timer = difftime(testEndTime, testStartTime);
 						//cout << "time elapsed: "<< timer <<endl;
-						resultString += "Time elapsed: " + to_string(timer) + " seconds\n\nFind maximum density in purple cluster:\n";
+						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/"\n\nFind maximum density in purple cluster:\n";
 						glutSetWindowTitle("Task 2 - Find maximum density in purple cluster.");
 						playSound(0);
 						playSound2(0);
@@ -719,24 +737,32 @@ void keyPressed(unsigned char key, int x, int y){
 					initTexture(scatFbo1, scatTex1);
 					playSound(0);
 					playSound2(0);
+					time(&testStartTime);
+					gettimeofday(&startTime, NULL);
 				break;
 				//högst densitet i andra klustret
 				//gör samma som innan fast med andra klustret
 				case 2:
 					//glutSetWindowTitle("Task 2");
+					
+					gettimeofday(&endTime, NULL);					
+					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
 
+					time(&testEndTime);
+					timer = difftime(testEndTime, testStartTime);
 					newX = mouseX;
 					newY = mouseY;
 					movePosParallel(newX, newY, markerSize, parallelTex2);
 					resultString += "maxValue is "+ to_string(maxValue2) + " chose value ";					
 					task1(resultString, newX, newY, parallelTex2, maxValue2);
-
+					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
+					
 					if(subTask == 9){
 						taskNumber++;
 						subTask = 1;
-						time(&testEndTime);
-						timer = difftime(testEndTime, testStartTime);
-						resultString += "Time elapsed: " + to_string(timer) + " seconds\n\nFind area of green and purple cluster with equal density:\n";
+						//time(&testEndTime);
+						//timer = difftime(testEndTime, testStartTime);
+						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/"\n\nFind area of green and purple cluster with equal density:\n";
 						glutSetWindowTitle("Task 3 - Find area of green and purple cluster with equal density."); 
 						hoover = false;
 						playSound(0);
@@ -769,11 +795,19 @@ void keyPressed(unsigned char key, int x, int y){
 					initTexture(scatFbo1, scatTex1);
 					playSound(0);
 					playSound2(0);
+					time(&testStartTime);
+					gettimeofday(&startTime, NULL);
 				break;
 				//Hitta 50/50
 				//samma som innan eventuellt andra plots
 				//byt till parallella koordinater
 				case 3:
+
+					gettimeofday(&endTime, NULL);					
+					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
+
+					time(&testEndTime);
+					timer = difftime(testEndTime, testStartTime);
 					newX = mouseX;
 					newY = mouseY;
 					newX2 = mouse2X;
@@ -781,13 +815,14 @@ void keyPressed(unsigned char key, int x, int y){
 					movePosParallel(newX, newY, markerSize, parallelTex);
 					movePosParallel(newX2, newY2, markerSize, parallelTex2);					
 					task3(resultString, newX, newY, newX2, newY2, parallelTex, parallelTex2);
-
+					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
+					time(&testStartTime);
 					if(subTask == 9){
 						taskNumber++;
 						subTask = 1;
-						time(&testEndTime);
-						timer = difftime(testEndTime, testStartTime);
-						resultString += "Time elapsed: " + to_string(timer) + " seconds\n\nFind maximum density of green cluster:\n";
+						//time(&testEndTime);
+						//timer = difftime(testEndTime, testStartTime);
+						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/"\n\nFind maximum density of green cluster:\n";
 						glutSetWindowTitle("Task 4 - Find maximum density of green cluster."); 
 						hoover=true;
 						playSound(0);
@@ -829,20 +864,29 @@ void keyPressed(unsigned char key, int x, int y){
 					mouse2Y=H/2;
 					playSound(0);
 					playSound2(0);
+					time(&testStartTime);
+					gettimeofday(&startTime, NULL);
 				break;
 
 				case 4:
+
+					gettimeofday(&endTime, NULL);					
+					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
+					
+					time(&testEndTime);
+					timer = difftime(testEndTime, testStartTime);
 					newX = mouseX;
 					newY = mouseY;
 					movePosScatter(newX, newY, markerSize, scatterTex);				
 					task4(resultString, newX, newY, scatterTex, scatterMax1);
+					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
 
 					if(subTask == 9){
 						taskNumber++;
 						subTask = 1;
 						time(&testEndTime);
 						timer = difftime(testEndTime, testStartTime);
-						resultString += "Time elapsed: " + to_string(timer) + " seconds\n\nFind maximum density of purple cluster:\n";
+						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/ "\n\nFind maximum density of purple cluster:\n";
 						glutSetWindowTitle("Task 5 - Find maximum density of purple cluster."); 
 						playSound(0);
 						playSound2(0);
@@ -875,20 +919,29 @@ void keyPressed(unsigned char key, int x, int y){
 					initTexture(scatFbo1, scatTex1);
 					playSound(0);
 					playSound2(0);
+					time(&testStartTime);
+					gettimeofday(&startTime, NULL);
 				break;
 
 				case 5:
+
+					gettimeofday(&endTime, NULL);					
+					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
+			
+					time(&testEndTime);
+					timer = difftime(testEndTime, testStartTime);
 					newX = mouseX;
 					newY = mouseY;
 					movePosScatter(newX, newY, markerSize, scatterTex2);				
 					task5(resultString, newX, newY, scatterTex2, scatterMax2);
+					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
 
 					if(subTask == 9){
 						taskNumber++;
 						subTask = 1;
 						time(&testEndTime);
 						timer = difftime(testEndTime, testStartTime);
-						resultString += "Time elapsed: " + to_string(timer) + " seconds\n\nFind area of green and purple cluster with equal density:\n";
+						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/"\n\nFind area of green and purple cluster with equal density:\n";
 						glutSetWindowTitle("Task 6 - Find area of green and purple cluster with equal density."); 
 						playSound(0);
 						playSound2(0);
@@ -922,9 +975,17 @@ void keyPressed(unsigned char key, int x, int y){
 					initTexture(scatFbo1, scatTex1);
 					playSound(0);
 					playSound2(0);
+					time(&testStartTime);
+					gettimeofday(&startTime, NULL);
 				break;
 		
 				case 6:
+
+					gettimeofday(&endTime, NULL);					
+					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
+
+					time(&testEndTime);
+					timer = difftime(testEndTime, testStartTime);
 					newX = mouseX;
 					newY = mouseY;
 					newX2 = mouse2X;
@@ -932,6 +993,7 @@ void keyPressed(unsigned char key, int x, int y){
 					movePosScatter(newX, newY, markerSize, scatterTex);	
 					movePosScatter(newX2, newY2, markerSize, scatterTex2);				
 					task6(resultString, newX, newY, newX2, newY2, scatterTex, scatterTex2);
+					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
 
 					if(subTask == 9){
 						taskNumber++;
@@ -944,7 +1006,7 @@ void keyPressed(unsigned char key, int x, int y){
 						if(numberOfRuns == 2){
 							time(&testEndTime);
 							timer = difftime(testEndTime, testStartTime);
-							resultString += "Time elapsed: " + to_string(timer) + " seconds\n\n";
+							//resultString += "Time elapsed: " + to_string(timer) + " seconds\n\n";
 							writeResultFile(resultString);
 							exit(0);
 						}else{
@@ -993,6 +1055,8 @@ void keyPressed(unsigned char key, int x, int y){
 					initTexture(scatFbo1, scatTex1);
 					playSound(0);
 					playSound2(0);
+					time(&testStartTime);
+					gettimeofday(&startTime, NULL);
 				break;
 				//kör case 4-6 för parallella koordinater
 			}
