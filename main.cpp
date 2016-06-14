@@ -617,6 +617,10 @@ void displayParallel(int subTask){
 		paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
 		readFile_pCoords(data, paraFile1, paraAxes);
 		paraFile2 = "./data/parallel/3dpara" + to_string(subTask+1) + ".txt";
+	}else{
+		paraFile1 = "./data/parallel/3dparaTUT1.txt";
+		readFile_pCoords(data, paraFile1, paraAxes);
+		paraFile2 = "./data/parallel/3dparaTUT2.txt";
 	}
 	//paraFile2[22] = '0'+(subTask+1);
 	cout << "switching to "<<paraFile1 << " and "<<paraFile2<<endl;
@@ -632,6 +636,11 @@ void displayScatter(int subTask){
 		clusterFileB = "./data/scatter/cluster" + to_string(subTask) + ".txt";
 		readFile_cluster(data2, clusterFileB, clusterCounter1);
 		clusterFileR = "./data/scatter/cluster" + to_string(subTask+1) + ".txt";
+		readFile_cluster(data3, clusterFileR, clusterCounter2);
+	}else{
+		clusterFileB = "./data/scatter/3dscatterTUT1.txt";
+		readFile_cluster(data2, clusterFileB, clusterCounter1);
+		clusterFileR = "./data/scatter/3dscatterTUT2.txt";
 		readFile_cluster(data3, clusterFileR, clusterCounter2);
 	}
 	normalizeAxis2(data2, data3);
@@ -800,8 +809,10 @@ void keyPressed(unsigned char key, int x, int y){
 						pauseScreen=true;
 						break;
 					}
-
-					subTask+=2;
+					if(TUTORIAL){
+						subTask=9;
+					}else
+						subTask+=2;
 					displayParallel(subTask);
 					//paraFile1[22] = '0'+subTask;	
 					/*paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
@@ -863,8 +874,10 @@ void keyPressed(unsigned char key, int x, int y){
 						pauseScreen=true;
 						break;
 					}
-
-					subTask+=2;
+					if(TUTORIAL){
+						subTask=9;
+					}else
+						subTask+=2;
 					displayParallel(subTask);
 					//paraFile1[22] = '0'+subTask;	
 					/*paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
@@ -928,7 +941,9 @@ void keyPressed(unsigned char key, int x, int y){
 						pauseScreen=true;
 						break;
 					}else{
-
+					if(TUTORIAL){
+						subTask=9;
+					}else
 						subTask+=2;
 						cout << "FAP" <<subTask<<endl;
 						//paraFile1[22] = '0'+subTask;	
@@ -991,8 +1006,10 @@ void keyPressed(unsigned char key, int x, int y){
 						pauseScreen=true;
 						break;
 					}
-
-					subTask+=2;	
+					if(TUTORIAL){
+						subTask=9;
+					}else
+						subTask+=2;
 					displayScatter(subTask);
 					/*clusterFileB = "./data/scatter/cluster" + to_string(subTask) + ".txt";
 					readFile_cluster(data2, clusterFileB, clusterCounter1);
@@ -1048,7 +1065,10 @@ void keyPressed(unsigned char key, int x, int y){
 						//playClusterSound(300,300);
 						break;
 					}
-					subTask+=2;	
+					if(TUTORIAL){
+						subTask=9;
+					}else
+						subTask+=2;
 					displayScatter(subTask);
 					/*clusterFileB = "./data/scatter/cluster" + to_string(subTask) + ".txt";
 					readFile_cluster(data2, clusterFileB, clusterCounter1);
@@ -1127,7 +1147,7 @@ void keyPressed(unsigned char key, int x, int y){
 							mouse2X=W/2;
 							mouse2Y=H/2;*/
 							glutReshapeWindow(W, H);
-							USERTEST = true;
+							//USERTEST = true;
 							playClusterSound(scatterPositions[(subTask-1)],scatterPositions[subTask]);
 							pauseScreen = true;
 						}
@@ -1135,6 +1155,9 @@ void keyPressed(unsigned char key, int x, int y){
 						break;
 					}else{
 
+					if(TUTORIAL){
+						subTask=9;
+					}else
 						subTask+=2;	
 						displayScatter(subTask);
 						/*
@@ -1189,7 +1212,7 @@ void fKeyPressed(int key, int x, int y){
 
 		case GLUT_KEY_F8:	
 			glutSetWindowTitle("Tutorial run.");
-			soundactive = false;
+			soundactive = true;
 			hoover = true;
 			taskNumber = 1;
 			//subTask = 1;
