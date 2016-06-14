@@ -739,7 +739,7 @@ void keyPressed(unsigned char key, int x, int y){
 		}
 	}else if(key == 32){
 		if((taskNumber == 3 || taskNumber == 6) && soundactive){
-			if(PARALLEL)							
+			if(plot == PARALLEL)							
 				playClusterSound(paraPositions[subTask-1],paraPositions[subTask]);
 			else
 				playClusterSound(scatterPositions[subTask-1],scatterPositions[subTask]);
@@ -924,32 +924,35 @@ void keyPressed(unsigned char key, int x, int y){
 						clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
 						clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
 						initTexture(scatFbo1, scatTex1);*/
+						playClusterSound(paraPositions[(subTask-1)],paraPositions[subTask]);
 						pauseScreen=true;
 						break;
-					}
+					}else{
 
-					subTask+=2;
-					cout << "FAP" <<subTask<<endl;
-					//paraFile1[22] = '0'+subTask;	
-					/*paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
-					readFile_pCoords(data, paraFile1, paraAxes);
-					paraFile2 = "./data/parallel/3dpara" + to_string(subTask+1) + ".txt";
-					//paraFile2[22] = '0'+(subTask+1);
-					cout << "switching to "<<paraFile1 << " and "<<paraFile2<<endl;
-					readFile_pCoords(parData2, paraFile2, paraAxes);
-					normalizeAxis(data, parData2);
-					dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
-					dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
-					initTexture(scatFbo1, scatTex1);*/
-					displayParallel(subTask);
-					playSound(0);
-					playSound2(0);
-					cout << " DASE "<< to_string(subTask-1) << " KUK "<<to_string(subTask)<<endl;
-					playClusterSound(paraPositions[(subTask-1)],paraPositions[subTask]);
-					//playClusterSound(300,300);
-					//playSound2(0);
-					time(&testStartTime);
-					gettimeofday(&startTime, NULL);
+						subTask+=2;
+						cout << "FAP" <<subTask<<endl;
+						//paraFile1[22] = '0'+subTask;	
+						/*paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
+						readFile_pCoords(data, paraFile1, paraAxes);
+						paraFile2 = "./data/parallel/3dpara" + to_string(subTask+1) + ".txt";
+						//paraFile2[22] = '0'+(subTask+1);
+						cout << "switching to "<<paraFile1 << " and "<<paraFile2<<endl;
+						readFile_pCoords(parData2, paraFile2, paraAxes);
+						normalizeAxis(data, parData2);
+						dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
+						dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
+						initTexture(scatFbo1, scatTex1);*/
+						displayParallel(subTask);
+						playSound(0);
+						playSound2(0);
+						cout << " DASE "<< to_string(subTask-1) << " KUK "<<to_string(subTask)<<endl;
+						
+						//playClusterSound(300,300);
+						//playSound2(0);
+						time(&testStartTime);
+						gettimeofday(&startTime, NULL);
+						playClusterSound(scatterPositions[(subTask-1)],scatterPositions[subTask]);
+					}
 				break;
 
 				case 4:
@@ -1125,7 +1128,7 @@ void keyPressed(unsigned char key, int x, int y){
 							mouse2Y=H/2;*/
 							glutReshapeWindow(W, H);
 							USERTEST = true;
-							//playClusterSound(scatterPositions[(subTask-1)],scatterPositions[subTask]);
+							playClusterSound(scatterPositions[(subTask-1)],scatterPositions[subTask]);
 							pauseScreen = true;
 						}
 						//exit(0);
