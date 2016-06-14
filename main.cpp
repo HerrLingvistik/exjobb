@@ -120,6 +120,22 @@ float soundGains[11] =
 	0.40f, 0.63f, 1.0f 
 };
 
+int paraPositions[10] = {
+	0, 0,
+	200, 200,
+	300, 300,
+	400, 400,
+	500, 500 
+};
+
+int scatterPositions[10] = {
+	0, 0,
+	200, 200,
+	300, 300,
+	400, 400,
+	500, 500  
+};
+
 vector <GLfloat> paraAxes;
 
 //Calculate position for this mouse markers vertices.
@@ -626,20 +642,24 @@ void displayScatter(int subTask){
 
 void playClusterSound(int x, int y){
 	float vol2;
-		//int newX, newY;
-		mouse2X = x;
-	  mouse2Y = y;
-		mouse2Click = true;
+		int newX, newY;
+		
 		if(plot == PARALLEL){
 			//newX=x;
 			//newY=y;
-			//movePosParallel(newX, newY, markerSize, parallelTex2);
+			mouse2X = x;
+	  	mouse2Y = y;
+			mouse2Click = true;
+			movePosParallel(mouse2X, mouse2Y, markerSize, parallelTex2);
 			vol2 = getGains((calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, parallelTex2)/maxValue2));
 		}
 		else if(plot == SCATTER){
 			//newX=x;
 			//newY=y;
-			//movePosScatter(newX, newY, markerSize, scatterTex2);
+			mouse2X = x;
+	  	mouse2Y = y;
+			mouse2Click = true;
+			movePosScatter(mouse2X, mouse2Y, markerSize, scatterTex2);
 			vol2 = getGains((calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex2)/scatterMax2));
 		}			
 		//mouse2X = x;
@@ -718,8 +738,12 @@ void keyPressed(unsigned char key, int x, int y){
 			playSound2(0);
 		}
 	}else if(key == 32){
-		if((taskNumber == 3 || taskNumber == 6) && soundactive)
-			playClusterSound(300,300);
+		if((taskNumber == 3 || taskNumber == 6) && soundactive){
+			if(PARALLEL)							
+				playClusterSound(paraPositions[subTask-1],paraPositions[subTask]);
+			else
+				playClusterSound(scatterPositions[subTask-1],scatterPositions[subTask]);
+		}
 		time(&testStartTime);
 		pauseScreen=false;
 		//clock_start = clock();
@@ -854,7 +878,7 @@ void keyPressed(unsigned char key, int x, int y){
 					dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
 					initTexture(scatFbo1, scatTex1);*/
 					playSound(0);
-					//playSound2(0);
+					playSound2(0);
 					time(&testStartTime);
 					gettimeofday(&startTime, NULL);
 				break;
@@ -862,7 +886,7 @@ void keyPressed(unsigned char key, int x, int y){
 				//samma som innan eventuellt andra plots
 				//byt till parallella koordinater
 				case 3:
-					
+					cout << "POSITION: "<<mouse2X << ":"<<mouse2Y<<endl;
 					gettimeofday(&endTime, NULL);					
 					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
 					time(&testEndTime);
@@ -873,7 +897,7 @@ void keyPressed(unsigned char key, int x, int y){
 					newY2 = mouse2Y;
 					movePosParallel(newX, newY, markerSize, parallelTex);
 					//movePosParallel(newX2, newY2, markerSize, parallelTex2);					
-					task3(resultString, newX, newY, newX2, newY2, parallelTex, parallelTex2);
+					task3(resultString, newX, newY, mouse2X, mouse2Y, parallelTex, parallelTex2);
 					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
 					time(&testStartTime);
 					if(subTask == 9){
@@ -905,6 +929,7 @@ void keyPressed(unsigned char key, int x, int y){
 					}
 
 					subTask+=2;
+					cout << "FAP" <<subTask<<endl;
 					//paraFile1[22] = '0'+subTask;	
 					/*paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
 					readFile_pCoords(data, paraFile1, paraAxes);
@@ -918,7 +943,10 @@ void keyPressed(unsigned char key, int x, int y){
 					initTexture(scatFbo1, scatTex1);*/
 					displayParallel(subTask);
 					playSound(0);
-					playClusterSound(300,300);
+					playSound2(0);
+					cout << " DASE "<< to_string(subTask-1) << " KUK "<<to_string(subTask)<<endl;
+					playClusterSound(paraPositions[(subTask-1)],paraPositions[subTask]);
+					//playClusterSound(300,300);
 					//playSound2(0);
 					time(&testStartTime);
 					gettimeofday(&startTime, NULL);
@@ -1029,7 +1057,7 @@ void keyPressed(unsigned char key, int x, int y){
 					clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
 					initTexture(scatFbo1, scatTex1);*/
 					playSound(0);
-					//playSound2(0);
+					playSound2(0);
 					time(&testStartTime);
 					gettimeofday(&startTime, NULL);
 				break;
@@ -1051,7 +1079,7 @@ void keyPressed(unsigned char key, int x, int y){
 					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
 
 					if(subTask == 9){
-						taskNumber++;
+						//taskNumber++;
 						subTask = 1;
 						//resultString += "\n4:\n";
 						//glutSetWindowTitle("Running test - Task 4 - Find max of purple(kush)"); 
@@ -1064,7 +1092,7 @@ void keyPressed(unsigned char key, int x, int y){
 							//resultString += "Time elapsed: " + to_string(timer) + " seconds\n\n";
 							if(!TUTORIAL)
 								writeResultFile(resultString);
-							exit(0);
+								exit(0);
 						}else{
 							soundactive = soundactive ? false : true;
 							time(&testEndTime);
@@ -1097,31 +1125,32 @@ void keyPressed(unsigned char key, int x, int y){
 							mouse2Y=H/2;*/
 							glutReshapeWindow(W, H);
 							USERTEST = true;
-							
+							//playClusterSound(scatterPositions[(subTask-1)],scatterPositions[subTask]);
 							pauseScreen = true;
 						}
 						//exit(0);
 						break;
-					}
+					}else{
 
-					subTask+=2;	
-					displayScatter(subTask);
-					/*
-					clusterFileB = "./data/scatter/cluster" + to_string(subTask) + ".txt";
-					readFile_cluster(data2, clusterFileB, clusterCounter1);
-					clusterFileR = "./data/scatter/cluster" + to_string(subTask+1) + ".txt";
-					cout <<" file for purple "<<clusterFileR <<endl;
-					readFile_cluster(data3, clusterFileR, clusterCounter2);
-					normalizeAxis2(data2, data3);
-					clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
-					clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-					initTexture(scatFbo1, scatTex1);
-					*/
-					playSound(0);
-					//playSound2(0);
-					time(&testStartTime);
-					gettimeofday(&startTime, NULL);
-					playClusterSound(300,300);
+						subTask+=2;	
+						displayScatter(subTask);
+						/*
+						clusterFileB = "./data/scatter/cluster" + to_string(subTask) + ".txt";
+						readFile_cluster(data2, clusterFileB, clusterCounter1);
+						clusterFileR = "./data/scatter/cluster" + to_string(subTask+1) + ".txt";
+						cout <<" file for purple "<<clusterFileR <<endl;
+						readFile_cluster(data3, clusterFileR, clusterCounter2);
+						normalizeAxis2(data2, data3);
+						clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
+						clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
+						initTexture(scatFbo1, scatTex1);
+						*/
+						playSound(0);
+						playSound2(0);
+						time(&testStartTime);
+						gettimeofday(&startTime, NULL);
+						playClusterSound(scatterPositions[(subTask-1)],scatterPositions[subTask]);
+					}
 				break;
 				//kör case 4-6 för parallella koordinater
 			}
