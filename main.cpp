@@ -459,11 +459,11 @@ void draw(){
 	//Enable or disable a generic vertex attribute array
 	glEnableVertexAttribArray(0);
 
-	if(!hoover){
+	if(displaySecondMarker){
 		glUniform4f(glGetUniformLocation(mouseShader, "color"), 161.0/255.0, 1.0, 66.0/255.0, 1.0f);
 		}
 
-	else if(hoover){
+	else {
 		glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0, 161.0/255.0, 66.0/255.0, 1.0f);
 	}
 

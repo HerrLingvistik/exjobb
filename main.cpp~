@@ -8,12 +8,16 @@
 
 /*
 	THINGS TO ADD 	 
-	- fixa användartester!
-	- Kom på frågor!
-	- Utför rigorösa tester!
-	- Återupprätta Hallströms heder - sänk familjen Wallenberg
-	- Städa kod
-	- Fixa så ljudet används med hjälp av soundgains-arrayen
+	- Fixa några nya kluster. 
+	- Placera ut en markör bestämt och jämför med den andra markören. 
+	- Fixa tutorial så användaren kan prova innan test. Spara inte resultatet! Kör detta som ett separat test!
+	- Se till att man skriver ut inte bara task number utan vad man gör!
+
+	- Sekunder till millisekunder. KLAR! 
+	- Kör tidtagning för varje enskild plot. KLAR!
+
+	- Återupprätta Hallströms heder - sänk familjen Wallenberg.
+	-
 */
 
 #define GL_GLEXT_PROTOTYPES	
@@ -25,6 +29,8 @@
 #include <cmath>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
+#include <sys/time.h>
 #include "utils/common.h"
 #include "utils/dataHandler.h"
 #include "utils/gl_utils.h"
@@ -34,22 +40,26 @@
 
 using namespace std;
 //Shader handles
-GLuint drawShader, parallelShader, mouseShader, tempScatterShader, drawScatterShader, drawTexShader;
+GLuint drawShader, parallelShader, mouseShader, tempScatterShader, drawScatterShader, drawTexShader, simpleTexShader;
 //Pointers for vertices
-GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisArray, paraAxisArray, dataArray, dataArray2, mouseBuffer, mouseArray, clusterArray1, clusterArray2;
+GLuint triVertArray, triVertArray2, triVertBuffer, triVertBuffer2, scatterAxisArray, paraAxisArray, dataArray, dataArray2, mouseBuffer, mouseArray, clusterArray1, clusterArray2, texVertsArray;
 //Texture and fbo handles
-GLuint parTex1, parFbo1, parTex2, parFbo2, finalParTex, finalParFbo,  finalScatTex, finalScatFbo, scatTex1, scatTex2, scatFbo1, scatFbo2; 
+GLuint parTex1, parFbo1, parTex2, parFbo2, finalParTex, finalParFbo,  finalScatTex, finalScatFbo, scatTex1, scatTex2, scatFbo1, scatFbo2, pauseTexPara, pauseTexScatter; 
 
 int plot, scatterAxisX = 1, scatterAxisY = 2, background = 0, clusterCounter1=1, clusterCounter2=1, dimX = 0, dimY = 0, maxPos = 0, mouseX, mouseY, mouse2X, mouse2Y, taskNumber=1, subTask = 1, numberOfRuns=0;
 
 const static int PARALLEL = 0, SCATTER = 1, BLACK = 0, WHITE = 1;
-bool bPressed = false, rPressed = false, hoover = false, soundactive = true, DRAWRED=true, DRAWBLUE=true, USERTEST=false; 
+bool bPressed = false, rPressed = false, hoover = false, soundactive = true, DRAWRED=true, DRAWBLUE=true, USERTEST=false, TUTORIAL=false, pauseScreen=false, displaySecondMarker=false; 
 
 float parallelTex[W][H];
 float parallelTex2[W][H];
 float scatterTex[sW][sH];
 float scatterTex2[sW][sH];
 float* texture = new float[ W*H ];
+time_t testStartTime;
+time_t testEndTime;
+clock_t clock_start;
+struct timeval startTime, endTime;
 
 vector<float> data, parData2, data2, data3;
 vector<int> first;
@@ -101,21 +111,6 @@ GLfloat mouse2Verts[8] =
 	0.5f, -0.5f, 
 	0.5f, 0.5f
 };
-/*
-float soundGains[6] = 
-{
-	0.00f, 0.10f, 0.18f, 
-	0.32f, 0.56f, 1.00f 
-};
-*/
-
-/*float soundGains[11] = 
-{
-	0.00f, 0.01f, 0.02f, 
-	0.03f, 0.04f, 0.06f, 
-	0.10f, 0.16f, 0.25f, 
-	0.40f, 0.63f 
-};*/
 
 float soundGains[11] = 
 {
@@ -123,6 +118,22 @@ float soundGains[11] =
 	0.03f, 0.04f, 0.06f, 
 	0.10f, 0.16f, 0.25f, 
 	0.40f, 0.63f, 1.0f 
+};
+
+int paraPositions[10] = {
+	242, 248,
+	1025, 272,
+	1172, 288,
+	393, 234,
+	438, 264 
+};
+
+int scatterPositions[10] = {
+	201, 325,
+	325, 305,
+	235, 248,
+	280, 376,
+	306, 334  
 };
 
 vector <GLfloat> paraAxes;
@@ -315,106 +326,128 @@ void draw(){
 	glClearColor(0,0,0,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-	if(plot == PARALLEL){
-		glUseProgram(drawTexShader);
-		glBindVertexArray(triVertArray2);
+	if(pauseScreen){
+		glUseProgram(simpleTexShader);
+		glBindVertexArray(texVertsArray);
 		//Enable or disable a genedata[ric vertex attribute array
 		glEnableVertexAttribArray(0);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, finalParTex);
-		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
-		if(background == WHITE){
-			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
-			glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
-		}
-		else{
-			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
-			glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
-		}
-		
-		
-		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
-
+		if(plot == PARALLEL)
+			glBindTexture(GL_TEXTURE_2D, pauseTexPara);
+		else
+			glBindTexture(GL_TEXTURE_2D, pauseTexScatter);	
+		glUniform1i(glGetUniformLocation(simpleTexShader, "tex"), 0);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-	
+
 		glBindTexture(GL_TEXTURE_2D, 0); 
 		//Disable and unbind just to be safe
 		glDisableVertexAttribArray(0);
 		glBindVertexArray(0);	
 		//Don't draw using the parallel coordinates shader anymore.
 		glUseProgram(0);
-
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_CULL_FACE);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		
-
-		glUseProgram(mouseShader);
-		glBindVertexArray(paraAxisArray);
-		glEnableVertexAttribArray(0);
-		//Set line width of the axes
+	//cout << "DASE!!!"<<endl;
+	}else{
+		if(plot == PARALLEL){
+			glUseProgram(drawTexShader);
+			glBindVertexArray(triVertArray2);
+			//Enable or disable a genedata[ric vertex attribute array
+			glEnableVertexAttribArray(0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, finalParTex);
+			glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
+			if(background == WHITE){
+				glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
+				glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
+			}
+			else{
+				glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
+				glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
+			}
 		
-		glLineWidth(3.0f);
-		if(background == BLACK)
-			glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f, 0.2f);
-		else if(background == WHITE)
-			glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 0.0f, 0.2f);
-		glDrawArrays(GL_LINES, 0, 8);
-		//Set regular line width	
-		glLineWidth(1.0f);
-
-		glUseProgram(0);
 		
-		glDisable(GL_BLEND);
+			glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
 
-	}
-	else if(plot == SCATTER){		
-
-		glUseProgram(drawTexShader);
-		glBindVertexArray(triVertArray2);
-		//Enable or disable a genedata[ric vertex attribute array
-		glEnableVertexAttribArray(0);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, finalScatTex);
-		glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
-		glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
-		glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
-
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
 	
-		glBindTexture(GL_TEXTURE_2D, 0); 
-		//Disable and unbind just to be safe
-		glDisableVertexAttribArray(0);
-		glBindVertexArray(0);	
-		//Don't draw using the parallel coordinates shader anymore.
-		glUseProgram(0);
+			glBindTexture(GL_TEXTURE_2D, 0); 
+			//Disable and unbind just to be safe
+			glDisableVertexAttribArray(0);
+			glBindVertexArray(0);	
+			//Don't draw using the parallel coordinates shader anymore.
+			glUseProgram(0);
 
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_CULL_FACE);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		
+			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_CULL_FACE);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		
 
-		glUseProgram(mouseShader);
-		glBindVertexArray(scatterAxisArray);
-		glEnableVertexAttribArray(0);
-		//Set line width of the axes
+			glUseProgram(mouseShader);
+			glBindVertexArray(paraAxisArray);
+			glEnableVertexAttribArray(0);
+			//Set line width of the axes
 		
-		glLineWidth(3.0f);
-		if(background == BLACK)
-			glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f, 0.3f);
-		else if(background == WHITE)
-			glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 0.0f, 0.3f);
-		glDrawArrays(GL_LINE_STRIP, 0, 3);
-		//Set regular line width	
-		glLineWidth(1.0f);
+			glLineWidth(3.0f);
+			if(background == BLACK)
+				glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f, 0.2f);
+			else if(background == WHITE)
+				glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 0.0f, 0.2f);
+			glDrawArrays(GL_LINES, 0, 8);
+			//Set regular line width	
+			glLineWidth(1.0f);
 
-		glUseProgram(0);
+			glUseProgram(0);
 		
-		glDisable(GL_BLEND);
+			glDisable(GL_BLEND);
 
-	}
+
+		}
+		else if(plot == SCATTER){		
+
+			glUseProgram(drawTexShader);
+			glBindVertexArray(triVertArray2);
+			//Enable or disable a genedata[ric vertex attribute array
+			glEnableVertexAttribArray(0);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, finalScatTex);
+			glUniform1i(glGetUniformLocation(drawTexShader, "tex"), 0);
+			glUniform4f(glGetUniformLocation(drawTexShader, "color"), 64.0f/255.0f, 1.0f, 64.0f/255.0f, 1);
+			glUniform4f(glGetUniformLocation(drawTexShader, "color2"), 1.0f, 64.0f/255.0f, 1.0f, 1);
+			glUniform1i(glGetUniformLocation(drawTexShader, "backgroundcolor"), background);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	
+			glBindTexture(GL_TEXTURE_2D, 0); 
+			//Disable and unbind just to be safe
+			glDisableVertexAttribArray(0);
+			glBindVertexArray(0);	
+			//Don't draw using the parallel coordinates shader anymore.
+			glUseProgram(0);
+
+			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_CULL_FACE);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);		
+
+			glUseProgram(mouseShader);
+			glBindVertexArray(scatterAxisArray);
+			glEnableVertexAttribArray(0);
+			//Set line width of the axes
+		
+			glLineWidth(3.0f);
+			if(background == BLACK)
+				glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0f, 1.0f, 1.0f, 0.3f);
+			else if(background == WHITE)
+				glUniform4f(glGetUniformLocation(mouseShader, "color"), 0.0f, 0.0f, 0.0f, 0.3f);
+			glDrawArrays(GL_LINE_STRIP, 0, 3);
+			//Set regular line width	
+			glLineWidth(1.0f);
+
+			glUseProgram(0);
+		
+			glDisable(GL_BLEND);
+
+		}
+		 
    
 	glUseProgram(mouseShader);
 	//Recalculate mouse marker area
@@ -431,14 +464,15 @@ void draw(){
 		}
 
 	else if(hoover){
-		glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0, 1.0, 66.0/255.0, 1.0f);
+		glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0, 161.0/255.0, 66.0/255.0, 1.0f);
 	}
 
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
 	//Bind data array containing coordinates for drawing lines between
 	glBindVertexArray(0);
 	
-	if(!hoover){	
+	//if(!hoover){	
+	if(displaySecondMarker){
 		glBindVertexArray(mouseArray);
 		glBindBuffer(GL_ARRAY_BUFFER, mouseBuffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(mouse2Verts), mouse2Verts, GL_STATIC_DRAW);
@@ -453,9 +487,7 @@ void draw(){
 	//Enable or disable a generic vertex attribute array
 	glDisableVertexAttribArray(0);
 	glUseProgram(0);
-   
-	
-
+	}
 	//Swaps the buffers of the current window if double buffered(draw)
 	glutSwapBuffers();
 
@@ -488,11 +520,11 @@ void mouseEvent(int event, int state, int x, int y){
 		}
 		mouseX = x;
 		mouseY = y;
-		if(soundactive)
+		if(soundactive&& !pauseScreen)
 			playSound(vol1);
 	}
 	
-	if(event == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
+	/*if(event == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
 		float vol2;
 		mouse2Click = true;
 		if(plot == PARALLEL){
@@ -509,12 +541,12 @@ void mouseEvent(int event, int state, int x, int y){
 		}			
 		mouse2X = x;
 		mouse2Y = y;
-		if(soundactive)
+		if(soundactive && !pauseScreen)
 			playSound2(vol2);
-	}
+	}*/
 }
 
-//Interaction function for clicking mouse button
+//Interaction function for clicking mouse buttonhttps://www.opengl.org/discussion_boards/showthread.php/123211-Keyboard-Input-in-GLUT
 //Here it would do to calculate the vertices only when clicking mouse and not in every frame. 
 //void mouseMoveClick(int x, int y){
 void mouseMove(int x, int y){
@@ -537,12 +569,13 @@ void mouseMove(int x, int y){
 				newY=y;
 				movePosParallel(newX, newY, markerSize, parallelTex2);
 				float vol2 = getGains((calcGaussVolume_Parallel(newX, newY, markerSize, parallelTex2)/maxValue2));
-				if(soundactive){
+				if(soundactive && !pauseScreen){
 					playSound(vol1);
-					playSound2(vol2);
+					if(!displaySecondMarker)
+						playSound2(vol2);
 				}
 				
-
+				
 			}
 			else if(plot == SCATTER && x>=0  && x<sW && y>=0 && y<sH){
 				mouseX = x;
@@ -560,15 +593,16 @@ void mouseMove(int x, int y){
 
 				cout <<endl;
 
-				if(soundactive){
+				if(soundactive&& !pauseScreen){
 					playSound(vol1);
-					playSound2(vol2);
+					if(!displaySecondMarker)
+						playSound2(vol2);
 				}
 
 				std::string s;
 				s = " pos " + std::to_string(newX) + " y "  + to_string(newY) + " vol: " + to_string(vol1);			
 				char const *pchar = s.c_str();
-				//glutSetWindowTitle(pchar);
+				glutSetWindowTitle(pchar);
 			}
 		//}
 	}
@@ -578,10 +612,75 @@ void mouseMove(int x, int y){
 
 }
 
+void displayParallel(int subTask){
+	if(USERTEST){	
+		paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
+		readFile_pCoords(data, paraFile1, paraAxes);
+		paraFile2 = "./data/parallel/3dpara" + to_string(subTask+1) + ".txt";
+	}else{
+		paraFile1 = "./data/parallel/3dparaTUT1.txt";
+		readFile_pCoords(data, paraFile1, paraAxes);
+		paraFile2 = "./data/parallel/3dparaTUT2.txt";
+	}
+	//paraFile2[22] = '0'+(subTask+1);
+	cout << "switching to "<<paraFile1 << " and "<<paraFile2<<endl;
+	readFile_pCoords(parData2, paraFile2, paraAxes);
+	normalizeAxis(data, parData2);
+	dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
+	dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
+	initTexture(scatFbo1, scatTex1);
+}
+
+void displayScatter(int subTask){
+	if(USERTEST){	
+		clusterFileB = "./data/scatter/cluster" + to_string(subTask) + ".txt";
+		readFile_cluster(data2, clusterFileB, clusterCounter1);
+		clusterFileR = "./data/scatter/cluster" + to_string(subTask+1) + ".txt";
+		readFile_cluster(data3, clusterFileR, clusterCounter2);
+	}else{
+		clusterFileB = "./data/scatter/3dscatterTUT1.txt";
+		readFile_cluster(data2, clusterFileB, clusterCounter1);
+		clusterFileR = "./data/scatter/3dscatterTUT2.txt";
+		readFile_cluster(data3, clusterFileR, clusterCounter2);
+	}
+	normalizeAxis2(data2, data3);
+	clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
+	clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
+	initTexture(scatFbo1, scatTex1);
+}
+
+void playClusterSound(int x, int y){
+	float vol2;
+		int newX, newY;
+		
+		if(plot == PARALLEL){
+			//newX=x;
+			//newY=y;
+			mouse2X = x;
+	  	mouse2Y = y;
+			mouse2Click = true;
+			movePosParallel(mouse2X, mouse2Y, markerSize, parallelTex2);
+			vol2 = getGains((calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, parallelTex2)/maxValue2));
+		}
+		else if(plot == SCATTER){
+			//newX=x;
+			//newY=y;
+			mouse2X = x;
+	  	mouse2Y = y;
+			mouse2Click = true;
+			movePosScatter(mouse2X, mouse2Y, markerSize, scatterTex2);
+			vol2 = getGains((calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex2)/scatterMax2));
+		}			
+		//mouse2X = x;
+		//mouse2Y = y;
+		if(soundactive)
+			playSound2(vol2);
+}
+
 void keyPressed(unsigned char key, int x, int y){	
 	
 	
-	if(key == 'b'){
+	/*if(key == 'b'){
 		rPressed = false;
 		bPressed = true;
 	}
@@ -625,7 +724,16 @@ void keyPressed(unsigned char key, int x, int y){
 				rPressed = false;
 			}else if( cluster == 0){
 				DRAWRED = false;
-				initTexture(scatFbo2, scatTex2);
+				initTexture(scatFbo2, scatTex2);paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
+						readFile_pCoords(data, paraFile1, paraAxes);
+						paraFile2 = "./data/parallel/3dpara" + to_string(subTask+1) + ".txt";
+						//paraFile2[22] = '0'+(subTask+1);
+						cout << "switching to "<<paraFile1 << " and "<<paraFile2<<endl;
+						readFile_pCoords(parData2, paraFile2, paraAxes);
+						normalizeAxis(data, parData2);
+						dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
+						dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
+						initTexture(scatFbo1, scatTex1);
 			}
 		}
 			
@@ -638,286 +746,295 @@ void keyPressed(unsigned char key, int x, int y){
 			hoover = true;
 			playSound2(0);
 		}
-	}else if(key == 13){
+	}else */if(key == 32){
+		if((taskNumber == 3 || taskNumber == 6)){
+			if(plot == PARALLEL)							
+				playClusterSound(paraPositions[subTask-1],paraPositions[subTask]);
+			else
+				playClusterSound(scatterPositions[subTask-1],scatterPositions[subTask]);
+		}
+		time(&testStartTime);
+		pauseScreen=false;
+		//clock_start = clock();
+		gettimeofday(&startTime, NULL);	
+	}
+	else if(key == 13){
 		//Gör tre tester variera texturer som presenteras i dessa!
-		if(USERTEST){
+		if((USERTEST || TUTORIAL) && !pauseScreen){
 			switch(taskNumber){
-				//högst densitet i första klustret
-				//räkna ut hur nära högsta densitet
-				//byt texturer to_string
-				//om 10 test är körda öka tasknumber
-				//Parallella strutar
-				//OBS GÖR BARA MED LJUD NU FIXA UTAN LJUD SEN!!
 				int newX, newY, newX2, newY2;
+				double timer;
+				float ellapsedTime;
+				//=clock();
 				case 1:
-					//glutSetWindowTitle("Task 1");
 					
+					time(&testEndTime);
+					timer = difftime(testEndTime, testStartTime);
+					//cout << "timer is " << to_string((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f) <<endl;
+					gettimeofday(&endTime, NULL);					
+					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
 					newX = mouseX;
 					newY = mouseY;
 					movePosParallel(newX, newY, markerSize, parallelTex);
 					resultString += "maxValue is "+ to_string(maxValue) + " chose value ";					
 					task1(resultString, newX, newY, parallelTex, maxValue);
+					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
+					
 
-					if(subTask == 9){
+					if(subTask == 9 || TUTORIAL){
 						taskNumber++;
 						subTask = 1;
-						resultString += "\n2:\n";
-						glutSetWindowTitle("Running test - Task 2 - Sample that purple stuff(kush)");
+						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/"\n\nFind maximum density in purple cluster:\n";
+						if(USERTEST)						
+							glutSetWindowTitle("Task 2 - Find maximum density in purple cluster.");
 						playSound(0);
 						playSound2(0);
-						paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
-						readFile_pCoords(data, paraFile1, paraAxes);
-						paraFile2 = "./data/parallel/3dpara" + to_string(subTask+1) + ".txt";
-						//paraFile2[22] = '0'+(subTask+1);
-						cout << "switching to "<<paraFile1 << " and "<<paraFile2<<endl;
-						readFile_pCoords(parData2, paraFile2, paraAxes);
-						normalizeAxis(data, parData2);
-						dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
-						dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
-						initTexture(scatFbo1, scatTex1);
+						displayParallel(subTask);
+						pauseScreen=true;
 						break;
 					}
-
+					
 					subTask+=2;
-					//paraFile1[22] = '0'+subTask;	
-					paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
-					readFile_pCoords(data, paraFile1, paraAxes);
-					paraFile2 = "./data/parallel/3dpara" + to_string(subTask+1) + ".txt";
-					//paraFile2[22] = '0'+(subTask+1);
-					cout << "switching to "<<paraFile1 << " and "<<paraFile2<<endl;
-					readFile_pCoords(parData2, paraFile2, paraAxes);
-					normalizeAxis(data, parData2);
-					dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
-					dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
-					initTexture(scatFbo1, scatTex1);
-					
-					
+					displayParallel(subTask);
+					playSound(0);
+					playSound2(0);
+					time(&testStartTime);
+					gettimeofday(&startTime, NULL);
 				break;
 				//högst densitet i andra klustret
 				//gör samma som innan fast med andra klustret
 				case 2:
 					//glutSetWindowTitle("Task 2");
+					
+					gettimeofday(&endTime, NULL);					
+					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
 
+					time(&testEndTime);
+					timer = difftime(testEndTime, testStartTime);
 					newX = mouseX;
 					newY = mouseY;
 					movePosParallel(newX, newY, markerSize, parallelTex2);
 					resultString += "maxValue is "+ to_string(maxValue2) + " chose value ";					
 					task1(resultString, newX, newY, parallelTex2, maxValue2);
-
-					if(subTask == 9){
+					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
+					
+					if(subTask == 9 || TUTORIAL){
 						taskNumber++;
 						subTask = 1;
-						resultString += "\n3:\n";
-						glutSetWindowTitle("Running test - Task 3 - Mix and compare green vs purple(chronic kush)"); 
-						hoover = false;
+						//time(&testEndTime);
+						//timer = difftime(testEndTime, testStartTime);
+						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/"\n\nFind area of green and purple cluster with equal density:\n";
+						if(USERTEST)
+							glutSetWindowTitle("Task 3 - Find area of green and purple cluster with equal density."); 
+						//hoover = false;
+						displaySecondMarker = true;
 						playSound(0);
 						playSound2(0);
-						paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
-						readFile_pCoords(data, paraFile1, paraAxes);
-						paraFile2 = "./data/parallel/3dpara" + to_string(subTask+1) + ".txt";
-						//paraFile2[22] = '0'+(subTask+1);
-						cout << "switching to "<<paraFile1 << " and "<<paraFile2<<endl;
-						readFile_pCoords(parData2, paraFile2, paraAxes);
-						normalizeAxis(data, parData2);
-						dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
-						dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
-						initTexture(scatFbo1, scatTex1);
+						displayParallel(subTask);
+						
+						pauseScreen=true;
 						break;
 					}
-
+					
 					subTask+=2;
-					//paraFile1[22] = '0'+subTask;	
-					paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
-					readFile_pCoords(data, paraFile1, paraAxes);
-					paraFile2 = "./data/parallel/3dpara" + to_string(subTask+1) + ".txt";
-					//paraFile2[22] = '0'+(subTask+1);
-					cout << "switching to "<<paraFile1 << " and "<<paraFile2<<endl;
-					readFile_pCoords(parData2, paraFile2, paraAxes);
-					normalizeAxis(data, parData2);
-					dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
-					dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
-					initTexture(scatFbo1, scatTex1);
+					displayParallel(subTask);
+					playSound(0);
+					playSound2(0);
+					time(&testStartTime);
+					gettimeofday(&startTime, NULL);
 				break;
 				//Hitta 50/50
 				//samma som innan eventuellt andra plots
 				//byt till parallella koordinater
 				case 3:
+					cout << "POSITION: "<<mouse2X << ":"<<mouse2Y<<endl;
+					gettimeofday(&endTime, NULL);					
+					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
+					time(&testEndTime);
+					timer = difftime(testEndTime, testStartTime); 
 					newX = mouseX;
 					newY = mouseY;
 					newX2 = mouse2X;
 					newY2 = mouse2Y;
 					movePosParallel(newX, newY, markerSize, parallelTex);
-					movePosParallel(newX2, newY2, markerSize, parallelTex2);					
-					task3(resultString, newX, newY, newX2, newY2, parallelTex, parallelTex2);
-
-					if(subTask == 9){
+					//movePosParallel(newX2, newY2, markerSize, parallelTex2);					
+					task3(resultString, newX, newY, mouse2X, mouse2Y, parallelTex, parallelTex2);
+					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
+					time(&testStartTime);
+					if(subTask == 9 || TUTORIAL){
 						taskNumber++;
 						subTask = 1;
-						resultString += "\n4:\n";
-						glutSetWindowTitle("Running test - Task 4 - Find max of green (chronic)"); 
-						hoover=true;
+						//time(&testEndTime);
+						//timer = difftime(testEndTime, testStartTime);
+						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/"\n\nFind maximum density of green cluster:\n";
+						if(USERTEST)						
+							glutSetWindowTitle("Task 4 - Find maximum density of green cluster."); 
+						//hoover=true;
+						displaySecondMarker = false;
 						playSound(0);
 						playSound2(0);
 						plot = SCATTER;
-						glutReshapeWindow(sW, sH);
 						glViewport(0,0,sW,sH);
-						clusterFileB = "./data/scatter/cluster" + to_string(subTask) + ".txt";
-						readFile_cluster(data2, clusterFileB, clusterCounter1);
-						clusterFileR = "./data/scatter/cluster" + to_string(subTask+1) + ".txt";
-						readFile_cluster(data3, clusterFileR, clusterCounter2);
-						normalizeAxis2(data2, data3);
-						clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
-						clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-						initTexture(scatFbo1, scatTex1);
+						glutReshapeWindow(sW, sH);
+						displayScatter(subTask);		
+						playClusterSound(paraPositions[(subTask-1)],paraPositions[subTask]);
+						pauseScreen=true;
 						break;
+					}else{
+					
+						subTask+=2;
+						displayParallel(subTask);
+						playSound(0);
+						playSound2(0);
+						
+						
+						time(&testStartTime);
+						gettimeofday(&startTime, NULL);
+						playClusterSound(paraPositions[(subTask-1)],paraPositions[subTask]);
 					}
-
-					subTask+=2;
-					//paraFile1[22] = '0'+subTask;	
-					paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
-					readFile_pCoords(data, paraFile1, paraAxes);
-					paraFile2 = "./data/parallel/3dpara" + to_string(subTask+1) + ".txt";
-					//paraFile2[22] = '0'+(subTask+1);
-					cout << "switching to "<<paraFile1 << " and "<<paraFile2<<endl;
-					readFile_pCoords(parData2, paraFile2, paraAxes);
-					normalizeAxis(data, parData2);
-					dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
-					dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
-					initTexture(scatFbo1, scatTex1);
 				break;
 
 				case 4:
+
+					gettimeofday(&endTime, NULL);					
+					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
+					
+					time(&testEndTime);
+					timer = difftime(testEndTime, testStartTime);
 					newX = mouseX;
 					newY = mouseY;
 					movePosScatter(newX, newY, markerSize, scatterTex);				
 					task4(resultString, newX, newY, scatterTex, scatterMax1);
+					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
 
-					if(subTask == 9){
+					if(subTask == 9|| TUTORIAL){
 						taskNumber++;
 						subTask = 1;
-						resultString += "\n5:\n";
-						glutSetWindowTitle("Running test - Task 5 - Find max of green(kush)"); 
+						time(&testEndTime);
+						timer = difftime(testEndTime, testStartTime);
+						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/ "\n\nFind maximum density of purple cluster:\n";
+						if(USERTEST)						
+							glutSetWindowTitle("Task 5 - Find maximum density of purple cluster."); 
 						playSound(0);
 						playSound2(0);
-						clusterFileB = "./data/scatter/cluster" + to_string(subTask) + ".txt";
-						readFile_cluster(data2, clusterFileB, clusterCounter1);
-						clusterFileR = "./data/scatter/cluster" + to_string(subTask+1) + ".txt";
-						cout <<" file for purple "<<clusterFileR <<endl;
-						readFile_cluster(data3, clusterFileR, clusterCounter2);
-						normalizeAxis2(data2, data3);
-						clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
-						clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-						initTexture(scatFbo1, scatTex1);
+						displayScatter(subTask);
+						pauseScreen=true;
 						break;
 					}
-
-					subTask+=2;	
-					clusterFileB = "./data/scatter/cluster" + to_string(subTask) + ".txt";
-					readFile_cluster(data2, clusterFileB, clusterCounter1);
-					clusterFileR = "./data/scatter/cluster" + to_string(subTask+1) + ".txt";
-					cout <<" file for purple "<<clusterFileR <<endl;
-					readFile_cluster(data3, clusterFileR, clusterCounter2);
-					normalizeAxis2(data2, data3);
-					clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
-					clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-					initTexture(scatFbo1, scatTex1);
+					if(TUTORIAL){
+						subTask=9;
+					}else
+						subTask+=2;
+					displayScatter(subTask);
+					playSound(0);
+					playSound2(0);
+					time(&testStartTime);
+					gettimeofday(&startTime, NULL);
 				break;
 
 				case 5:
+
+					gettimeofday(&endTime, NULL);					
+					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
+			
+					time(&testEndTime);
+					timer = difftime(testEndTime, testStartTime);
 					newX = mouseX;
 					newY = mouseY;
 					movePosScatter(newX, newY, markerSize, scatterTex2);				
 					task5(resultString, newX, newY, scatterTex2, scatterMax2);
+					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
 
-					if(subTask == 9){
+					if(subTask == 9 || TUTORIAL){
 						taskNumber++;
 						subTask = 1;
-						resultString += "\n6:\n";
-						glutSetWindowTitle("Running test - Task 6 - fiddy/fiddy(kush)"); 
+						time(&testEndTime);
+						timer = difftime(testEndTime, testStartTime);
+						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/"\n\nFind area of green and purple cluster with equal density:\n";
+						if(USERTEST)						
+							glutSetWindowTitle("Task 6 - Find area of green and purple cluster with equal density."); 
 						playSound(0);
 						playSound2(0);
-						hoover=false;
-						clusterFileB = "./data/scatter/cluster" + to_string(subTask) + ".txt";
-						readFile_cluster(data2, clusterFileB, clusterCounter1);
-						clusterFileR = "./data/scatter/cluster" + to_string(subTask+1) + ".txt";
-						cout <<" file for purple "<<clusterFileR <<endl;
-						readFile_cluster(data3, clusterFileR, clusterCounter2);
-						normalizeAxis2(data2, data3);
-						clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
-						clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-						initTexture(scatFbo1, scatTex1);
+						//hoover=false;
+						displaySecondMarker = true;
+						displayScatter(subTask);
+						pauseScreen=true;
+						//playClusterSound(300,300);
 						break;
 					}
-
-					subTask+=2;	
-					clusterFileB = "./data/scatter/cluster" + to_string(subTask) + ".txt";
-					readFile_cluster(data2, clusterFileB, clusterCounter1);
-					clusterFileR = "./data/scatter/cluster" + to_string(subTask+1) + ".txt";
-					cout <<" file for purple "<<clusterFileR <<endl;
-					readFile_cluster(data3, clusterFileR, clusterCounter2);
-					normalizeAxis2(data2, data3);
-					clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
-					clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-					initTexture(scatFbo1, scatTex1);
+					
+					subTask+=2;
+					displayScatter(subTask);
+					playSound(0);
+					playSound2(0);
+					time(&testStartTime);
+					gettimeofday(&startTime, NULL);
 				break;
 		
 				case 6:
+					
+					gettimeofday(&endTime, NULL);					
+					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
+
+					time(&testEndTime);
+					timer = difftime(testEndTime, testStartTime);
 					newX = mouseX;
 					newY = mouseY;
 					newX2 = mouse2X;
 					newY2 = mouse2Y;
 					movePosScatter(newX, newY, markerSize, scatterTex);	
-					movePosScatter(newX2, newY2, markerSize, scatterTex2);				
+					//movePosScatter(newX2, newY2, markerSize, scatterTex2);				
 					task6(resultString, newX, newY, newX2, newY2, scatterTex, scatterTex2);
+					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
 
-					if(subTask == 9){
-						taskNumber++;
+					if(subTask == 9 || TUTORIAL){
+						//taskNumber++;
 						subTask = 1;
 						//resultString += "\n4:\n";
 						//glutSetWindowTitle("Running test - Task 4 - Find max of purple(kush)"); 
 						playSound(0);
 						playSound2(0);
 						numberOfRuns++;
-						if(numberOfRuns == 2){
-							writeResultFile(resultString);
-							exit(0);
+						if(numberOfRuns == 2 || TUTORIAL){
+							time(&testEndTime);
+							timer = difftime(testEndTime, testStartTime);
+							//resultString += "Time elapsed: " + to_string(timer) + " seconds\n\n";
+							if(!TUTORIAL)
+								writeResultFile(resultString);
+								exit(0);
 						}else{
-							resultString += "\n\n sound off 1: \n";
-							glutSetWindowTitle("Running test - Task 1 - Sample that green stuff(chronic)");
-							hoover = true;
+							soundactive = soundactive ? false : true;
+							time(&testEndTime);
+							timer = difftime(testEndTime, testStartTime);
+							resultString += "Time elapsed: " + to_string(timer) + " seconds\n\n" + "Sound on? " + string(soundactive==true ? "true" : "false") + string("\nFind maximum density of green cluster:\n");
+							if(USERTEST)
+								glutSetWindowTitle("Task 1 - Find maximum density of green cluster.");
+							//hoover = true;
+							displaySecondMarker = false;							
 							plot = PARALLEL;
-
-							glViewport(0,0,W,H);
-							//glutReshapeWindow(W, H);
-							paraFile1 = "./data/parallel/3dpara1.txt";
-							paraFile2 = "./data/parallel/3dpara2.txt";
-							readFile_pCoords(data, paraFile1, paraAxes);
-							readFile_pCoords(parData2, paraFile2, paraAxes);
-
-							normalizeAxis(data, parData2);
-							dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
-							dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
-							initTexture(scatFbo1, scatTex1);
-							glutReshapeWindow(W, H);
-							USERTEST = true;
 							taskNumber = 1;
 							subTask = 1;
-							soundactive=false;
+							glViewport(0,0,W,H);
+							glutReshapeWindow(W, H);
+							displayParallel(subTask);
+							glutReshapeWindow(W, H);
+							//USERTEST = true;
+							playClusterSound(scatterPositions[(subTask-1)],scatterPositions[subTask]);
+							pauseScreen = true;
 						}
 						//exit(0);
 						break;
-					}
+					}else{
 
-					subTask+=2;	
-					clusterFileB = "./data/scatter/cluster" + to_string(subTask) + ".txt";
-					readFile_cluster(data2, clusterFileB, clusterCounter1);
-					clusterFileR = "./data/scatter/cluster" + to_string(subTask+1) + ".txt";
-					cout <<" file for purple "<<clusterFileR <<endl;
-					readFile_cluster(data3, clusterFileR, clusterCounter2);
-					normalizeAxis2(data2, data3);
-					clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
-					clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-					initTexture(scatFbo1, scatTex1);
+					
+						subTask+=2;	
+						displayScatter(subTask);
+						playSound(0);
+						playSound2(0);
+						time(&testStartTime);
+						gettimeofday(&startTime, NULL);
+						playClusterSound(scatterPositions[(subTask-1)],scatterPositions[subTask]);
+					}
 				break;
 				//kör case 4-6 för parallella koordinater
 			}
@@ -927,7 +1044,7 @@ void keyPressed(unsigned char key, int x, int y){
 
 void fKeyPressed(int key, int x, int y){
 	switch(key){
-		case GLUT_KEY_F1:
+		/*case GLUT_KEY_F1:
 			plot = PARALLEL;
 			playSound(0);
 			playSound2(0);
@@ -948,31 +1065,35 @@ void fKeyPressed(int key, int x, int y){
 				playSound(0);
 				playSound2(0);
 			}		
-			cout << "sound on? " << soundactive << endl;
+			cout << "sound on? " << to_string(soundactive) << endl;
+		break;*/
+
+		case GLUT_KEY_F8:	
+			glutSetWindowTitle("Tutorial run.");
+			soundactive = true;
+			hoover = true;
+			taskNumber = 1;
+			//subTask = 1;
+			pauseScreen = true;
+			TUTORIAL = true;
+			glViewport(0,0,W,H);
+			displayParallel(subTask);		
+			glutReshapeWindow(W, H);
 		break;
 		case GLUT_KEY_F12:
 			//Start with parallel coordintes
-			resultString = "1: \n";
-			glutSetWindowTitle("Running test - Task 1 - Sample that green stuff(chronic)");
+			soundactive=true;
+			resultString = "Sound on? " + string(soundactive==true ? "true" : "false") + "\nFind maximum density of green cluster: \n";
+			glutSetWindowTitle("Task 1 - Find maximum density of green cluster.");
 			hoover = true;
 			plot = PARALLEL;
-
-			glViewport(0,0,W,H);
-			//glutReshapeWindow(W, H);
-			paraFile1 = "./data/parallel/3dpara1.txt";
-			paraFile2 = "./data/parallel/3dpara2.txt";
-			readFile_pCoords(data, paraFile1, paraAxes);
-			readFile_pCoords(parData2, paraFile2, paraAxes);
-
-			normalizeAxis(data, parData2);
-			dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
-			dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
-			initTexture(scatFbo1, scatTex1);
-			glutReshapeWindow(W, H);
 			USERTEST = true;
 			taskNumber = 1;
 			subTask = 1;
-			//cout << parData2.size()<<endl;
+			glViewport(0,0,W,H);
+			glutReshapeWindow(W, H);
+			displayParallel(subTask);
+			pauseScreen = true;
 		break;
 	}
 }
@@ -993,7 +1114,7 @@ void init(int W, int H){
 	glutInitWindowSize(W,H);
 	//Set version to be used
 	glutInitContextVersion(3, 3);
-	glutCreateWindow("Do you wanna roll in my 64?!");
+	glutCreateWindow("User Tests");
 	//Call to the drawing function
   glutDisplayFunc(draw);
 	glutIdleFunc(idle);
@@ -1008,10 +1129,6 @@ void init(int W, int H){
 	
 	clusterFileR = "./data/scatter/cluster1.txt";
 	clusterFileB = "./data/scatter/cluster2.txt";
-	clusterFileR[14] = '1';
-	//read data set into data array
-	//readFile_pCoords(data, "./data/clusterspara5.txt", paraAxes);
-	//readFile_pCoords(parData2, "./data/clusterspara3.txt", paraAxes);
 
 	readFile_pCoords(data, "./data/parallel/3dpara1.txt", paraAxes);
 	readFile_pCoords(parData2, "./data/parallel/3dpara2.txt", paraAxes);
@@ -1034,11 +1151,13 @@ void init(int W, int H){
 	tempScatterShader = loadShaders("./shaders/tempScatter.vert", "./shaders/tempScatter.frag");
 	mouseShader = loadShaders("./shaders/mouse.vert", "./shaders/mouse.frag");
 	drawTexShader = loadShaders("./shaders/texDraw.vert", "./shaders/texDraw.frag");
+	simpleTexShader = loadShaders("./shaders/simpleTex.vert", "./shaders/simpleTex.frag");
 	
 	//Create fbos and textures 
 	triVertArray = createVertArray(triVerts, sizeof(triVerts), drawShader);
 	scatterAxisArray = createVertArray(scatterAxisPoints, sizeof(scatterAxisPoints), mouseShader);
 	triVertArray2 = createVertArray(triVerts, sizeof(triVerts), drawTexShader);
+	texVertsArray = createVertArray(triVerts, sizeof(triVerts), simpleTexShader);
 	
 	dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
 	dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
@@ -1049,6 +1168,9 @@ void init(int W, int H){
 	clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
 
 	paraAxisArray = createVertArray(&paraAxes.front(), sizeof(GL_FLOAT)*paraAxes.size(), mouseShader);
+	
+	pauseTexPara = loadBMP("./bitmap/large.bmp");
+	pauseTexScatter = loadBMP("./bitmap/small.bmp");
 
 	//Create parallel coordinates texture
 	plot = PARALLEL;
@@ -1073,7 +1195,7 @@ void init(int W, int H){
 	//Set initial display to parallel coordinates plot
 	plot = PARALLEL;
 	glViewport(0,0,W,H);
-
+	//pauseScreen = true;
 	glErrorCheck();
 }
 
