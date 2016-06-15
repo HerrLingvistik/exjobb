@@ -1,0 +1,223 @@
+Parallel Coordinates
+
+Sound on? true
+Find maximum density of green cluster: 
+maxValue is 22.000000 chose value 16.000000 how close 72.727272%
+Time: 1101.000000 seconds.
+
+maxValue is 40.000000 chose value 36.000000 how close 90.000000%
+Time: 1383.000000 seconds.
+
+maxValue is 28.000000 chose value 19.000000 how close 67.857140%
+Time: 833.000000 seconds.
+
+maxValue is 34.000000 chose value 23.000000 how close 67.647057%
+Time: 1019.000000 seconds.
+
+maxValue is 34.000000 chose value 28.000000 how close 82.352943%
+Time: 931.000000 seconds.
+
+
+
+ Find maximum density in purple cluster:
+maxValue is 42.000000 chose value 32.000000 how close 76.190475%
+Time: 1168.000000 seconds.
+
+maxValue is 20.000000 chose value 18.000000 how close 90.000000%
+Time: 962.000000 seconds.
+
+maxValue is 39.000000 chose value 32.000000 how close 82.051285%
+Time: 1151.000000 seconds.
+
+maxValue is 74.000000 chose value 21.000000 how close 28.378378%
+Time: 885.000000 seconds.
+
+maxValue is 26.000000 chose value 16.000000 how close 61.538460%
+Time: 797.000000 seconds.
+
+
+
+Find area of green and purple cluster with equal density:
+56.000000% vs 44.000000%
+Time: 2102.000000 seconds.
+
+72.093025% vs 27.906977%
+Time: 1280.000000 seconds.
+
+60.975609% vs 39.024391%
+Time: 1150.000000 seconds.
+
+54.545456% vs 45.454544%
+Time: 1234.000000 seconds.
+
+61.702129% vs 38.297871%
+Time: 1251.000000 seconds.
+
+
+
+ Sound on? false
+Find maximum density of green cluster:
+maxValue is 22.000000 chose value 16.000000 how close 72.727272%
+Time: 2152.000000 seconds.
+
+maxValue is 40.000000 chose value 30.000000 how close 75.000000%
+Time: 996.000000 seconds.
+
+maxValue is 28.000000 chose value 19.000000 how close 67.857140%
+Time: 868.000000 seconds.
+
+maxValue is 34.000000 chose value 20.000000 how close 58.823528%
+Time: 950.000000 seconds.
+
+maxValue is 34.000000 chose value 28.000000 how close 82.352943%
+Time: 848.000000 seconds.
+
+
+
+ Find maximum density in purple cluster:
+maxValue is 42.000000 chose value 28.000000 how close 66.666664%
+Time: 1435.000000 seconds.
+
+maxValue is 20.000000 chose value 13.000000 how close 65.000000%
+Time: 896.000000 seconds.
+
+maxValue is 39.000000 chose value 31.000000 how close 79.487183%
+Time: 989.000000 seconds.
+
+maxValue is 74.000000 chose value 16.000000 how close 21.621622%
+Time: 933.000000 seconds.
+
+maxValue is 26.000000 chose value 19.000000 how close 73.076920%
+Time: 1502.000000 seconds.
+
+
+
+Find area of green and purple cluster with equal density:
+57.692307% vs 42.307693%
+Time: 918.000000 seconds.
+
+66.666664% vs 33.333332%
+Time: 962.000000 seconds.
+
+57.894737% vs 42.105263%
+Time: 785.000000 seconds.
+
+58.333332% vs 41.666668%
+Time: 885.000000 seconds.
+
+60.000000% vs 40.000000%
+Time: 819.000000 seconds.
+
+
+
+ Sound on? true
+
+Scatter plot
+Find maximum density of green cluster:
+11.000000 how close 84.615387%
+Time: 2702.000000 seconds.
+
+48.000000 how close 100.000000%
+Time: 1214.000000 seconds.
+
+32.000000 how close 86.486488%
+Time: 1498.000000 seconds.
+
+27.000000 how close 100.000000%
+Time: 1500.000000 seconds.
+
+13.000000 how close 100.000000%
+Time: 1149.000000 seconds.
+
+
+
+Find maximum density of purple cluster:
+19.000000 how close 76.000000%
+Time: 1118.000000 seconds.
+
+28.000000 how close 87.500000%
+Time: 1133.000000 seconds.
+
+11.000000 how close 84.615387%
+Time: 800.000000 seconds.
+
+9.000000 how close 69.230766%
+Time: 733.000000 seconds.
+
+8.000000 how close 72.727272%
+Time: 766.000000 seconds.
+
+
+
+Find area of green and purple cluster with equal density:
+50.000000% vs 50.000000%
+Time: 1301.000000 seconds.
+
+62.857143% vs 37.142857%
+Time: 1685.000000 seconds.
+
+74.000000% vs 26.000000%
+Time: 1398.000000 seconds.
+
+84.375000% vs 15.625000%
+Time: 1355.000000 seconds.
+
+56.521740% vs 43.478260%
+Time: 1613.000000 seconds.
+
+
+
+ Sound on? false
+
+Find maximum density of green cluster:
+13.000000 how close 100.000000%
+Time: 1701.000000 seconds.
+
+44.000000 how close 91.666664%
+Time: 1064.000000 seconds.
+
+37.000000 how close 100.000000%
+Time: 1650.000000 seconds.
+
+15.000000 how close 55.555557%
+Time: 1648.000000 seconds.
+
+13.000000 how close 100.000000%
+Time: 1531.000000 seconds.
+
+
+
+Find maximum density of purple cluster:
+21.000000 how close 84.000000%
+Time: 901.000000 seconds.
+
+28.000000 how close 87.500000%
+Time: 1701.000000 seconds.
+
+11.000000 how close 84.615387%
+Time: 1431.000000 seconds.
+
+9.000000 how close 69.230766%
+Time: 1264.000000 seconds.
+
+10.000000 how close 90.909088%
+Time: 1182.000000 seconds.
+
+
+
+Find area of green and purple cluster with equal density:
+40.909092% vs 59.090908%
+Time: 1001.000000 seconds.
+
+60.606060% vs 39.393940%
+Time: 765.000000 seconds.
+
+74.000000% vs 26.000000%
+Time: 1582.000000 seconds.
+
+84.375000% vs 15.625000%
+Time: 1630.000000 seconds.
+
+56.521740% vs 43.478260%
+Time: 1665.000000 seconds.
+

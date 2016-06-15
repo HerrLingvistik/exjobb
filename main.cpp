@@ -464,7 +464,11 @@ void draw(){
 		}
 
 	else {
-		glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0, 161.0/255.0, 66.0/255.0, 1.0f);
+		if(taskNumber == 1 || taskNumber == 4)
+			glUniform4f(glGetUniformLocation(mouseShader, "color"), 161.0/255.0, 1.0, 66.0/255.0, 1.0f);
+			//glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0, 161.0/255.0, 66.0/255.0, 1.0f);
+		else if(taskNumber == 2 || taskNumber == 5)
+			glUniform4f(glGetUniformLocation(mouseShader, "color"), 1.0, 64.0/255.0, 1.0, 1.0f);
 	}
 
 	glDrawArrays(GL_LINE_LOOP, 0, 4);
@@ -560,10 +564,10 @@ void mouseMove(int x, int y){
 				movePosParallel(newX, newY, markerSize, parallelTex);
 				float vol1 = getGains((calcGaussVolume_Parallel(newX, newY, markerSize, parallelTex)/maxValue));
 
-				std::string s;
+				/*std::string s;
 				s = " pos " + std::to_string(newX) + " y "  + to_string(newY) + " vol: " + to_string(parallelTex[newX][newY]);			
 				char const *pchar = s.c_str();
-				glutSetWindowTitle(pchar);
+				glutSetWindowTitle(pchar);*/
 
 				newX=x;
 				newY=y;
@@ -598,11 +602,12 @@ void mouseMove(int x, int y){
 					if(!displaySecondMarker)
 						playSound2(vol2);
 				}
-
+/*
 				std::string s;
 				s = " pos " + std::to_string(newX) + " y "  + to_string(newY) + " vol: " + to_string(vol1);			
 				char const *pchar = s.c_str();
 				glutSetWindowTitle(pchar);
+*/
 			}
 		//}
 	}
@@ -651,7 +656,7 @@ void displayScatter(int subTask){
 
 void playClusterSound(int x, int y){
 	float vol2;
-		int newX, newY;
+		//int newX, newY;
 		
 		if(plot == PARALLEL){
 			//newX=x;
@@ -679,74 +684,7 @@ void playClusterSound(int x, int y){
 
 void keyPressed(unsigned char key, int x, int y){	
 	
-	
-	/*if(key == 'b'){
-		rPressed = false;
-		bPressed = true;
-	}
-	
-	else if(key == 'r'){
-		bPressed = false;
-		rPressed = true;
-	}
-	else if(isdigit(key) && plot == SCATTER){
-		int cluster = key - '0';
-		//string str(key);	
-		if(bPressed){
-			if(cluster > 0 && cluster <= 8){
-				DRAWBLUE = true;
-				clusterFileB[14] = key;
-
-				glViewport(0,0,sW,sH);
-				readFile_cluster(data2, clusterFileB, clusterCounter1);
-				readFile_cluster(data3, clusterFileR, clusterCounter2);
-				normalizeAxis2(data2, data3);
-				clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
-				clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-				initTexture(scatFbo1, scatTex1);
-				bPressed = false;
-			}else if( cluster == 0){
-				DRAWBLUE = false;
-				initTexture(scatFbo1, scatTex1);
-			}
-		}else if(rPressed){
-			if(cluster > 0 && cluster <= 8){
-				DRAWRED = true;
-				clusterFileR[14] = key;
-
-				glViewport(0,0,sW,sH);	
-				readFile_cluster(data2, clusterFileB, clusterCounter1);
-				readFile_cluster(data3, clusterFileR, clusterCounter2);
-				normalizeAxis2(data2, data3);
-				clusterArray1 = changeScatterPlot(1,2, 0, &data2.front(), sizeof(GL_FLOAT)*data2.size(), tempScatterShader);
-				clusterArray2 = changeScatterPlot(1,2, 0, &data3.front(), sizeof(GL_FLOAT)*data3.size(), tempScatterShader);
-				initTexture(scatFbo2, scatTex2);
-				rPressed = false;
-			}else if( cluster == 0){
-				DRAWRED = false;
-				initTexture(scatFbo2, scatTex2);paraFile1 = "./data/parallel/3dpara" + to_string(subTask) + ".txt";
-						readFile_pCoords(data, paraFile1, paraAxes);
-						paraFile2 = "./data/parallel/3dpara" + to_string(subTask+1) + ".txt";
-						//paraFile2[22] = '0'+(subTask+1);
-						cout << "switching to "<<paraFile1 << " and "<<paraFile2<<endl;
-						readFile_pCoords(parData2, paraFile2, paraAxes);
-						normalizeAxis(data, parData2);
-						dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
-						dataArray2 = createVertArray( &parData2.front(), sizeof(GL_FLOAT)*parData2.size(), parallelShader);
-						initTexture(scatFbo1, scatTex1);
-			}
-		}
-			
-	}
-	else if(key == 'h'){	
-		if(hoover == true){
-			hoover = false;
-		}
-		else{
-			hoover = true;
-			playSound2(0);
-		}
-	}else */if(key == 32){
+if(key == 32){
 		if((taskNumber == 3 || taskNumber == 6)){
 			if(plot == PARALLEL)							
 				playClusterSound(paraPositions[subTask-1],paraPositions[subTask]);
@@ -763,14 +701,9 @@ void keyPressed(unsigned char key, int x, int y){
 		if((USERTEST || TUTORIAL) && !pauseScreen){
 			switch(taskNumber){
 				int newX, newY, newX2, newY2;
-				double timer;
 				float ellapsedTime;
-				//=clock();
 				case 1:
 					
-					time(&testEndTime);
-					timer = difftime(testEndTime, testStartTime);
-					//cout << "timer is " << to_string((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f) <<endl;
 					gettimeofday(&endTime, NULL);					
 					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
 					newX = mouseX;
@@ -784,7 +717,7 @@ void keyPressed(unsigned char key, int x, int y){
 					if(subTask == 9 || TUTORIAL){
 						taskNumber++;
 						subTask = 1;
-						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/"\n\nFind maximum density in purple cluster:\n";
+						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/"\n\n Find maximum density in purple cluster:\n";
 						if(USERTEST)						
 							glutSetWindowTitle("Task 2 - Find maximum density in purple cluster.");
 						playSound(0);
@@ -804,13 +737,10 @@ void keyPressed(unsigned char key, int x, int y){
 				//högst densitet i andra klustret
 				//gör samma som innan fast med andra klustret
 				case 2:
-					//glutSetWindowTitle("Task 2");
 					
 					gettimeofday(&endTime, NULL);					
 					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
 
-					time(&testEndTime);
-					timer = difftime(testEndTime, testStartTime);
 					newX = mouseX;
 					newY = mouseY;
 					movePosParallel(newX, newY, markerSize, parallelTex2);
@@ -850,8 +780,6 @@ void keyPressed(unsigned char key, int x, int y){
 					cout << "POSITION: "<<mouse2X << ":"<<mouse2Y<<endl;
 					gettimeofday(&endTime, NULL);					
 					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
-					time(&testEndTime);
-					timer = difftime(testEndTime, testStartTime); 
 					newX = mouseX;
 					newY = mouseY;
 					newX2 = mouse2X;
@@ -862,32 +790,56 @@ void keyPressed(unsigned char key, int x, int y){
 					resultString += "Time: "+ to_string(ellapsedTime) + " seconds.\n\n";
 					time(&testStartTime);
 					if(subTask == 9 || TUTORIAL){
-						taskNumber++;
-						subTask = 1;
-						//time(&testEndTime);
-						//timer = difftime(testEndTime, testStartTime);
-						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/"\n\nFind maximum density of green cluster:\n";
-						if(USERTEST)						
-							glutSetWindowTitle("Task 4 - Find maximum density of green cluster."); 
-						//hoover=true;
-						displaySecondMarker = false;
-						playSound(0);
-						playSound2(0);
-						plot = SCATTER;
-						glViewport(0,0,sW,sH);
-						glutReshapeWindow(sW, sH);
-						displayScatter(subTask);		
-						playClusterSound(paraPositions[(subTask-1)],paraPositions[subTask]);
-						pauseScreen=true;
-						break;
+						soundactive = soundactive ? false : true;
+						//numberOfRuns++;
+						if(numberOfRuns == 0){
+							taskNumber=1;
+							subTask=1;
+							numberOfRuns++;
+							resultString += "\n\n Sound on? " + string(soundactive==true ? "true" : "false") + string("\nFind maximum density of green cluster:\n");
+							if(USERTEST)
+								glutSetWindowTitle("Task 1 - Find maximum density of green cluster.");
+							//hoover = true;
+							displaySecondMarker = false;							
+							plot = PARALLEL;
+							taskNumber = 1;
+							subTask = 1;
+							glViewport(0,0,W,H);
+							glutReshapeWindow(W, H);
+							displayParallel(subTask);
+							glutReshapeWindow(W, H);
+							//USERTEST = true;
+							playClusterSound(scatterPositions[(subTask-1)],scatterPositions[subTask]);
+							playSound(0);
+							playSound2(0);
+							pauseScreen = true;
+						}else{		
+							numberOfRuns = 0;				
+							taskNumber++;
+							subTask = 1;
+						
+							
+							if(USERTEST)						
+								glutSetWindowTitle("Task 4 - Find maximum density of green cluster."); 
+							//hoover=true;
+							displaySecondMarker = false;
+							playSound(0);
+							playSound2(0);
+							plot = SCATTER;
+							glViewport(0,0,sW,sH);
+							glutReshapeWindow(sW, sH);
+							displayScatter(subTask);		
+							playClusterSound(paraPositions[(subTask-1)],paraPositions[subTask]);
+							resultString +=  "\n\n Sound on? " + string(soundactive==true ? "true" : "false") +/*"Time elapsed: " + to_string(timer) + " seconds*/"\n\n" + string(plot==PARALLEL ? "Parallel Coordinates": "Scatter plot") +  "\nFind maximum density of green cluster:\n";
+							pauseScreen=true;
+						}
+						break;		
 					}else{
 					
 						subTask+=2;
 						displayParallel(subTask);
 						playSound(0);
 						playSound2(0);
-						
-						
 						time(&testStartTime);
 						gettimeofday(&startTime, NULL);
 						playClusterSound(paraPositions[(subTask-1)],paraPositions[subTask]);
@@ -899,8 +851,6 @@ void keyPressed(unsigned char key, int x, int y){
 					gettimeofday(&endTime, NULL);					
 					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
 					
-					time(&testEndTime);
-					timer = difftime(testEndTime, testStartTime);
 					newX = mouseX;
 					newY = mouseY;
 					movePosScatter(newX, newY, markerSize, scatterTex);				
@@ -910,8 +860,7 @@ void keyPressed(unsigned char key, int x, int y){
 					if(subTask == 9|| TUTORIAL){
 						taskNumber++;
 						subTask = 1;
-						time(&testEndTime);
-						timer = difftime(testEndTime, testStartTime);
+
 						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/ "\n\nFind maximum density of purple cluster:\n";
 						if(USERTEST)						
 							glutSetWindowTitle("Task 5 - Find maximum density of purple cluster."); 
@@ -937,8 +886,6 @@ void keyPressed(unsigned char key, int x, int y){
 					gettimeofday(&endTime, NULL);					
 					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
 			
-					time(&testEndTime);
-					timer = difftime(testEndTime, testStartTime);
 					newX = mouseX;
 					newY = mouseY;
 					movePosScatter(newX, newY, markerSize, scatterTex2);				
@@ -948,8 +895,6 @@ void keyPressed(unsigned char key, int x, int y){
 					if(subTask == 9 || TUTORIAL){
 						taskNumber++;
 						subTask = 1;
-						time(&testEndTime);
-						timer = difftime(testEndTime, testStartTime);
 						resultString += /*"Time elapsed: " + to_string(timer) + " seconds*/"\n\nFind area of green and purple cluster with equal density:\n";
 						if(USERTEST)						
 							glutSetWindowTitle("Task 6 - Find area of green and purple cluster with equal density."); 
@@ -976,8 +921,6 @@ void keyPressed(unsigned char key, int x, int y){
 					gettimeofday(&endTime, NULL);					
 					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
 
-					time(&testEndTime);
-					timer = difftime(testEndTime, testStartTime);
 					newX = mouseX;
 					newY = mouseY;
 					newX2 = mouse2X;
@@ -990,23 +933,34 @@ void keyPressed(unsigned char key, int x, int y){
 					if(subTask == 9 || TUTORIAL){
 						//taskNumber++;
 						subTask = 1;
-						//resultString += "\n4:\n";
-						//glutSetWindowTitle("Running test - Task 4 - Find max of purple(kush)"); 
+ 
 						playSound(0);
 						playSound2(0);
-						numberOfRuns++;
-						if(numberOfRuns == 2 || TUTORIAL){
-							time(&testEndTime);
-							timer = difftime(testEndTime, testStartTime);
-							//resultString += "Time elapsed: " + to_string(timer) + " seconds\n\n";
+						
+						if(numberOfRuns == 1 || TUTORIAL){
 							if(!TUTORIAL)
 								writeResultFile(resultString);
 								exit(0);
 						}else{
+							numberOfRuns++;
 							soundactive = soundactive ? false : true;
-							time(&testEndTime);
-							timer = difftime(testEndTime, testStartTime);
-							resultString += "Time elapsed: " + to_string(timer) + " seconds\n\n" + "Sound on? " + string(soundactive==true ? "true" : "false") + string("\nFind maximum density of green cluster:\n");
+							taskNumber=4;
+							subTask = 1;
+						
+							resultString += "\n\n Sound on? " + string(soundactive==true ? "true" : "false") +/*"Time elapsed: " + to_string(timer) + " seconds*/"\n\nFind maximum density of green cluster:\n";
+							if(USERTEST)						
+								glutSetWindowTitle("Task 4 - Find maximum density of green cluster."); 
+							//hoover=true;
+							displaySecondMarker = false;
+							playSound(0);
+							playSound2(0);
+							plot = SCATTER;
+							glViewport(0,0,sW,sH);
+							glutReshapeWindow(sW, sH);
+							displayScatter(subTask);		
+							playClusterSound(paraPositions[(subTask-1)],paraPositions[subTask]);
+							pauseScreen=true;
+							/*resultString += "\n\n Sound on? " + string(soundactive==true ? "true" : "false") + string("\nFind maximum density of green cluster:\n");
 							if(USERTEST)
 								glutSetWindowTitle("Task 1 - Find maximum density of green cluster.");
 							//hoover = true;
@@ -1020,13 +974,11 @@ void keyPressed(unsigned char key, int x, int y){
 							glutReshapeWindow(W, H);
 							//USERTEST = true;
 							playClusterSound(scatterPositions[(subTask-1)],scatterPositions[subTask]);
-							pauseScreen = true;
+							pauseScreen = true;*/
 						}
 						//exit(0);
 						break;
 					}else{
-
-					
 						subTask+=2;	
 						displayScatter(subTask);
 						playSound(0);
@@ -1044,30 +996,6 @@ void keyPressed(unsigned char key, int x, int y){
 
 void fKeyPressed(int key, int x, int y){
 	switch(key){
-		/*case GLUT_KEY_F1:
-			plot = PARALLEL;
-			playSound(0);
-			playSound2(0);
-			glutReshapeWindow(W, H);
-		break;
-		case GLUT_KEY_F2:
-			plot = SCATTER;
-			playSound(0);
-			playSound2(0);
-			glutReshapeWindow(sW, sH);
-		break;
-		case GLUT_KEY_F3:
-			background = (background == BLACK) ? WHITE : BLACK;
-		break;
-		case GLUT_KEY_F4:
-			soundactive = (soundactive) ? false : true;
-			if(!soundactive){
-				playSound(0);
-				playSound2(0);
-			}		
-			cout << "sound on? " << to_string(soundactive) << endl;
-		break;*/
-
 		case GLUT_KEY_F8:	
 			glutSetWindowTitle("Tutorial run.");
 			soundactive = true;
@@ -1083,7 +1011,7 @@ void fKeyPressed(int key, int x, int y){
 		case GLUT_KEY_F12:
 			//Start with parallel coordintes
 			soundactive=true;
-			resultString = "Sound on? " + string(soundactive==true ? "true" : "false") + "\nFind maximum density of green cluster: \n";
+			resultString = string(plot==PARALLEL ? "Parallel Coordinates": "Scatter plot") + "\n\nSound on? " + string(soundactive==true ? "true" : "false") + "\nFind maximum density of green cluster: \n";
 			glutSetWindowTitle("Task 1 - Find maximum density of green cluster.");
 			hoover = true;
 			plot = PARALLEL;
