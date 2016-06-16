@@ -126,25 +126,26 @@ float sampleDensityScatter(int x, int y, float markerSize, float scatterTex[sW][
 
 void task1(std::string &resultString, int posX, int posY, float texture[][H], float maxValue){
 	
-	resultString = resultString + to_string(texture[posX][posY]) + " how close " + to_string(100.0f*texture[posX][posY]/maxValue) + "%\n";
+	resultString = resultString + to_string(texture[posX][posY]) + "," + to_string(100.0f*texture[posX][posY]/maxValue) + ", ";
 }
 
 void task2(std::string &resultString, int posX, int posY, float texture[][H], float maxValue){
-	resultString = resultString + to_string(texture[posX][posY]) + " how close " + to_string(100.0f*texture[posX][posY]/maxValue) + "%\n"; 
+	resultString = resultString + to_string(texture[posX][posY]) + "," + to_string(100.0f*texture[posX][posY]/maxValue) + ","; 
 }
 
 void task3(std::string &resultString, int posX1, int posY1, int posX2, int posY2, float texture1[][H], float texture2[][H]){
-	resultString += to_string(100.0f*texture1[posX1][posY1]/(texture1[posX1][posY1]+texture2[posX2][posY2])) + "% vs " + to_string(100.0f*texture2[posX2][posY2]/(texture1[posX1][posY1]+texture2[posX2][posY2])) + "%\n";
+	//resultString += to_string(100.0f*texture1[posX1][posY1]/(texture1[posX1][posY1]+texture2[posX2][posY2])) + "% vs " + to_string(100.0f*texture2[posX2][posY2]/(texture1[posX1][posY1]+texture2[posX2][posY2])) + "%\n";
+	resultString += to_string(100.0f*texture1[posX1][posY1]/(texture1[posX1][posY1]+texture2[posX2][posY2])) + ", " + to_string(100.0f*texture2[posX2][posY2]/(texture1[posX1][posY1]+texture2[posX2][posY2])) + ", ";
 }
 
 void task4(std::string &resultString, int posX, int posY, float scatterTex1[][sH], float scatterMax1){
-	resultString = resultString + to_string(scatterTex1[posX][posY]) + " how close " + to_string(100.0f*scatterTex1[posX][posY]/scatterMax1) + "%\n";
+	resultString = resultString + to_string(scatterTex1[posX][posY]) + ", " + to_string(100.0f*scatterTex1[posX][posY]/scatterMax1) + ", ";
 }
 
 void task5(std::string &resultString, int posX, int posY, float scatterTex2[][sH], float scatterMax2){
-	resultString = resultString + to_string(scatterTex2[posX][posY]) + " how close " + to_string(100.0f*scatterTex2[posX][posY]/scatterMax2) + "%\n";
+	resultString = resultString + to_string(scatterTex2[posX][posY]) + ", " + to_string(100.0f*scatterTex2[posX][posY]/scatterMax2) + ", ";
 }
 
 void task6(std::string &resultString, int posX1, int posY1, int posX2, int posY2, float texture1[][sH], float texture2[][sH]){
-	resultString += to_string(100.0f*texture1[posX1][posY1]/(texture1[posX1][posY1]+texture2[posX2][posY2])) + "% vs " + to_string(100.0f*texture2[posX2][posY2]/(texture1[posX1][posY1]+texture2[posX2][posY2])) + "%\n";
+	resultString += to_string(100.0f*texture1[posX1][posY1]/(texture1[posX1][posY1]+texture2[posX2][posY2])) + ", " + to_string(100.0f*texture2[posX2][posY2]/(texture1[posX1][posY1]+texture2[posX2][posY2])) + ", ";
 }
