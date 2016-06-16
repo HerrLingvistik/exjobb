@@ -6,7 +6,7 @@ uniform sampler2D scatterTex;
 uniform sampler2D scatterTex2;
 uniform float maxValue;
 out vec4 out_Color;
-float offset = 1.0/600.0;
+uniform float offset;// = 1.0/600.0;
 
 float weight = 0.0;
 float sigma = 1.0;

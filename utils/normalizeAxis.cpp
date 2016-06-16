@@ -59,14 +59,14 @@ void normalizeAxis(vector<float>& data, vector<float>& data2){
 		//Perform feature scaling on this column, this gives values between 0 to 1.
 		for(int i = startPoint; i < 2*dimX*dimY; ) {
 						
-			data[i] = (data[i] - minValue)/(maxValue - minValue) * 599.0f;	
+			data[i] = (data[i] - minValue)/(maxValue - minValue) * (float)H;	
 			i+=dimX*2.0f;
 		} 
 		
 		//Perform feature scaling on this column, this gives values between 0 to 1.
 		for(int i = startPoint; i < 2*dimX*dimY; ) {
 						
-			data2[i] = (data2[i] - minValue)/(maxValue - minValue) * 599.0f;	
+			data2[i] = (data2[i] - minValue)/(maxValue - minValue) * (float)H;	
 			i+=dimX*2.0f;
 		} 
 

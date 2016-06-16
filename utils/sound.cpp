@@ -55,7 +55,7 @@ float calcVolume(int x, int y, float markerSize){
 }
 
 
-float calcGaussVolume_Parallel(int x, int y, float markerSize, float parallelTex[W][620]){
+float calcGaussVolume_Parallel(int x, int y, float markerSize, float parallelTex[W][H]){
 	
 	float sigma = 1.0;
 	float weight = 0;

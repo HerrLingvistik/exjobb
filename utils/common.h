@@ -7,12 +7,12 @@
 using namespace std;
 
 //Sets the width and height of the window for the parallel coordinates
-const int W = 1299;
-const int H = 620;
+const int W = 1600;
+const int H = 800;
 
 
-const int sW = 600;
-const int sH = 600;
+const int sW = 900;
+const int sH = 900;
 
 //Two dimensional array to store the parallel texture
 extern float parallelTex[W][H];

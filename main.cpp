@@ -193,6 +193,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		//cout << "create parallel texture"<<endl;
 		glBindVertexArray(dataArray);
 		glEnableVertexAttribArray(0);
+		glUniform1f(glGetUniformLocation(parallelShader, "height"), (float)H);
 		//Draw lines tell opengl how many values will be sent to the shaders
 		//Bind frambuffer to draw into texture
 		glBindFramebuffer(GL_FRAMEBUFFER, parFbo1);
@@ -212,6 +213,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		//cout << "create parallel texture"<<endl;
 		glBindVertexArray(dataArray2);
 		glEnableVertexAttribArray(0);
+		glUniform1f(glGetUniformLocation(parallelShader, "height"), (float)H);
 		//Draw lines tell opengl how many values will be sent to the shaders
 		//Bind frambuffer to draw into texture
 		glBindFramebuffer(GL_FRAMEBUFFER, parFbo2);
@@ -238,6 +240,8 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glEnableVertexAttribArray(0);
 		glUniform1i(glGetUniformLocation(drawShader, "parallelTex"), 0);
 		glUniform1i(glGetUniformLocation(drawShader, "parallelTex2"), 1);
+		glUniform1f(glGetUniformLocation(drawShader, "offsetX"), 1.0f/(float)W);
+		glUniform1f(glGetUniformLocation(drawShader, "offsetY"), 1.0f/(float)H);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, parTex1);
 		glActiveTexture(GL_TEXTURE1);
@@ -310,6 +314,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex"), 0);
 		glUniform1i(glGetUniformLocation(drawScatterShader, "scatterTex2"), 1);	
 		glUniform1f(glGetUniformLocation(drawScatterShader, "maxValue"), scatterMaxTot_Balle);	
+		glUniform1f(glGetUniformLocation(drawScatterShader, "offset"), 1.0f/(float)sW);	
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, scatTex1);
 		glActiveTexture(GL_TEXTURE1);
@@ -564,10 +569,10 @@ void mouseMove(int x, int y){
 				movePosParallel(newX, newY, markerSize, parallelTex);
 				float vol1 = getGains((calcGaussVolume_Parallel(newX, newY, markerSize, parallelTex)/maxValue));
 
-				/*std::string s;
+				std::string s;
 				s = " pos " + std::to_string(newX) + " y "  + to_string(newY) + " vol: " + to_string(parallelTex[newX][newY]);			
 				char const *pchar = s.c_str();
-				glutSetWindowTitle(pchar);*/
+				glutSetWindowTitle(pchar);
 
 				newX=x;
 				newY=y;
@@ -602,12 +607,12 @@ void mouseMove(int x, int y){
 					if(!displaySecondMarker)
 						playSound2(vol2);
 				}
-/*
+
 				std::string s;
 				s = " pos " + std::to_string(newX) + " y "  + to_string(newY) + " vol: " + to_string(vol1);			
 				char const *pchar = s.c_str();
 				glutSetWindowTitle(pchar);
-*/
+
 			}
 		//}
 	}

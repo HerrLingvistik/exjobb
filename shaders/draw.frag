@@ -5,8 +5,8 @@ uniform sampler2D parallelTex;
 uniform sampler2D parallelTex2;
 out vec4 out_Color;
 
-float offsetX = 1.0/1299.0;
-float offsetY = 1.0/620.0;
+uniform float offsetX;//= 1.0/1299.0;
+uniform float offsetY;//= 1.0/620.0;
  
 float weight = 0.0;
 float sigma = 1.0;
