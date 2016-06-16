@@ -49,7 +49,7 @@ GLuint parTex1, parFbo1, parTex2, parFbo2, finalParTex, finalParFbo,  finalScatT
 int plot, scatterAxisX = 1, scatterAxisY = 2, background = 0, clusterCounter1=1, clusterCounter2=1, dimX = 0, dimY = 0, maxPos = 0, mouseX, mouseY, mouse2X, mouse2Y, taskNumber=1, subTask = 1, numberOfRuns=0;
 
 const static int PARALLEL = 0, SCATTER = 1, BLACK = 0, WHITE = 1;
-bool bPressed = false, rPressed = false, hoover = false, soundactive = true, DRAWRED=true, DRAWBLUE=true, USERTEST=false, TUTORIAL=false, pauseScreen=false, displaySecondMarker=false; 
+bool bPressed = false, rPressed = false, hoover = false, soundactive = true, DRAWRED=true, DRAWBLUE=true, USERTEST=false, TUTORIAL=false, pauseScreen=false, displaySecondMarker=false, LIKERT=true; 
 
 float parallelTex[W][H];
 float parallelTex2[W][H];
@@ -684,7 +684,7 @@ void playClusterSound(int x, int y){
 //task1 and task2 outputs maxvalue, chosen value, how close in percent and how long time in milliseconds
 void keyPressed(unsigned char key, int x, int y){	
 	
-if(key == 32){
+if(key == 32 && LIKERT){
 		if((taskNumber == 3 || taskNumber == 6)){
 			if(plot == PARALLEL)							
 				playClusterSound(paraPositions[subTask-1],paraPositions[subTask]);
@@ -832,6 +832,7 @@ if(key == 32){
 							playClusterSound(paraPositions[(subTask-1)],paraPositions[subTask]);
 							resultString +=  "\n\n"+string(plot==PARALLEL ? "Parallel Coordinates": "Scatter plot") + " Sound on? " + string(soundactive==true ? "true" : "false") +  "\nFind maximum density of green cluster:\nMaxvalue, Chosen Value, How Close(%), Time(Milliseconds)\n";
 							pauseScreen=true;
+							LIKERT = false;
 						}
 						break;		
 					}else{
@@ -980,6 +981,10 @@ if(key == 32){
 
 void fKeyPressed(int key, int x, int y){
 	switch(key){
+		case GLUT_KEY_F1:
+			if(pauseScreen)
+				LIKERT = true;
+		break;
 		case GLUT_KEY_F8:	
 			glutSetWindowTitle("Tutorial run.");
 			soundactive = true;
