@@ -1,0 +1,116 @@
+Parallel Coordinates Sound on? true
+Find maximum density of green cluster: 
+Maxvalue, Chosen Value, How Close %, Time
+22.000000,13.000000,59.090908, 1334.000000
+40.000000,1.000000,2.500000, 0.000000
+28.000000,0.000000,0.000000, 1.000000
+34.000000,0.000000,0.000000, 640.000000
+34.000000,0.000000,0.000000, 264.000000
+
+
+Parallel Coordinates Sound on? true
+Find maximum density in purple cluster
+Maxvalue, Chosen Value, How Close(%), Time(Milliseconds)
+42.000000, 19.000000,45.238094, 217.000000
+20.000000, 13.000000,65.000000, 269.000000
+39.000000, 0.000000,0.000000, 252.000000
+74.000000, 12.000000,16.216217, 251.000000
+26.000000, 4.000000,15.384615, 385.000000
+
+
+Parallel Coordinates Sound on? true
+Find area of green and purple cluster with equal density:
+Green Cluster Ratio%, Purple Cluster Ratio%, Time(Milliseconds)
+50.000000, 50.000000, 234.000000 
+40.000000, 60.000000, 278.000000 
+0.000000, 100.000000, 261.000000 
+0.000000, 100.000000, 308.000000 
+0.000000, 100.000000, 367.000000 
+
+
+Parallel Coordinates Sound on? false
+Find maximum density of green cluster:
+22.000000,11.000000,50.000000, 217.000000
+40.000000,8.000000,20.000000, 263.000000
+28.000000,0.000000,0.000000, 252.000000
+34.000000,0.000000,0.000000, 251.000000
+34.000000,0.000000,0.000000, 252.000000
+
+
+Parallel Coordinates Sound on? false
+Find maximum density in purple cluster
+Maxvalue, Chosen Value, How Close(%), Time(Milliseconds)
+42.000000, 19.000000,45.238094, 284.000000
+20.000000, 13.000000,65.000000, 263.000000
+39.000000, 0.000000,0.000000, 252.000000
+74.000000, 12.000000,16.216217, 250.000000
+26.000000, 4.000000,15.384615, 251.000000
+
+
+Parallel Coordinates Sound on? false
+Find area of green and purple cluster with equal density:
+Green Cluster Ratio%, Purple Cluster Ratio%, Time(Milliseconds)
+50.000000, 50.000000, 250.000000 
+40.000000, 60.000000, 263.000000 
+0.000000, 100.000000, 267.000000 
+0.000000, 100.000000, 256.000000 
+0.000000, 100.000000, 251.000000 
+
+
+Scatter plot Sound on? true
+Find maximum density of green cluster:
+Maxvalue, Chosen Value, How Close(%), Time(Milliseconds)
+0.000000, 0.000000, 334.000000 
+0.000000, 0.000000, 261.000000 
+0.000000, 0.000000, 248.000000 
+0.000000, 0.000000, 277.000000 
+0.000000, 0.000000, 279.000000 
+
+
+Scatter plot Sound on? true
+Find maximum density of purple cluster:
+Maxvalue, Chosen Value, How Close %, Time
+1.000000, 4.000000, 216.000000
+0.000000, 0.000000, 264.000000
+0.000000, 0.000000, 277.000000
+0.000000, 0.000000, 263.000000
+0.000000, 0.000000, 316.000000
+
+
+Scatter plot Sound on? true
+Find area of green and purple cluster with equal density:
+Green Cluster Ratio%, Purple Cluster Ratio%, Time(Milliseconds)
+0.000000, 100.000000, 300.000000
+0.000000, 100.000000, 314.000000
+0.000000, 100.000000, 247.000000
+0.000000, 100.000000, 293.000000
+0.000000, 100.000000, 297.000000
+
+
+Scatter plot Sound on? false
+Find maximum density of green cluster:
+0.000000, 0.000000, 250.000000 
+0.000000, 0.000000, 248.000000 
+0.000000, 0.000000, 249.000000 
+0.000000, 0.000000, 281.000000 
+0.000000, 0.000000, 280.000000 
+
+
+Scatter plot Sound on? false
+Find maximum density of purple cluster:
+Maxvalue, Chosen Value, How Close %, Time
+1.000000, 4.000000, 200.000000
+0.000000, 0.000000, 227.000000
+0.000000, 0.000000, 278.000000
+0.000000, 0.000000, 262.000000
+0.000000, 0.000000, 294.000000
+
+
+Scatter plot Sound on? false
+Find area of green and purple cluster with equal density:
+Green Cluster Ratio%, Purple Cluster Ratio%, Time(Milliseconds)
+0.000000, 100.000000, 317.000000
+0.000000, 100.000000, 279.000000
+0.000000, 100.000000, 280.000000
+0.000000, 100.000000, 295.000000
+0.000000, 100.000000, 297.000000

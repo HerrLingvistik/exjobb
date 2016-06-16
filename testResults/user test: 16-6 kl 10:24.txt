@@ -1,0 +1,177 @@
+Parallel Coordinates Sound on? true
+Find maximum density of green cluster: 
+ Maxvalue, Chosen Value, How Close %, Time
+22.000000,16.000000,72.727272, 901.000000
+40.000000,31.000000,77.500000, 884.000000
+28.000000,11.000000,39.285713, 787.000000
+34.000000,26.000000,76.470589, 818.000000
+34.000000,27.000000,79.411766, 734.000000
+Find maximum density in purple cluster
+ Maxvalue, Chosen Value, How Close %, Time
+42.000000, 27.000000,64.285713, 717.000000
+20.000000, 12.000000,60.000000, 750.000000
+39.000000, 31.000000,79.487183, 852.000000
+74.000000, 19.000000,25.675676, 752.000000
+26.000000, 22.000000,84.615387, 734.000000
+Find area of green and purple cluster with equal density:
+ Green Cluster Ratio%, Purple Cluster Ratio%, Time Milliseconds
+57.692307, 42.307693
+Time: 717.000000 seconds.
+
+70.000000, 30.000000
+Time: 1247.000000 seconds.
+
+55.555557, 44.444443
+Time: 882.000000 seconds.
+
+53.125000, 46.875000
+Time: 836.000000 seconds.
+
+59.090908, 40.909092
+Time: 798.000000 seconds.
+
+
+Sound on? false
+Find maximum density of green cluster:
+22.000000,14.000000,63.636364, 718.000000
+40.000000,31.000000,77.500000, 964.000000
+28.000000,22.000000,78.571426, 786.000000
+34.000000,23.000000,67.647057, 784.000000
+34.000000,28.000000,82.352943, 1003.000000
+Find maximum density in purple cluster
+ Maxvalue, Chosen Value, How Close %, Time
+42.000000, 29.000000,69.047623, 1635.000000
+20.000000, 14.000000,70.000000, 783.000000
+39.000000, 36.000000,92.307693, 1035.000000
+74.000000, 14.000000,18.918919, 817.000000
+26.000000, 22.000000,84.615387, 836.000000
+Find area of green and purple cluster with equal density:
+ Green Cluster Ratio%, Purple Cluster Ratio%, Time Milliseconds
+57.692307, 42.307693
+Time: 867.000000 seconds.
+
+73.913040, 26.086956
+Time: 1132.000000 seconds.
+
+54.285713, 45.714287
+Time: 902.000000 seconds.
+
+54.545456, 45.454544
+Time: 923.000000 seconds.
+
+57.142857, 42.857143
+Time: 804.000000 seconds.
+
+
+
+ Sound on? true
+
+Scatter plot
+Find maximum density of green cluster:
+10.000000 how close 76.923080%
+Time: 1583.000000 seconds.
+
+31.000000 how close 64.583336%
+Time: 1148.000000 seconds.
+
+11.000000 how close 29.729731%
+Time: 547.000000 seconds.
+
+9.000000 how close 33.333332%
+Time: 580.000000 seconds.
+
+9.000000 how close 69.230766%
+Time: 530.000000 seconds.
+
+
+
+Find maximum density of purple cluster:
+14.000000 how close 56.000000%
+Time: 1485.000000 seconds.
+
+18.000000 how close 56.250000%
+Time: 483.000000 seconds.
+
+8.000000 how close 61.538460%
+Time: 466.000000 seconds.
+
+6.000000 how close 46.153847%
+Time: 448.000000 seconds.
+
+7.000000 how close 63.636364%
+Time: 417.000000 seconds.
+
+
+
+Find area of green and purple cluster with equal density:
+35.000000% vs 65.000000%
+Time: 584.000000 seconds.
+
+18.750000% vs 81.250000%
+Time: 566.000000 seconds.
+
+67.500000% vs 32.500000%
+Time: 600.000000 seconds.
+
+61.538460% vs 38.461540%
+Time: 997.000000 seconds.
+
+52.380951% vs 47.619049%
+Time: 580.000000 seconds.
+
+
+
+ Sound on? false
+
+Find maximum density of green cluster:
+8.000000 how close 61.538460%
+Time: 650.000000 seconds.
+
+25.000000 how close 52.083332%
+Time: 499.000000 seconds.
+
+21.000000 how close 56.756756%
+Time: 566.000000 seconds.
+
+13.000000 how close 48.148148%
+Time: 578.000000 seconds.
+
+9.000000 how close 69.230766%
+Time: 550.000000 seconds.
+
+
+
+Find maximum density of purple cluster:
+13.000000 how close 52.000000%
+Time: 967.000000 seconds.
+
+26.000000 how close 81.250000%
+Time: 547.000000 seconds.
+
+8.000000 how close 61.538460%
+Time: 597.000000 seconds.
+
+6.000000 how close 46.153847%
+Time: 581.000000 seconds.
+
+9.000000 how close 81.818184%
+Time: 465.000000 seconds.
+
+
+
+Find area of green and purple cluster with equal density:
+48.000000% vs 52.000000%
+Time: 917.000000 seconds.
+
+53.571430% vs 46.428570%
+Time: 1030.000000 seconds.
+
+66.666664% vs 33.333332%
+Time: 916.000000 seconds.
+
+84.375000% vs 15.625000%
+Time: 682.000000 seconds.
+
+47.368420% vs 52.631580%
+Time: 650.000000 seconds.
+
