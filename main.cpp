@@ -190,7 +190,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 	if(plot == PARALLEL){	
 		//Create texture with first parallel cluster
 		glUseProgram(parallelShader);
-		cout << "create parallel texture"<<endl;
+		//cout << "create parallel texture"<<endl;
 		glBindVertexArray(dataArray);
 		glEnableVertexAttribArray(0);
 		//Draw lines tell opengl how many values will be sent to the shaders
@@ -209,7 +209,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		
 		//Create texture with second parallel cluster
 		glUseProgram(parallelShader);
-		cout << "create parallel texture"<<endl;
+		//cout << "create parallel texture"<<endl;
 		glBindVertexArray(dataArray2);
 		glEnableVertexAttribArray(0);
 		//Draw lines tell opengl how many values will be sent to the shaders
@@ -250,7 +250,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glBindFramebuffer(GL_FRAMEBUFFER, scatFbo1);
 		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		cout << "create scatter texture"<<endl;
+		//cout << "create scatter texture"<<endl;
 		glUseProgram(tempScatterShader);
 		glUniform1i(glGetUniformLocation(tempScatterShader, "resolution"), sW);
 		glBindVertexArray(clusterArray1);
@@ -272,7 +272,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		glBindFramebuffer(GL_FRAMEBUFFER, scatFbo2);
 		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		cout << "create scatter texture"<<endl;
+		//cout << "create scatter texture"<<endl;
 		glUseProgram(tempScatterShader);
 		glUniform1f(glGetUniformLocation(tempScatterShader, "resolution"), sH);
 		glBindVertexArray(clusterArray2);
@@ -297,7 +297,7 @@ void initTexture(GLuint fboTemp, GLuint texTemp){
 		createScatterArray(scatterTex2, scatTex2, scatterMax2);
 
 		float scatterMaxTot_Balle = (scatterMax1 > scatterMax2) ? scatterMax1 : scatterMax2;
-		cout << "scatterMaxTot_Balle = " << scatterMaxTot_Balle << endl;
+		//cout << "scatterMaxTot_Balle = " << scatterMaxTot_Balle << endl;
 
 
 		glUseProgram(drawScatterShader);
@@ -595,7 +595,7 @@ void mouseMove(int x, int y){
 				movePosScatter(newX, newY, markerSize, scatterTex2);
 				float vol2 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex2)/scatterMax2));
 
-				cout <<endl;
+				//cout <<endl;
 
 				if(soundactive&& !pauseScreen){
 					playSound(vol1);
@@ -628,7 +628,7 @@ void displayParallel(int subTask){
 		paraFile2 = "./data/parallel/3dparaTUT2.txt";
 	}
 	//paraFile2[22] = '0'+(subTask+1);
-	cout << "switching to "<<paraFile1 << " and "<<paraFile2<<endl;
+	//cout << "switching to "<<paraFile1 << " and "<<paraFile2<<endl;
 	readFile_pCoords(parData2, paraFile2, paraAxes);
 	normalizeAxis(data, parData2);
 	dataArray = createVertArray( &data.front(), sizeof(GL_FLOAT)*data.size(), parallelShader); 
@@ -777,7 +777,7 @@ if(key == 32 && LIKERT){
 				break;
 				//Task 3 outputs % comparison between green and purple cluster first(left) green then purple(right) and milliseconds
 				case 3:
-					cout << "POSITION: "<<mouse2X << ":"<<mouse2Y<<endl;
+					//cout << "POSITION: "<<mouse2X << ":"<<mouse2Y<<endl;
 					gettimeofday(&endTime, NULL);					
 					ellapsedTime = round((endTime.tv_sec - startTime.tv_sec)*1000.0f + (endTime.tv_usec - startTime.tv_usec)/1000.0f);
 					newX = mouseX;
@@ -1054,8 +1054,8 @@ void init(int W, int H){
 	readFile_cluster(data2, clusterFileR, clusterCounter1);	
 	readFile_cluster(data3, clusterFileB, clusterCounter2);	
 	
-	cout << "size of cluster 1 "<< data.size()<<endl;
-	cout << "size of cluster 2 "<< parData2.size()<<endl;
+	//cout << "size of cluster 1 "<< data.size()<<endl;
+	//cout << "size of cluster 2 "<< parData2.size()<<endl;
 	//Normalize clusters
 	normalizeAxis(data, parData2);
 	normalizeAxis2(data2, data3);
