@@ -586,7 +586,7 @@ void mouseMove(int x, int y){
 				mouseY = y;
 				movePosScatter(newX, newY, markerSize, scatterTex);
 				
-				cout << "playing sound percentage "<<(calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex)/scatterMax1)<<endl;
+				//cout << "playing sound percentage "<<(calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex)/scatterMax1)<<endl;
 	
 				float vol1 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex)/scatterMax1));
 				//cout << "moved ("<<to_string(x)<<","<<to_string(y)<<") giving "<< scatterTex[x][y] <<"to ("<<newX<<","<<newY<<")giving "<< scatterTex[newX][newY] <<endl;
@@ -871,9 +871,6 @@ if(key == 32){
 						pauseScreen=true;
 						break;
 					}
-					if(TUTORIAL){
-						subTask=9;
-					}else
 						subTask+=2;
 					displayScatter(subTask);
 					playSound(0);
@@ -939,7 +936,7 @@ if(key == 32){
 						playSound(0);
 						playSound2(0);
 						
-						if(numberOfRuns == 1 || TUTORIAL){
+						if(numberOfRuns == 1){
 							if(!TUTORIAL)
 								writeResultFile(resultString);
 								exit(0);
