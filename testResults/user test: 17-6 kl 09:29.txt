@@ -1,0 +1,118 @@
+Parallel Coordinates Sound on? true
+Find maximum density of green cluster: 
+Maxvalue, Chosen Value, How Close %, Time
+23.000000,17.000000,73.913040, 1501.000000
+40.000000,10.000000,25.000000, 950.000000
+28.000000,18.000000,64.285713, 703.000000
+35.000000,21.000000,60.000000, 872.000000
+34.000000,29.000000,85.294121, 724.000000
+
+
+Parallel Coordinates Sound on? true
+Find maximum density in purple cluster
+Maxvalue, Chosen Value, How Close(%), Time(Milliseconds)
+41.000000, 26.000000,63.414635, 951.000000
+20.000000, 12.000000,60.000000, 1070.000000
+40.000000, 27.000000,67.500000, 1039.000000
+73.000000, 73.000000,100.000000, 1923.000000
+27.000000, 21.000000,77.777779, 1889.000000
+
+
+Parallel Coordinates Sound on? true
+Find area of green and purple cluster with equal density:
+Green Cluster Ratio%, Purple Cluster Ratio%, Time(Milliseconds)
+0.000000, 100.000000, 1101.000000 
+65.789474, 34.210526, 1602.000000 
+55.555557, 44.444443, 921.000000 
+67.500000, 32.500000, 1673.000000 
+55.813953, 44.186047, 1973.000000 
+
+
+Parallel Coordinates Sound on? false
+Find maximum density of green cluster: 
+Maxvalue, Chosen Value, How Close %, Time
+23.000000,12.000000,52.173912, 3369.000000
+40.000000,29.000000,72.500000, 833.000000
+28.000000,18.000000,64.285713, 672.000000
+35.000000,19.000000,54.285713, 989.000000
+34.000000,24.000000,70.588234, 855.000000
+
+
+Parallel Coordinates Sound on? false
+Find maximum density in purple cluster
+Maxvalue, Chosen Value, How Close(%), Time(Milliseconds)
+41.000000, 29.000000,70.731705, 1051.000000
+20.000000, 16.000000,80.000000, 920.000000
+40.000000, 37.000000,92.500000, 1056.000000
+73.000000, 15.000000,20.547945, 822.000000
+27.000000, 20.000000,74.074074, 721.000000
+
+
+Parallel Coordinates Sound on? false
+Find area of green and purple cluster with equal density:
+Green Cluster Ratio%, Purple Cluster Ratio%, Time(Milliseconds)
+59.259258, 40.740742, 984.000000 
+68.292686, 31.707317, 1050.000000 
+54.285713, 45.714287, 704.000000 
+58.064518, 41.935482, 872.000000 
+53.658535, 46.341465, 755.000000 
+
+
+Scatter plot Sound on? true
+Find maximum density of green cluster:
+Maxvalue, Chosen Value, How Close(%), Time(Milliseconds)
+13.000000, 10.000000, 76.923080, 1101.000000 
+48.000000, 31.000000, 64.583336, 779.000000 
+37.000000, 29.000000, 78.378380, 584.000000 
+27.000000, 27.000000, 100.000000, 743.000000 
+13.000000, 6.000000, 46.153847, 678.000000 
+
+
+Scatter plot Sound on? true
+Find maximum density of purple cluster:
+Maxvalue, Chosen Value, How Close %, Time
+25.000000, 13.000000, 52.000000, 866.000000
+32.000000, 24.000000, 75.000000, 431.000000
+13.000000, 8.000000, 61.538460, 498.000000
+13.000000, 6.000000, 46.153847, 467.000000
+11.000000, 5.000000, 45.454544, 450.000000
+
+
+Scatter plot Sound on? true
+Find area of green and purple cluster with equal density:
+Green Cluster Ratio%, Purple Cluster Ratio%, Time(Milliseconds)
+45.833332, 54.166668, 784.000000
+31.578947, 68.421051, 633.000000
+66.666664, 33.333332, 581.000000
+70.588234, 29.411764, 567.000000
+52.380951, 47.619049, 596.000000
+
+
+Scatter plot Sound on? false
+Find maximum density of green cluster: 
+Maxvalue, Chosen Value, How Close %, Time
+13.000000, 8.000000, 61.538460, 821.000000 
+48.000000, 21.000000, 43.750000, 513.000000 
+37.000000, 32.000000, 86.486488, 599.000000 
+27.000000, 19.000000, 70.370369, 632.000000 
+13.000000, 11.000000, 84.615387, 615.000000 
+
+
+Scatter plot Sound on? false
+Find maximum density of purple cluster:
+Maxvalue, Chosen Value, How Close %, Time
+25.000000, 19.000000, 76.000000, 1401.000000
+32.000000, 16.000000, 50.000000, 433.000000
+13.000000, 7.000000, 53.846153, 466.000000
+13.000000, 7.000000, 53.846153, 467.000000
+11.000000, 7.000000, 63.636364, 499.000000
+
+
+Scatter plot Sound on? false
+Find area of green and purple cluster with equal density:
+Green Cluster Ratio%, Purple Cluster Ratio%, Time(Milliseconds)
+35.000000, 65.000000, 619.000000
+45.833332, 54.166668, 405.000000
+74.000000, 26.000000, 582.000000
+84.375000, 15.625000, 516.000000
+52.380951, 47.619049, 483.000000

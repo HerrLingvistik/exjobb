@@ -508,7 +508,7 @@ void idle()
 {
 	glutPostRedisplay();
 }
-
+/*
 //Interaction function for clicking mouse button
 void mouseEvent(int event, int state, int x, int y){	
 
@@ -533,7 +533,7 @@ void mouseEvent(int event, int state, int x, int y){
 			playSound(vol1);
 	}
 	
-	/*if(event == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
+	if(event == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
 		float vol2;
 		mouse2Click = true;
 		if(plot == PARALLEL){
@@ -552,9 +552,9 @@ void mouseEvent(int event, int state, int x, int y){
 		mouse2Y = y;
 		if(soundactive && !pauseScreen)
 			playSound2(vol2);
-	}*/
+	}
 }
-
+*/
 //Interaction function for clicking mouse buttonhttps://www.opengl.org/discussion_boards/showthread.php/123211-Keyboard-Input-in-GLUT
 //Here it would do to calculate the vertices only when clicking mouse and not in every frame. 
 //void mouseMoveClick(int x, int y){
@@ -566,24 +566,26 @@ void mouseMove(int x, int y){
 			if(plot == PARALLEL && x>=0  && x<W && y>=0 && y<H){
 				mouseX = x;
 				mouseY = y;
+				float maxValueTot = (maxValue>maxValue2)?maxValue: maxValue2;
 				movePosParallel(newX, newY, markerSize, parallelTex);
-				float vol1 = getGains((calcGaussVolume_Parallel(newX, newY, markerSize, parallelTex)/maxValue));
+				float vol1 = getGains((calcGaussVolume_Parallel(newX, newY, markerSize, parallelTex)/maxValueTot));
 
-				std::string s;
-				s = " pos " + std::to_string(newX) + " y "  + to_string(newY) + " vol: " + to_string(parallelTex[newX][newY]);			
-				char const *pchar = s.c_str();
-				glutSetWindowTitle(pchar);
+				
 
 				newX=x;
 				newY=y;
 				movePosParallel(newX, newY, markerSize, parallelTex2);
-				float vol2 = getGains((calcGaussVolume_Parallel(newX, newY, markerSize, parallelTex2)/maxValue2));
+				float vol2 = getGains((calcGaussVolume_Parallel(newX, newY, markerSize, parallelTex2)/maxValueTot));
 				if(soundactive && !pauseScreen){
 					playSound(vol1);
 					if(!displaySecondMarker)
 						playSound2(vol2);
 				}
 				
+				/*std::string s;
+				s = " pos " + std::to_string(x) + " y "  + to_string(y) + " vol: green " + to_string(vol1) + " purple " + to_string(vol2);			
+				char const *pchar = s.c_str();
+				glutSetWindowTitle(pchar);*/
 				
 			}
 			else if(plot == SCATTER && x>=0  && x<sW && y>=0 && y<sH){
@@ -592,13 +594,13 @@ void mouseMove(int x, int y){
 				movePosScatter(newX, newY, markerSize, scatterTex);
 				
 				//cout << "playing sound percentage "<<(calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex)/scatterMax1)<<endl;
-	
-				float vol1 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex)/scatterMax1));
+				float scatterMaxTot = (scatterMax1>scatterMax2)?scatterMax1: scatterMax2;
+				float vol1 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex)/scatterMaxTot));
 				//cout << "moved ("<<to_string(x)<<","<<to_string(y)<<") giving "<< scatterTex[x][y] <<"to ("<<newX<<","<<newY<<")giving "<< scatterTex[newX][newY] <<endl;
 				newX=x;
 				newY=y;
 				movePosScatter(newX, newY, markerSize, scatterTex2);
-				float vol2 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex2)/scatterMax2));
+				float vol2 = getGains((calcGaussVolume_Scatter(newX, newY, markerSize, scatterTex2)/scatterMaxTot));
 
 				//cout <<endl;
 
@@ -608,10 +610,10 @@ void mouseMove(int x, int y){
 						playSound2(vol2);
 				}
 
-				std::string s;
-				s = " pos " + std::to_string(newX) + " y "  + to_string(newY) + " vol: " + to_string(vol1);			
+				/*std::string s;
+				s = " pos " + std::to_string(x) + " y "  + to_string(y)  + " vol: green " + to_string(vol1) + " purple " + to_string(vol2);		
 				char const *pchar = s.c_str();
-				glutSetWindowTitle(pchar);
+				glutSetWindowTitle(pchar);*/
 
 			}
 		//}
@@ -670,7 +672,8 @@ void playClusterSound(int x, int y){
 	  	mouse2Y = y;
 			mouse2Click = true;
 			movePosParallel(mouse2X, mouse2Y, markerSize, parallelTex2);
-			vol2 = getGains((calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, parallelTex2)/maxValue2));
+			float maxValueTot = (maxValue>maxValue2) ? maxValue : maxValue2;
+			vol2 = getGains((calcGaussVolume_Parallel(mouse2X, mouse2Y, markerSize, parallelTex2)/maxValueTot));
 		}
 		else if(plot == SCATTER){
 			//newX=x;
@@ -679,7 +682,8 @@ void playClusterSound(int x, int y){
 	  	mouse2Y = y;
 			mouse2Click = true;
 			movePosScatter(mouse2X, mouse2Y, markerSize, scatterTex2);
-			vol2 = getGains((calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex2)/scatterMax2));
+			float scatterMaxTot = (scatterMax1>scatterMax2) ? scatterMax1 : scatterMax2;
+			vol2 = getGains((calcGaussVolume_Scatter(mouse2X, mouse2Y, markerSize, scatterTex2)/scatterMaxTot));
 		}			
 		//mouse2X = x;
 		//mouse2Y = y;
@@ -1044,7 +1048,7 @@ void init(int W, int H){
 	glutReshapeFunc(reshape);
 	//Initiate stuff for the drawing
 	//glutSetCursor(GLUT_CURSOR_NONE);
-	glutMouseFunc(mouseEvent);
+	//glutMouseFunc(mouseEvent);
 	glutPassiveMotionFunc(mouseMove);
 	//glutMotionFunc(mouseMoveClick);
 	glutKeyboardFunc(keyPressed);

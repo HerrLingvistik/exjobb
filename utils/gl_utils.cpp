@@ -223,13 +223,13 @@ void createParallelArray(float texArray[][H], GLuint tex, float &maxValue){
 	glBindTexture(GL_TEXTURE_2D, 0);
 	//glActiveTexture(0);
 
-	int i = 0, row = 0, arrayRow = H-1, col = 0;//xpos;//, ypos;
+	int i = 0, row = 0, arrayRow = H-1, col = 0, xpos, ypos;
 
 	while(i<W*H){
 		if(texture[i] > maxValue){
 			maxValue = texture[i];
-			//xpos = col; 
-			//ypos = arrayRow; 
+			xpos = col; 
+			ypos = arrayRow; 
 		}
 
 		texArray[col][arrayRow] = texture[i];
@@ -242,7 +242,7 @@ void createParallelArray(float texArray[][H], GLuint tex, float &maxValue){
 		}
 	}
 
-	//cout << "maximum value in parallel plot: "<< maxValue<< " pos: "<<xpos << " : "<<ypos << endl;
+	cout << "maximum value in parallel plot: "<< maxValue<< " pos: "<<xpos << " : "<<ypos << endl;
 
 }
 void createScatterArray(float readTex[][sH], GLuint texIn, float &scatterMax){
@@ -256,14 +256,14 @@ void createScatterArray(float readTex[][sH], GLuint texIn, float &scatterMax){
 		glGetTexImage(GL_TEXTURE_2D, 0, GL_RED, GL_FLOAT, texture2);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	
-		int i = 0, row = sH-1, col = 0;//, xpos=0;//, ypos=0;//, row2=0;
+		int i = 0, row = sH-1, col = 0 , xpos=0 , ypos=0;//, row2=0;
 		int count = 0;
 
 		while(i<sW*sH){
 			if(texture2[i] > scatterMax){
 				scatterMax = texture2[i];
-				//xpos = col; 
-				//ypos = row;
+				xpos = col; 
+				ypos = row;
 				//cout << "changed stuff "<< endl;
 			}
 			if(texture2[i] != 0)
@@ -279,7 +279,7 @@ void createScatterArray(float readTex[][sH], GLuint texIn, float &scatterMax){
 			}
 		}
 
-		//cout << "maximum value in scatterplot: "<< scatterMax<< " pos: "<<xpos << " : "<<ypos << endl;
+		cout << "maximum value in scatterplot: "<< scatterMax<< " pos: "<<xpos << " : "<<ypos << endl;
 		//cout << "counter: "<<count<<endl;
 }
 //http://www.opengl-tutorial.org/beginners-tutorials/tutorial-5-a-textured-cube/
