@@ -996,7 +996,7 @@ void fKeyPressed(int key, int x, int y){
 		break;
 		case GLUT_KEY_F8:	
 			glutSetWindowTitle("Tutorial run.");
-			soundactive = true;
+			soundactive = false;
 			hoover = true;
 			taskNumber = 1;
 			//subTask = 1;
