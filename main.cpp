@@ -1008,7 +1008,7 @@ void fKeyPressed(int key, int x, int y){
 		break;
 		case GLUT_KEY_F12:
 			//Start with parallel coordintes
-			soundactive=true;
+			soundactive=false;
 			
 			hoover = true;
 			plot = PARALLEL;
