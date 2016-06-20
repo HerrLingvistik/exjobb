@@ -969,6 +969,8 @@ if(key == 32 && LIKERT){
 							glutReshapeWindow(W, H);
 							displayScatter(subTask);		
 							playClusterSound(paraPositions[(subTask-1)],paraPositions[subTask]);
+							playSound(0);
+							playSound2(0);
 							pauseScreen=true;
 						}
 						//exit(0);
