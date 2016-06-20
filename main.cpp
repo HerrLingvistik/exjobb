@@ -972,6 +972,7 @@ if(key == 32 && LIKERT){
 							playSound(0);
 							playSound2(0);
 							pauseScreen=true;
+							LIKERT = false;
 						}
 						//exit(0);
 						break;
