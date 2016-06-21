@@ -998,15 +998,17 @@ void fKeyPressed(int key, int x, int y){
 		break;
 		case GLUT_KEY_F8:	
 			glutSetWindowTitle("Tutorial run.");
-			soundactive = true;
+			soundactive = false;
 			hoover = true;
 			taskNumber = 1;
-			//subTask = 1;
+			plot = SCATTER;
+			subTask = 1;
 			pauseScreen = true;
 			TUTORIAL = true;
-			glViewport(0,0,W,H);
-			displayParallel(subTask);		
-			glutReshapeWindow(W, H);
+			glViewport(0,0,sW,sH);
+			glutReshapeWindow(sW, sH);
+			displayScatter(subTask);
+			pauseScreen = true;
 		break;
 		case GLUT_KEY_F12:
 			//Start with parallel coordintes
