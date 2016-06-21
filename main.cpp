@@ -972,7 +972,8 @@ if(key == 32 && LIKERT){
 							playSound(0);
 							playSound2(0);
 							pauseScreen=true;
-							LIKERT = false;
+
+							LIKERT=false;
 						}
 						//exit(0);
 						break;
@@ -1000,22 +1001,23 @@ void fKeyPressed(int key, int x, int y){
 		break;
 		case GLUT_KEY_F8:	
 			glutSetWindowTitle("Tutorial run.");
-			soundactive = true;
+			soundactive = false;
 			hoover = true;
 			taskNumber = 1;
-			plot=SCATTER;
+
+			plot = SCATTER;
 			subTask = 1;
+			pauseScreen = true;
 			TUTORIAL = true;
 			glViewport(0,0,sW,sH);
 			glutReshapeWindow(sW, sH);
 			displayScatter(subTask);
-			resultString = string(plot==PARALLEL ? "Parallel Coordinates": "Scatter plot") + " Sound on? " + string(soundactive==true ? "true" : "false") + "\nFind maximum density of green cluster: \nMaxvalue, Chosen Value, How Close %, Time\n";
-			glutSetWindowTitle("Tutorial run.");
+
 			pauseScreen = true;
 		break;
 		case GLUT_KEY_F12:
 			//Start with parallel coordintes
-			soundactive=true;
+			soundactive=false;
 			
 			hoover = true;
 			plot = SCATTER;
