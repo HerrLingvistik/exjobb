@@ -1011,7 +1011,7 @@ void fKeyPressed(int key, int x, int y){
 			displayScatter(subTask);
 			resultString = string(plot==PARALLEL ? "Parallel Coordinates": "Scatter plot") + " Sound on? " + string(soundactive==true ? "true" : "false") + "\nFind maximum density of green cluster: \nMaxvalue, Chosen Value, How Close %, Time\n";
 			glutSetWindowTitle("Tutorial run.");
-			pauseScreen = true;
+			pauseScreen = true; 
 		break;
 		case GLUT_KEY_F12:
 			//Start with parallel coordintes
