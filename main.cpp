@@ -1012,8 +1012,8 @@ void fKeyPressed(int key, int x, int y){
 			glViewport(0,0,sW,sH);
 			glutReshapeWindow(sW, sH);
 			displayScatter(subTask);
-
 			pauseScreen = true;
+
 		break;
 		case GLUT_KEY_F12:
 			//Start with parallel coordintes
