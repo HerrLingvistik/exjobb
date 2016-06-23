@@ -1001,7 +1001,7 @@ void fKeyPressed(int key, int x, int y){
 		break;
 		case GLUT_KEY_F8:	
 			glutSetWindowTitle("Tutorial run.");
-			soundactive = false;
+			soundactive = true;
 			hoover = true;
 			taskNumber = 1;
 
@@ -1017,7 +1017,7 @@ void fKeyPressed(int key, int x, int y){
 		break;
 		case GLUT_KEY_F12:
 			//Start with parallel coordintes
-			soundactive=false;
+			soundactive=true;
 			
 			hoover = true;
 			plot = SCATTER;
